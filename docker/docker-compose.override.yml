@@ -1,0 +1,15 @@
+services:
+  neo4j:
+    ports:
+      - ${NEO4J_PORT_HTTP}:7474
+      - ${NEO4J_PORT_BOLT}:7687
+  elasticsearch:
+    ports:
+      - ${ELASTICSEARCH_PORT}:9200
+  project:
+    ports:
+      - ${CLIENT_PORT}:5173
+      - ${SERVER_PORT}:4000
+  letterbox:
+    ports:
+      - ${NGINX_PORT}:80

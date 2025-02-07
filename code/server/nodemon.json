@@ -1,0 +1,9 @@
+{
+    "verbose": true,
+    "exec": "tsx src/index.ts",
+    "watch": [
+      "src"
+    ],
+    "ignore": [],
+    "ext": "*.ts"
+  }

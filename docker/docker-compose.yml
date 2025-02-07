@@ -1,0 +1,42 @@
+services:
+  neo4j:
+    image: neo4j:${NEO4J_VERSION}
+    restart: ${RESTART_POLICY}
+    environment:
+      - NEO4J_AUTH=${NEO4J_LOGIN}/${NEO4J_PASSWORD}
+      - NEO4J_server_memory_heap_max__size=${NEO4J_HEAP}
+      - NEO4J_dbms_memory_pagecache_size=${NEO4J_PAGECACHE}
+    volumes:
+      - ${PROJECT_PATH}/docker/neo4j/data:/data
+  elasticsearch:
+    image: elasticsearch:${ELASTICSEARCH_VERSION}
+    restart: ${RESTART_POLICY}
+    environment:
+      - TAKE_FILE_OWNERSHIP=1
+      - ES_JAVA_OPTS=${ELASTICSEARCH_JVM_OPTS}
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+    volumes:
+      - ${PROJECT_PATH}/docker/elasticsearch/data:/usr/share/elasticsearch/data
+  project:
+      build:
+        context: ./project
+        dockerfile: ./Dockerfile
+      entrypoint: /entrypoint.sh
+      user: node
+      restart: ${RESTART_POLICY}
+      depends_on:
+      - elasticsearch
+      - neo4j
+      volumes:
+      - ${PROJECT_PATH}/docker/project/entrypoint.sh:/entrypoint.sh
+      - ${PROJECT_PATH}/code:/code
+      - ${PROJECT_PATH}/docker/.env:/.env
+      - ${PROJECT_PATH}/docker/project/data:/var/letterbox
+  letterbox:
+    image: nginx:${NGINX_VERSION}
+    restart: ${RESTART_POLICY}
+    depends_on:
+      - project
+    volumes:
+      - ${PROJECT_PATH}/docker/nginx.site.conf:/etc/nginx/conf.d/default.conf
