@@ -2,15 +2,19 @@ services:
   neo4j:
     image: neo4j:${NEO4J_VERSION}
     restart: ${RESTART_POLICY}
+    user: "${USER_ID}:${GROUP_ID}"
     environment:
-      - NEO4J_AUTH=${NEO4J_LOGIN}/${NEO4J_PASSWORD}
       - NEO4J_server_memory_heap_max__size=${NEO4J_HEAP}
-      - NEO4J_dbms_memory_pagecache_size=${NEO4J_PAGECACHE}
+      - NEO4J_server_memory_pagecache_size=${NEO4J_PAGECACHE}
+      - NEO4J_PLUGINS=["apoc"]
+      - NEO4J_AUTH=neo4j/l3tm31n!
     volumes:
-      - ${PROJECT_PATH}/docker/neo4j/data:/data
+      - ${PROJECT_PATH}/docker/neo4j/data/data:/data
+      - ${PROJECT_PATH}/docker/neo4j/data/logs:/logs
   elasticsearch:
     image: elasticsearch:${ELASTICSEARCH_VERSION}
     restart: ${RESTART_POLICY}
+    user: "${USER_ID}:${GROUP_ID}"
     environment:
       - TAKE_FILE_OWNERSHIP=1
       - ES_JAVA_OPTS=${ELASTICSEARCH_JVM_OPTS}

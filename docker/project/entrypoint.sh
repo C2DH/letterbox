@@ -12,7 +12,6 @@ else
 fi
 echo "(i) Npm version is $(npm -v)"
 echo "(i) Node version is $(node -v)"
-echo "(i) Python version is $(python3 --version)"
 
 cd /code
 

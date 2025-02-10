@@ -20,7 +20,7 @@
     "build": "npm run build --workspaces --if-present",
     "lint": "npm run lint --workspaces --if-present",
     "test": "npm run test --workspaces --if-present",
-    "dev": "concurrently -n client,server \"npm run dev --workspace=@letterbox/client\" \"npm run dev --workspace=@letterbox/server\"",
+    "dev": "concurrently -n client,server \"npm run dev --workspace=@letterbox/client\" \"npm run start --workspace=@letterbox/server\"",
     "start": "concurrently -n client,server \"npm run start --workspace=@letterbox/client\" \"npm run start --workspace=@letterbox/server\""
   },
   "devDependencies": {

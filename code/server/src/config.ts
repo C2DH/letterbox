@@ -3,7 +3,13 @@ export default {
     port: process.env.SERVER_PORT || 4000,
   },
   elastic: {
-    host: process.env.ELASTICSEARCH_URL || 'http://localhost:9200/',
+    node: process.env.ELASTICSEARCH_URL || 'http://localhost:9200/',
+  },
+  neo4j: {
+    url: process.env.NEO4J_URL || 'bolt://localhost:7687',
+    login: process.env.NEO4J_LOGIN || 'neo4j',
+    password: process.env.NEO4J_PASSWORD || 'admin',
+    options: { disableLosslessIntegers: true, fetchSize: 10000 },
   },
   logs: {
     filter: process.env.LOG_FILTERS || '.*',

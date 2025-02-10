@@ -1,8 +1,7 @@
 import * as Boom from '@hapi/boom';
 import * as express from 'express';
+import { getLogger } from '@ouestware/node-logger';
 import { ValidateError } from 'tsoa';
-
-import { getLogger } from './services/logger';
 
 // Logger
 const log = getLogger('Error');

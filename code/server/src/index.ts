@@ -1,17 +1,35 @@
+import { getLogger } from '@ouestware/node-logger';
 import express, { json, urlencoded } from 'express';
+import http, { Server } from 'http';
 
 import config from './config';
 import { errorFilter } from './error';
+import { initGraphql } from './graphql/index';
 
-export const app = express();
+async function initServer() {
+  const log = getLogger('Server');
+  try {
+    log.info('Init Express');
+    const app = express();
+    app.use(urlencoded({ extended: true }));
+    app.use(json());
 
-// Use body parser to read sent json payloads
-app.use(urlencoded({ extended: true }));
-app.use(json());
+    // Generic filter to handler errors
+    app.use(errorFilter);
 
-// Generic filter to handler errors
-app.use(errorFilter);
+    // Create a server
+    const server: Server = http.createServer(app);
 
-app.listen(config.server.port, () =>
-  console.log(`App listening at http://localhost:${config.server.port}`),
-);
+    // Register GraphQL
+    await initGraphql(app, server);
+
+    // Start the server
+    server.listen(config.server.port, () =>
+      log.info(`Server listening at http://localhost:${config.server.port}`),
+    );
+  } catch (error) {
+    log.error('Error while starting the server', error);
+  }
+}
+
+initServer();
