@@ -1,6 +1,5 @@
 import { IResolvers } from '@graphql-tools/utils';
 import gql from 'graphql-tag';
-import { GraphQLJSONObject } from 'graphql-type-json';
 
 import { Services } from '../services';
 import { Dataprep } from '../services/dataprep';

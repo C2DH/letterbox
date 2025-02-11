@@ -1,6 +1,5 @@
 import * as neo4j from 'neo4j-driver';
 import { getLogger } from '@ouestware/node-logger';
-import { omit } from 'lodash';
 import { singleton } from 'tsyringe';
 
 import config from '../config';
