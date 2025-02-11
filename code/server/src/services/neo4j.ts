@@ -1,9 +1,9 @@
 import * as neo4j from 'neo4j-driver';
+import { getLogger } from '@ouestware/node-logger';
 import { omit } from 'lodash';
 import { singleton } from 'tsyringe';
 
 import config from '../config';
-import { getLogger } from '@ouestware/node-logger';
 
 @singleton()
 export class Neo4j {
@@ -52,9 +52,9 @@ export class Neo4j {
     params: Record<string, unknown>,
     field = 'result',
   ): Promise<Array<T>> {
-    this.log.debug(
-      `Running query ${query} with params ${JSON.stringify(omit(params, ['password']), null, 2)}`,
-    );
+    // this.log.debug(
+    //   `Running query ${query} with params ${JSON.stringify(omit(params, ['password']), null, 2)}`,
+    // );
     let result: Array<T> = [];
 
     const shouldBatch =
@@ -90,9 +90,9 @@ export class Neo4j {
     params: Record<string, unknown>,
     field = 'result',
   ): Promise<T | null> {
-    this.log.debug(
-      `Running query ${query} with params ${JSON.stringify(omit(params, ['password']), null, 2)}`,
-    );
+    // this.log.debug(
+    //   `Running query ${query} with params ${JSON.stringify(omit(params, ['password']), null, 2)}`,
+    // );
     const result = await tx.run(query, params);
     const record = result.records.shift();
     return !record ? null : (record.get(field) as T);

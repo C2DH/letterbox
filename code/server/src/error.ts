@@ -1,7 +1,6 @@
 import * as Boom from '@hapi/boom';
 import * as express from 'express';
 import { getLogger } from '@ouestware/node-logger';
-import { ValidateError } from 'tsoa';
 
 // Logger
 const log = getLogger('Error');
@@ -20,9 +19,6 @@ interface Error {
  * Default code is 500.
  */
 function getErrorStatusCode(error: Error): number {
-  if (error instanceof ValidateError) {
-    return 422;
-  }
   if (Boom.isBoom(error)) {
     return error.output.statusCode;
   }

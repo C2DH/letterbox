@@ -9,6 +9,7 @@ const config = {
   importOrderSeparation: true,
   importOrderSortSpecifiers: true,
   importOrderGroupNamespaceSpecifiers: true,
+  importOrderParserPlugins: ["typescript", "decorators-legacy"],
   plugins: ['@trivago/prettier-plugin-sort-imports'],
 };
 

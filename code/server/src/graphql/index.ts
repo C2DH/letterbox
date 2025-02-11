@@ -14,7 +14,7 @@ import { Server } from 'http';
 
 import { Services } from '../services';
 import { Neo4j } from '../services/neo4j';
-import { typeDefs } from './schema';
+import { resolvers, typeDefs } from './schema';
 
 export async function initGraphql(app: Express, httpServer: Server): Promise<void> {
   const neo4j = Services.get(Neo4j);
@@ -23,7 +23,7 @@ export async function initGraphql(app: Express, httpServer: Server): Promise<voi
   log.info('Init GraphQl server');
 
   log.debug('Create Neo4j GraphQl schema');
-  const neoSchema = new Neo4jGraphQL({ typeDefs, driver: neo4j.driver });
+  const neoSchema = new Neo4jGraphQL({ typeDefs, resolvers, driver: neo4j.driver });
   const schema = await neoSchema.getSchema();
   await neoSchema.checkNeo4jCompat();
   await neoSchema.assertIndexesAndConstraints({
