@@ -57,13 +57,16 @@ export class Dataprep {
       try {
         this.log.info(`Importing file ${file}`);
         const fileResult = await this.importFile(file);
-        this.log.info(`Imported ${fileResult} records from file: ${file}`);
+        this.log.info(
+          `Imported ${fileResult.count} records from file ${file} with ${fileResult.errors.length} errors`,
+        );
         result.count += fileResult.count;
         result.errors.push(...fileResult.errors);
       } catch (e) {
         throw new Error(`Error importing file ${file}: ${(e as Error).message}`);
       }
     }
+    this.log.info(`Import done for ${result.count} with ${result.errors.length}`);
     return result;
   }
 
@@ -79,15 +82,19 @@ export class Dataprep {
       parse({
         delimiter: config.server.import.column_seperator,
         columns: config.server.import.headers,
-        encoding: 'latin1',
+        encoding: 'utf8',
         quote: null,
-        relax_column_count: true,
       }),
     );
 
     for await (const record of stream) {
       count++;
       try {
+        if (Object.keys(record).length !== 9) {
+          throw new Error(
+            `Invalid number of columns in record n°${count} in file ${file} : ${Object.keys(record).join(',')}`,
+          );
+        }
         records.push(this.parseRecord(record));
       } catch (e) {
         errors.push(`Error parsing record n°${count} in file ${file}: ${(e as Error).message}`);
@@ -146,7 +153,12 @@ export class Dataprep {
     const group = message.match(
       /.*File name: \\\\atlas\.uni\.lux\\C2DH_L\s?E\s?T\s?T\s?E\s?R\s?B\s?O\s?X\\memorialc\\_memorialc-last\\(.*)\\([0-9]{4})-([0-9]{2})-([0-9]{2})(.*)\.pdf Page Number :([0-9]*).*$/,
     );
-    if (!group) throw new Error(`Could not parse message to find additional data`);
+    if (!group) {
+      const fileGroup = message.match(/.*File name: (.*) Page Number :([0-9]*).*$/);
+      throw new Error(
+        `Could not parse message to find additional data ${fileGroup && fileGroup.length === 3 ? fileGroup[1] : message}`,
+      );
+    }
 
     const filePath = `/${group[1].replaceAll('\\', '/')}/${group[2]}-${group[3]}-${group[4]}${group[5]}.pdf`;
     return {
