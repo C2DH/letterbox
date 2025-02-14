@@ -14,10 +14,11 @@ import { Neo4j } from './neo4j';
 // This interface MUST be compatible with the "Message" defined in code/server/src/graphql/schema.ts
 interface DataMessage {
   fingerprint: string;
+  year: number;
   filename: String;
   pageNumber: number;
   message: string;
-  raw_year: number;
+
   raw_company: String;
   raw_company_spare: String;
   raw_address?: String;
@@ -50,12 +51,16 @@ export class Dataprep {
   /**
    *
    */
-  async doImport() {
-    const files = await this.fs.listFiles(
+  async doImport(fileNamePattern?: RegExp) {
+    let files = await this.fs.listFiles(
       config.server.import.pathToMessages,
       config.server.import.messages_file_glob_pattern,
     );
-    this.log.info(`Found ${files.length} files to import`);
+    this.log.info(`Found ${files.length} files to import in data folder`);
+    if (fileNamePattern) {
+      files = files.filter((f) => fileNamePattern.test(basename(f)));
+      this.log.info(`Found ${files.length} files matching fileNamePattern: ${fileNamePattern}`);
+    }
 
     const result = { count: 0, errors: [] as string[] };
     for (const file of files) {
@@ -68,7 +73,7 @@ export class Dataprep {
           : 'utf-8';
         const fileResult = await this.importFile(file, encoding);
         this.log.info(
-          `Imported ${fileResult.count} records from file ${file} with ${fileResult.errors.length} errors`,
+          `Imported ${fileResult.count} records from file ${file} ignored ${fileResult.wrong} wrong messages and ${fileResult.errors.length} errors`,
         );
         result.count += fileResult.count;
         result.errors.push(...fileResult.errors);
@@ -86,6 +91,7 @@ export class Dataprep {
   private async importFile(file: string, encoding: BufferEncoding) {
     let records: DataMessage[] = [];
     let count = 0;
+    let wrong = 0;
     let errors: string[] = [];
 
     const stream = this.fs.streamFile(file).pipe(
@@ -106,12 +112,8 @@ export class Dataprep {
             `Invalid number of columns in record n°${count} in file ${file} : ${Object.keys(record).join(',')}`,
           );
         } else {
-          if (/%?wrong[%_]/i.test(record.year) || /%?wrong[%_]/i.test(record.company))
-            errors.push(
-              `%wrong% in record.year or record.company n°${count} in file ${file}: year:${record.year}, company: ${record.company}}`,
-            );
-
-          records.push(this.parseRecord(record));
+          if (/.*wrong.*/i.test(record.year) || /.*wrong.*/i.test(record.company)) wrong += 1;
+          else records.push(this.parseRecord(record));
         }
       } catch (e) {
         errors.push(`Error parsing record n°${count} in file ${file}: ${(e as Error).message}`);
@@ -122,7 +124,7 @@ export class Dataprep {
       }
     }
     if (records.length > 0) await this.importRecords(records);
-    return { count, errors };
+    return { count, errors, wrong };
   }
 
   /**
@@ -132,13 +134,14 @@ export class Dataprep {
     // Import into Neo4j
     await this.neo4j.getFirstResultQuery(
       `UNWIND $records as record
-        MERGE (c:Company { name: record.raw_company_spare })
+        MERGE (c:Company { name: record.raw_company })
         MERGE (m:Message { fingerprint: record.fingerprint })
         SET
           m.filename = record.filename,
           m.pageNumber = toInteger(record.pageNumber),
           m.message = record.message,
-          m.raw_year = toInteger(record.raw_year),
+          m.year = toInteger(record.year),
+
           m.raw_company = record.raw_company,
           m.raw_company_spare = record.raw_company_spare,
           m.raw_address = record.raw_address,
@@ -148,8 +151,8 @@ export class Dataprep {
           m.raw_countries = record.raw_countries
 
         MERGE (m)-[:CONTAINS]->(c)
-        
-        FOREACH (p IN [x IN [record.raw_address_spare] WHERE x <> null] | MERGE (a:Address { name: record.raw_address_spare }) MERGE (m)-[:CONTAINS]->(a))
+
+        FOREACH (ad IN [aa IN [record.raw_address] WHERE aa IS NOT NULL ] | MERGE (a:Address { name: ad }) MERGE (m)-[:CONTAINS]->(a) )
         FOREACH (p IN coalesce(record.raw_people, []) | MERGE (person:Person { name: p }) MERGE (m)-[:CONTAINS]->(person))
         FOREACH (country IN coalesce(record.raw_countries, []) | MERGE (c:Country { name: country }) MERGE (m)-[:CONTAINS]->(c))
       `,
@@ -166,7 +169,7 @@ export class Dataprep {
     pageNumber: number;
     message: string;
   } {
-    const group = message.match(/^.*File Name: ?.*?([^\\]+\.pdf) Page Number ?: ?([^ ]+)(.*)$/i);
+    const group = message.match(/^.*File Name: ?.*?([^\\]+\.pdf) Page Number ?: ?(\d+)(.*)$/i);
     if (!group) {
       const fileGroup = message.match(/.*(File name ?: .* Page Number ?: ?.*?) .*$/i);
       throw new Error(
@@ -188,11 +191,11 @@ export class Dataprep {
 
     const data = {
       fingerprint,
-      raw_year: checkNilOREmptyString(record.year) ? undefined : toNumber(record.year),
+      year: checkNilOREmptyString(record.year) ? undefined : toNumber(record.year),
       raw_company: this.cleanRecordValue(record.company),
       raw_company_spare: this.cleanRecordValue(record.company_spare),
       raw_address: this.cleanRecordValue(record.address, false),
-      raw_address_spare: this.cleanRecordValue(record.address_spare),
+      raw_address_spare: this.cleanRecordValue(record.address_spare, false),
       raw_people: this.cleanRecordValue(record.people, true),
       raw_people_abbr: this.cleanRecordValue(record.people_abbr, true),
       raw_countries: this.cleanRecordValue(record.countries, true),
@@ -201,8 +204,7 @@ export class Dataprep {
 
     if (isNil(data.raw_message))
       throw new Error(`Can't parse 'message' column, reading "${record.message}"`);
-    if (isNil(data.raw_year))
-      throw new Error(`Can't parse 'year' column, reading "${record.year}"`);
+    if (isNil(data.year)) throw new Error(`Can't parse 'year' column, reading "${record.year}"`);
     if (isNil(data.raw_company))
       throw new Error(`Can't parse 'company' column, reading "${record.company}`);
     if (isNil(data.raw_company_spare)) data.raw_company_spare = data.raw_company;

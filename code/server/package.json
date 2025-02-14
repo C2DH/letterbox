@@ -5,10 +5,10 @@
   "scripts": {
     "clean": "rimraf build",
     "build": "npm run clean && tsc",
-    "init":	"tsx src/bin/neo4j-schema",
+    "init": "tsx src/bin/neo4j-schema",
     "start": "npm run init && nodemon",
     "lint": "eslint .",
-    "data:import":	"tsx src/bin/import"
+    "data:import": "tsx src/bin/import"
   },
   "dependencies": {
     "@apollo/server": "^4.11.3",
@@ -24,6 +24,7 @@
     "csv-parse": "^5.6.0",
     "express": "^4.21.0",
     "globby": "14.0.2",
+    "graphql": "^16.10.0",
     "graphql-tag": "^2.12.6",
     "graphql-type-json": "^0.3.2",
     "neo4j-driver": "^5.28.0",

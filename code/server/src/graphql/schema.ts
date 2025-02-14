@@ -1,4 +1,5 @@
 import { IResolvers } from '@graphql-tools/utils';
+import { GraphQLObjectType } from 'graphql';
 import gql from 'graphql-tag';
 
 import { Services } from '../services';
@@ -29,12 +30,14 @@ export const typeDefs = gql`
 
   type Message @node {
     fingerprint: ID! @unique
-    date: Date!
-    filePath: String!
+
+    year: Int!
+    filename: String!
     pageNumber: Int!
+    message: String!
 
     # saving raw data of the CSV
-    raw_year: Int!
+
     raw_company: String!
     raw_company_spare: String!
     raw_address: String!
@@ -58,7 +61,7 @@ export const typeDefs = gql`
     """
     Create a graph in the database
     """
-    import: ImportReport
+    import(fileNamePattern: String): ImportReport
   }
 `;
 
@@ -67,8 +70,22 @@ const dataprep = Services.get(Dataprep);
 export const resolvers: IResolvers = {
   Query: {},
   Mutation: {
-    import: async () => {
-      return await dataprep.doImport();
+    import: async (
+      _parent: GraphQLObjectType,
+      params: {
+        fileNamePattern?: string;
+      },
+    ) => {
+      let reFileNamePattern: RegExp | undefined = undefined;
+      try {
+        reFileNamePattern = params.fileNamePattern
+          ? new RegExp(params.fileNamePattern, 'i')
+          : undefined;
+      } catch {
+        throw new Error(`'${params.fileNamePattern}' is not a valid regular expression`);
+      } finally {
+        return await dataprep.doImport(reFileNamePattern);
+      }
     },
   },
 };
