@@ -1,7 +1,7 @@
 import { getLogger } from '@ouestware/node-logger';
 import fs from 'fs/promises';
 import { globby } from 'globby';
-import { ReadStream, createReadStream } from 'node:fs';
+import { ReadStream, createReadStream, existsSync, readFileSync } from 'node:fs';
 import path from 'path';
 import readline from 'readline';
 import { finished } from 'stream/promises';
@@ -51,6 +51,21 @@ export class FileSystem {
   streamFile(storageRelativePath: string): ReadStream {
     const filePath = path.join(this.storagePath, storageRelativePath);
     return createReadStream(filePath);
+  }
+
+  /**
+   * Read a file from the storage path.
+   */
+  readFile(storageRelativePath: string, encoding: BufferEncoding = 'utf-8') {
+    const filePath = path.join(this.storagePath, storageRelativePath);
+    return readFileSync(filePath, { encoding });
+  }
+  /**
+   * Test file exitence
+   */
+  fileExists(storageRelativePath: string) {
+    const filePath = path.join(this.storagePath, storageRelativePath);
+    return existsSync(filePath);
   }
 
   /**

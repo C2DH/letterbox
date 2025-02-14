@@ -3,6 +3,7 @@ import { toNumber, toString } from '@ouestware/type-utils';
 import { parse } from 'csv-parse';
 import { isNil } from 'lodash';
 import hash from 'object-hash';
+import { basename } from 'path';
 import { inject, singleton } from 'tsyringe';
 
 import config from '../config';
@@ -13,9 +14,9 @@ import { Neo4j } from './neo4j';
 // This interface MUST be compatible with the "Message" defined in code/server/src/graphql/schema.ts
 interface DataMessage {
   fingerprint: string;
-  date: Date;
-  filePath: String;
+  filename: String;
   pageNumber: number;
+  message: string;
   raw_year: number;
   raw_company: String;
   raw_company_spare: String;
@@ -33,22 +34,26 @@ export class Dataprep {
    * Logger.
    */
   log = getLogger('DataSetImport');
-
+  pdfFilenames: Set<String> | null = null;
   /**
    * Default constructor.
    */
   constructor(
     @inject(Neo4j) public neo4j: Neo4j,
     @inject(FileSystem) public fs: FileSystem,
-  ) {}
+  ) {
+    if (fs.fileExists(config.server.import.pdfFilenameList)) {
+      this.pdfFilenames = new Set(fs.readFile(config.server.import.pdfFilenameList).split('\n'));
+    }
+  }
 
   /**
    *
    */
   async doImport() {
     const files = await this.fs.listFiles(
-      config.server.import.path,
-      config.server.import.file_glob_pattern,
+      config.server.import.pathToMessages,
+      config.server.import.messages_file_glob_pattern,
     );
     this.log.info(`Found ${files.length} files to import`);
 
@@ -56,7 +61,12 @@ export class Dataprep {
     for (const file of files) {
       try {
         this.log.info(`Importing file ${file}`);
-        const fileResult = await this.importFile(file);
+        const encoding: BufferEncoding = config.server.import.iso1FileNameRegexp.test(
+          basename(file),
+        )
+          ? 'latin1'
+          : 'utf-8';
+        const fileResult = await this.importFile(file, encoding);
         this.log.info(
           `Imported ${fileResult.count} records from file ${file} with ${fileResult.errors.length} errors`,
         );
@@ -73,7 +83,7 @@ export class Dataprep {
   /**
    * Do the import for one file.
    */
-  private async importFile(file: string) {
+  private async importFile(file: string, encoding: BufferEncoding) {
     let records: DataMessage[] = [];
     let count = 0;
     let errors: string[] = [];
@@ -82,8 +92,9 @@ export class Dataprep {
       parse({
         delimiter: config.server.import.column_seperator,
         columns: config.server.import.headers,
-        encoding: 'utf8',
+        encoding,
         quote: null,
+        skip_records_with_error: true,
       }),
     );
 
@@ -91,11 +102,17 @@ export class Dataprep {
       count++;
       try {
         if (Object.keys(record).length !== 9) {
-          throw new Error(
+          errors.push(
             `Invalid number of columns in record n°${count} in file ${file} : ${Object.keys(record).join(',')}`,
           );
+        } else {
+          if (/%?wrong[%_]/i.test(record.year) || /%?wrong[%_]/i.test(record.company))
+            errors.push(
+              `%wrong% in record.year or record.company n°${count} in file ${file}: year:${record.year}, company: ${record.company}}`,
+            );
+
+          records.push(this.parseRecord(record));
         }
-        records.push(this.parseRecord(record));
       } catch (e) {
         errors.push(`Error parsing record n°${count} in file ${file}: ${(e as Error).message}`);
       }
@@ -118,9 +135,9 @@ export class Dataprep {
         MERGE (c:Company { name: record.raw_company_spare })
         MERGE (m:Message { fingerprint: record.fingerprint })
         SET
-          m.date = date(record.date),
-          m.filePath = record.filePath,
+          m.filename = record.filename,
           m.pageNumber = toInteger(record.pageNumber),
+          m.message = record.message,
           m.raw_year = toInteger(record.raw_year),
           m.raw_company = record.raw_company,
           m.raw_company_spare = record.raw_company_spare,
@@ -128,8 +145,7 @@ export class Dataprep {
           m.raw_address_spare = record.raw_address_spare,
           m.raw_people = record.raw_people,
           m.raw_people_abbr = record.raw_people_abbr,
-          m.raw_countries = record.raw_countries,
-          m.raw_message = record.raw_message
+          m.raw_countries = record.raw_countries
 
         MERGE (m)-[:CONTAINS]->(c)
         
@@ -138,7 +154,7 @@ export class Dataprep {
         FOREACH (country IN coalesce(record.raw_countries, []) | MERGE (c:Country { name: country }) MERGE (m)-[:CONTAINS]->(c))
       `,
 
-      { records: records.map((r) => ({ ...r, date: r.date.toISOString().substring(0, 10) })) },
+      { records },
     );
   }
 
@@ -146,26 +162,22 @@ export class Dataprep {
    * Parse the message content of a record, and  extract some additionnal data.
    */
   private parseRecordMessage(message: string): {
-    filePath: string;
+    filename: string;
     pageNumber: number;
-    date: Date;
+    message: string;
   } {
-    const group = message.match(
-      /.*File name: \\\\atlas\.uni\.lux\\C2DH_L\s?E\s?T\s?T\s?E\s?R\s?B\s?O\s?X\\memorialc\\_memorialc-last\\(.*)\\([0-9]{4})-([0-9]{2})-([0-9]{2})(.*)\.pdf Page Number :([0-9]*).*$/,
-    );
+    const group = message.match(/^.*File Name: ?.*?([^\\]+\.pdf) Page Number ?: ?([^ ]+)(.*)$/i);
     if (!group) {
-      const fileGroup = message.match(/.*File name: (.*) Page Number :([0-9]*).*$/);
+      const fileGroup = message.match(/.*(File name ?: .* Page Number ?: ?.*?) .*$/i);
       throw new Error(
-        `Could not parse message to find additional data ${fileGroup && fileGroup.length === 3 ? fileGroup[1] : message}`,
+        `Could not parse message to find filename and page number: ${fileGroup ? fileGroup[1] : message}`,
       );
-    }
-
-    const filePath = `/${group[1].replaceAll('\\', '/')}/${group[2]}-${group[3]}-${group[4]}${group[5]}.pdf`;
-    return {
-      filePath,
-      pageNumber: toNumber(group[6]) || 1,
-      date: new Date(`${group[2]}-${group[3]}-${group[4]}`),
-    };
+    } else
+      return {
+        filename: group[1],
+        pageNumber: toNumber(group[2]) || 1,
+        message: group[3],
+      };
   }
 
   /**
@@ -195,11 +207,16 @@ export class Dataprep {
       throw new Error(`Can't parse 'company' column, reading "${record.company}`);
     if (isNil(data.raw_company_spare)) data.raw_company_spare = data.raw_company;
 
-    const addtionalData = this.parseRecordMessage(data.raw_message as string);
+    const { filename, pageNumber, message } = this.parseRecordMessage(data.raw_message as string);
 
+    if (this.pdfFilenames && !this.pdfFilenames.has(filename)) {
+      throw new Error(`Unknown PDF file "${filename}`);
+    }
     return {
       ...data,
-      ...addtionalData,
+      filename,
+      pageNumber,
+      message,
     } as DataMessage;
   }
 

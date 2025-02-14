@@ -17,9 +17,11 @@ export default {
       column_seperator: ' &&&***&&& ',
       value_separator: ' *_* ',
       // path relative to the data folder
-      path: '/',
-      file_glob_pattern: '*.txt',
+      pathToMessages: '/messages',
+      messages_file_glob_pattern: '*.txt',
       batchSize: 10,
+      iso1FileNameRegexp: /^196[1-5].*/,
+      pdfFilenameList: 'pdf_files.txt',
     },
   },
   elastic: {
