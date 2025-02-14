@@ -160,4 +160,10 @@ export class Neo4j {
   getWriteSession(): neo4j.Session {
     return this.driver.session({ defaultAccessMode: neo4j.session.WRITE, database: this.database });
   }
+
+  //TODO: RESET DB
+  // CALL apoc.periodic.commit(
+  //   "MATCH (n) WITH n LIMIT $limit DETACH DELETE n RETURN count(*) ",
+  //   {limit:1000}
+  // );
 }
