@@ -4,11 +4,11 @@
   "version": "0.0.1",
   "type": "module",
   "scripts": {
-    "clean": "rimraf dist",
+    "clean": "rimraf dist .eslintcache",
     "build": "tsc && vite build",
     "dev": "vite --host",
     "start": "npm run build && vite preview --host",
-    "lint": "eslint ."
+    "lint": "npx eslint 'src/**/*.{ts,tsx}' --no-ignore --cache"
   },
   "dependencies": {
     "@ouestware/facets": "^0.0.1-alpha.4",
@@ -35,6 +35,7 @@
     "globals": "^15.9.0",
     "sass": "^1.79.4",
     "typescript": "^5.5.3",
-    "vite": "^5.4.1"
+    "vite": "^5.4.1",
+    "vite-plugin-checker": "^0.9.0"
   }
 }

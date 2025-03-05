@@ -376,15 +376,10 @@ export const resolvers: IResolvers = {
       },
     ) => {
       let reFileNamePattern: RegExp | undefined = undefined;
-      try {
-        reFileNamePattern = params.fileNamePattern
-          ? new RegExp(params.fileNamePattern, 'i')
-          : undefined;
-      } catch {
-        throw new Error(`'${params.fileNamePattern}' is not a valid regular expression`);
-      } finally {
-        return await datasetImport.doImport(reFileNamePattern);
-      }
+      reFileNamePattern = params.fileNamePattern
+        ? new RegExp(params.fileNamePattern, 'i')
+        : undefined;
+      return await datasetImport.doImport(reFileNamePattern);
     },
   },
 };

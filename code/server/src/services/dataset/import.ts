@@ -16,18 +16,18 @@ import { Neo4j } from '../neo4j';
 interface DataMessage {
   fingerprint: string;
   year: number;
-  filename: String;
+  filename: string;
   pageNumber: number;
   message: string;
 
-  raw_company: String;
-  raw_company_spare: String;
-  raw_address?: String;
-  raw_address_spare?: String;
-  raw_people?: String[];
-  raw_people_abbr?: String[];
-  raw_countries?: String[];
-  raw_message: String;
+  raw_company: string;
+  raw_company_spare: string;
+  raw_address?: string;
+  raw_address_spare?: string;
+  raw_people?: string[];
+  raw_people_abbr?: string[];
+  raw_countries?: string[];
+  raw_message: string;
 }
 
 @singleton()
@@ -36,7 +36,7 @@ export class DatasetImport {
    * Logger.
    */
   log = getLogger('DataSetImport');
-  pdfFilenames: Set<String> | null = null;
+  pdfFilenames: Set<string> | null = null;
   /**
    * Default constructor.
    */
@@ -93,7 +93,7 @@ export class DatasetImport {
     let records: DataMessage[] = [];
     let count = 0;
     let wrong = 0;
-    let errors: string[] = [];
+    const errors: string[] = [];
 
     const stream = this.fs.streamFile(file).pipe(
       parse({

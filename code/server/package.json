@@ -3,11 +3,11 @@
   "version": "0.0.1",
   "main": "build/index.js",
   "scripts": {
-    "clean": "rimraf build",
+    "clean": "rimraf build .eslintcache",
     "build": "npm run clean && tsc",
     "init": "tsx src/bin/neo4j-schema",
     "start": "npm run init && nodemon",
-    "lint": "eslint .",
+    "lint": "npx eslint 'src/**/*.ts' --no-ignore --cache",
     "dataset:import": "tsx src/bin/dataset-import",
     "dataset:index": "tsx src/bin/dataset-index"
   },
