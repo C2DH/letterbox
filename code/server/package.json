@@ -8,7 +8,8 @@
     "init": "tsx src/bin/neo4j-schema",
     "start": "npm run init && nodemon",
     "lint": "eslint .",
-    "data:import": "tsx src/bin/import"
+    "dataset:import": "tsx src/bin/dataset-import",
+    "dataset:index": "tsx src/bin/dataset-index"
   },
   "dependencies": {
     "@apollo/server": "^4.11.3",
@@ -30,6 +31,7 @@
     "neo4j-driver": "^5.28.0",
     "object-hash": "^3.0.0",
     "reflect-metadata": "^0.2.2",
+    "ts-stream": "^3.0.0",
     "tsyringe": "^4.8.0"
   },
   "devDependencies": {

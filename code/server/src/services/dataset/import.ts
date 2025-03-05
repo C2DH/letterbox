@@ -6,10 +6,11 @@ import hash from 'object-hash';
 import { basename } from 'path';
 import { inject, singleton } from 'tsyringe';
 
-import config from '../config';
-import { checkNilOREmptyString } from '../utils/string';
-import { FileSystem } from './filesystem';
-import { Neo4j } from './neo4j';
+import config from '../../config';
+import { ImportReport } from '../../types';
+import { checkNilOREmptyString } from '../../utils/string';
+import { FileSystem } from '../filesystem';
+import { Neo4j } from '../neo4j';
 
 // This interface MUST be compatible with the "Message" defined in code/server/src/graphql/schema.ts
 interface DataMessage {
@@ -30,7 +31,7 @@ interface DataMessage {
 }
 
 @singleton()
-export class Dataprep {
+export class DatasetImport {
   /**
    * Logger.
    */
@@ -49,9 +50,9 @@ export class Dataprep {
   }
 
   /**
-   *
+   * Execute the import job.
    */
-  async doImport(fileNamePattern?: RegExp) {
+  async doImport(fileNamePattern?: RegExp): Promise<ImportReport> {
     let files = await this.fs.listFiles(
       config.server.import.pathToMessages,
       config.server.import.messages_file_glob_pattern,
@@ -62,7 +63,7 @@ export class Dataprep {
       this.log.info(`Found ${files.length} files matching fileNamePattern: ${fileNamePattern}`);
     }
 
-    const result = { count: 0, errors: [] as string[] };
+    const result: ImportReport = { count: 0, errors: [] };
     for (const file of files) {
       try {
         this.log.info(`Importing file ${file}`);
@@ -132,7 +133,7 @@ export class Dataprep {
    */
   private async importRecords(records: DataMessage[]) {
     // Import into Neo4j
-    await this.neo4j.getFirstResultQuery(
+    const result = await this.neo4j.getFirstResultQuery<number>(
       `UNWIND $records as record
         MERGE (c:Company { name: record.raw_company })
         MERGE (m:Message { fingerprint: record.fingerprint })
@@ -155,10 +156,18 @@ export class Dataprep {
         FOREACH (ad IN [aa IN [record.raw_address] WHERE aa IS NOT NULL ] | MERGE (a:Address { name: ad }) MERGE (m)-[:CONTAINS]->(a) )
         FOREACH (p IN coalesce(record.raw_people, []) | MERGE (person:Person { name: p }) MERGE (m)-[:CONTAINS]->(person))
         FOREACH (country IN coalesce(record.raw_countries, []) | MERGE (c:Country { name: country }) MERGE (m)-[:CONTAINS]->(c))
+
+        RETURN count(*) as result
       `,
 
       { records },
     );
+
+    if (result !== records.length) {
+      throw new Error(
+        `Error importing records: ${result} records imported instead of ${records.length}`,
+      );
+    }
   }
 
   /**

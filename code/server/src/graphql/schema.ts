@@ -5,7 +5,7 @@ import { GraphQLObjectType } from 'graphql';
 import gql from 'graphql-tag';
 
 import { Services } from '../services';
-import { Dataprep } from '../services/dataprep';
+import { DatasetImport } from '../services/dataset/import';
 
 export const typeDefs = gql`
   #
@@ -299,8 +299,8 @@ export const typeDefs = gql`
   }
 `;
 
-const dataprep = Services.get(Dataprep);
 const log = getLogger('GraphQl');
+const datasetImport = Services.get(DatasetImport);
 
 export const resolvers: IResolvers = {
   Query: {
@@ -383,7 +383,7 @@ export const resolvers: IResolvers = {
       } catch {
         throw new Error(`'${params.fileNamePattern}' is not a valid regular expression`);
       } finally {
-        return await dataprep.doImport(reFileNamePattern);
+        return await datasetImport.doImport(reFileNamePattern);
       }
     },
   },

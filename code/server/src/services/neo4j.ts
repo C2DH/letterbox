@@ -1,5 +1,6 @@
 import * as neo4j from 'neo4j-driver';
 import { getLogger } from '@ouestware/node-logger';
+import Stream from 'ts-stream';
 import { singleton } from 'tsyringe';
 
 import config from '../config';
@@ -27,6 +28,7 @@ export class Neo4j {
   constructor() {
     const neoConfig = config.neo4j;
     this.log.info('Creating the neo4j driver with configuration', neoConfig);
+    this.database = neoConfig.database;
     this.driver = neo4j.driver(
       neoConfig.url,
       neo4j.auth.basic(neoConfig.login, neoConfig.password),
@@ -161,9 +163,23 @@ export class Neo4j {
     return this.driver.session({ defaultAccessMode: neo4j.session.WRITE, database: this.database });
   }
 
-  //TODO: RESET DB
-  // CALL apoc.periodic.commit(
-  //   "MATCH (n) WITH n LIMIT $limit DETACH DELETE n RETURN count(*) ",
-  //   {limit:1000}
-  // );
+  streamReadQuery<T>(query: string, params: Record<string, unknown>): Stream<T> {
+    const stream = new Stream<T>();
+
+    const session = this.driver.session({ database: this.database });
+    session
+      .executeRead(async (tx) => {
+        try {
+          const result = tx.run(query, params);
+          for await (const record of result) {
+            await stream.write(record.get('result') as T);
+          }
+          stream.end();
+        } catch (e) {
+          stream.end(e as Error);
+        }
+      })
+      .finally(() => session.close());
+    return stream;
+  }
 }
