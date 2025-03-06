@@ -27,6 +27,7 @@ export default {
   elastic: {
     node: process.env.ELASTICSEARCH_URL || 'http://localhost:9200/',
     batchSize: 2000,
+    index_prefix: process.env.ELASTICSEARCH_INDEX_PREFIX || '',
   },
   neo4j: {
     url: process.env.NEO4J_URL || 'bolt://localhost:7687',

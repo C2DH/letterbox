@@ -207,15 +207,15 @@ export class DatasetIndexation {
   private getIndexName(item: ItemType): string {
     switch (item) {
       case 'message':
-        return 'messages';
+        return `${config.elastic.index_prefix}messages`;
       case 'person':
-        return 'people';
+        return `${config.elastic.index_prefix}people`;
       case 'company':
-        return 'companies';
+        return `${config.elastic.index_prefix}companies`;
       case 'address':
-        return 'addresses';
+        return `${config.elastic.index_prefix}addresses`;
       case 'country':
-        return 'countries';
+        return `${config.elastic.index_prefix}countries`;
     }
   }
 
