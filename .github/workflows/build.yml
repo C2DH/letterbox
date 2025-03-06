@@ -16,6 +16,20 @@ jobs:
     defaults:
       run:
         working-directory: ./code
+    services:
+      neo4j:
+        image: neo4j:5-community
+        ports:
+          - 8687:7687
+        env:
+          NEO4J_AUTH: neo4j/l3tm31n!
+          NEO4JLABS_PLUGINS: '["apoc"]'
+      elasticsearch:
+        image: elasticsearch/elasticsearch:8.17.3
+        ports:
+          - 9200:9200
+        env:
+          discovery.type: single-node
     steps:
       - uses: actions/checkout@v4
 
