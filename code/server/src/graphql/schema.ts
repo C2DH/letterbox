@@ -16,18 +16,106 @@ export const typeDefs = gql`
 
   type Company @node {
     name: ID! @unique
+    messages: [Message!]! @relationship(type: "CONTAINS", direction: IN)
+    countries(skip: Int = 0, limit: Int = 50): [Country!]!
+      @cypher(
+        columnName: "result"
+        statement: """
+        MATCH (this)<--(:Message)-->(n:Country) RETURN DISTINCT n AS result
+        """
+      )
+    people(skip: Int = 0, limit: Int = 50): [Person!]!
+      @cypher(
+        columnName: "result"
+        statement: """
+        MATCH (this)<--(:Message)-->(n:Person) RETURN DISTINCT n AS result
+        """
+      )
+    addresses(skip: Int = 0, limit: Int = 50): [Address!]!
+      @cypher(
+        columnName: "result"
+        statement: """
+        MATCH (this)<--(:Message)-->(n:Address) RETURN DISTINCT n AS result SKIP $skip LIMIT $limit
+        """
+      )
   }
 
   type Country @node {
     name: ID! @unique
+    messages: [Message!]! @relationship(type: "CONTAINS", direction: IN)
+    companies(skip: Int = 0, limit: Int = 50): [Company!]!
+      @cypher(
+        columnName: "result"
+        statement: """
+        MATCH (this)<--(:Message)-->(n:Company) RETURN DISTINCT n AS result
+        """
+      )
+    people(skip: Int = 0, limit: Int = 50): [Person!]!
+      @cypher(
+        columnName: "result"
+        statement: """
+        MATCH (this)<--(:Message)-->(n:Person) RETURN DISTINCT n AS result
+        """
+      )
+    addresses(skip: Int = 0, limit: Int = 50): [Address!]!
+      @cypher(
+        columnName: "result"
+        statement: """
+        MATCH (this)<--(:Message)-->(n:Address) RETURN DISTINCT n AS result SKIP $skip LIMIT $limit
+        """
+      )
   }
 
   type Address @node {
     name: ID! @unique
+    messages: [Message!]! @relationship(type: "CONTAINS", direction: IN)
+    companies(skip: Int = 0, limit: Int = 50): [Company!]!
+      @cypher(
+        columnName: "result"
+        statement: """
+        MATCH (this)<--(:Message)-->(n:Company) RETURN DISTINCT n AS result
+        """
+      )
+    people(skip: Int = 0, limit: Int = 50): [Person!]!
+      @cypher(
+        columnName: "result"
+        statement: """
+        MATCH (this)<--(:Message)-->(n:Person) RETURN DISTINCT n AS result
+        """
+      )
+    countries(skip: Int = 0, limit: Int = 50): [Country!]!
+      @cypher(
+        columnName: "result"
+        statement: """
+        MATCH (this)<--(:Message)-->(n:Country) RETURN DISTINCT n AS result SKIP $skip LIMIT $limit
+        """
+      )
   }
 
   type Person @node {
     name: ID! @unique
+    messages: [Message!]! @relationship(type: "CONTAINS", direction: IN)
+    companies(skip: Int = 0, limit: Int = 50): [Company!]!
+      @cypher(
+        columnName: "result"
+        statement: """
+        MATCH (this)<--(:Message)-->(n:Company) RETURN DISTINCT n AS result
+        """
+      )
+    addresses(skip: Int = 0, limit: Int = 50): [Address!]!
+      @cypher(
+        columnName: "result"
+        statement: """
+        MATCH (this)<--(:Message)-->(n:Address) RETURN DISTINCT n AS result
+        """
+      )
+    countries(skip: Int = 0, limit: Int = 50): [Country!]!
+      @cypher(
+        columnName: "result"
+        statement: """
+        MATCH (this)<--(:Message)-->(n:Country) RETURN DISTINCT n AS result SKIP $skip LIMIT $limit
+        """
+      )
   }
 
   type Message @node {
