@@ -4,7 +4,7 @@ import { batcher } from 'ts-stream';
 import { inject, singleton } from 'tsyringe';
 
 import config from '../../config';
-import { ImportReport, ItemType, itemTypes } from '../../types';
+import { EsIndices, ImportReport, ItemType, itemTypes } from '../../types';
 import { Elastic } from '../elastic';
 import { Neo4j } from '../neo4j';
 
@@ -29,7 +29,7 @@ export class DatasetIndexation {
   async doIndexation(): Promise<ImportReport> {
     await Promise.all(
       itemTypes.map((item) =>
-        this.es.createIndex(this.getIndexName(item), this.getIndexConfig(item), true),
+        this.es.createIndex(EsIndices[item], this.getIndexConfig(item), true),
       ),
     );
 
@@ -79,7 +79,7 @@ export class DatasetIndexation {
           async (batch) => {
             batchNumber++;
             this.log.info('Exec batch', batchNumber);
-            const report = await this.es.bulkImport(this.getIndexName('message'), batch);
+            const report = await this.es.bulkImport(EsIndices['message'], batch);
             result.count += batch.length;
             result.errors.push(...report.map((e) => e.error));
             this.log.info('Batch finished', batchNumber);
@@ -121,7 +121,7 @@ export class DatasetIndexation {
           async (batch) => {
             batchNumber++;
             this.log.info('People exec batch', batchNumber);
-            const report = await this.es.bulkImport(this.getIndexName('person'), batch);
+            const report = await this.es.bulkImport(EsIndices['person'], batch);
             result.count += batch.length;
             result.errors.push(...report.map((e) => e.error));
             this.log.info('People batch finished', batchNumber);
@@ -156,14 +156,14 @@ export class DatasetIndexation {
             countries: collect { MATCH(n)<--(:Message)-->(m:Country) RETURN DISTINCT {id: elementId(m), name: m.name} LIMIT ${config.elastic.nested_objects_limit} },
             years: collect { MATCH(n)<--(m:Message) RETURN DISTINCT m.year LIMIT ${config.elastic.nested_objects_limit} }
             } as result`,
-          {},
+          { ids },
         )
         .transform(batcher(config.elastic.batchSize))
         .forEach(
           async (batch) => {
             batchNumber++;
             this.log.info('Company exec batch', batchNumber);
-            const report = await this.es.bulkImport(this.getIndexName('company'), batch);
+            const report = await this.es.bulkImport(EsIndices['company'], batch);
             result.count += batch.length;
             result.errors.push(...report.map((e) => e.error));
             this.log.info('Company batch finished', batchNumber);
@@ -205,7 +205,7 @@ export class DatasetIndexation {
           async (batch) => {
             batchNumber++;
             this.log.info('Address exec batch', batchNumber);
-            const report = await this.es.bulkImport(this.getIndexName('address'), batch);
+            const report = await this.es.bulkImport(EsIndices['address'], batch);
             result.count += batch.length;
             result.errors.push(...report.map((e) => e.error));
             this.log.info('Address batch finished', batchNumber);
@@ -217,24 +217,6 @@ export class DatasetIndexation {
           },
         );
     });
-  }
-
-  /**
-   * Returns the index name for an item type.
-   */
-  private getIndexName(item: ItemType): string {
-    switch (item) {
-      case 'message':
-        return `${config.elastic.index_prefix}messages`;
-      case 'person':
-        return `${config.elastic.index_prefix}people`;
-      case 'company':
-        return `${config.elastic.index_prefix}companies`;
-      case 'address':
-        return `${config.elastic.index_prefix}addresses`;
-      case 'country':
-        return `${config.elastic.index_prefix}countries`;
-    }
   }
 
   /**

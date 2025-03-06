@@ -7,28 +7,10 @@ import { basename } from 'path';
 import { inject, singleton } from 'tsyringe';
 
 import config from '../../config';
-import { ImportReport } from '../../types';
+import { DataMessage, ImportReport } from '../../types';
 import { checkNilOREmptyString } from '../../utils/string';
 import { FileSystem } from '../filesystem';
 import { Neo4j } from '../neo4j';
-
-// This interface MUST be compatible with the "Message" defined in code/server/src/graphql/schema.ts
-interface DataMessage {
-  fingerprint: string;
-  year: number;
-  filename: string;
-  pageNumber: number;
-  message: string;
-
-  raw_company: string;
-  raw_company_spare: string;
-  raw_address?: string;
-  raw_address_spare?: string;
-  raw_people?: string[];
-  raw_people_abbr?: string[];
-  raw_countries?: string[];
-  raw_message: string;
-}
 
 @singleton()
 export class DatasetImport {
@@ -131,7 +113,7 @@ export class DatasetImport {
   /**
    * Import a list in records in databases.
    */
-  private async importRecords(records: DataMessage[]) {
+  public async importRecords(records: DataMessage[]) {
     // Import into Neo4j
     const result = await this.neo4j.getFirstResultQuery<number>(
       `UNWIND $records as record

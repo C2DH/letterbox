@@ -33,8 +33,8 @@ export default {
   neo4j: {
     url: process.env.NEO4J_URL || 'bolt://localhost:7687',
     login: process.env.NEO4J_LOGIN || 'neo4j',
-    password: process.env.NEO4J_PASSWORD || 'admin',
-    database: 'neo4j',
+    password: process.env.NEO4J_PASSWORD || 'l3tm31n!',
+    database: process.env.NEO4J_DATABASE || 'neo4j',
     options: {
       disableLosslessIntegers: true,
       fetchSize: 10000,

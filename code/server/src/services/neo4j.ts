@@ -165,7 +165,6 @@ export class Neo4j {
 
   streamReadQuery<T>(query: string, params: Record<string, unknown>): Stream<T> {
     const stream = new Stream<T>();
-
     const session = this.driver.session({ database: this.database });
     session
       .executeRead(async (tx) => {
@@ -175,11 +174,26 @@ export class Neo4j {
             await stream.write(record.get('result') as T);
           }
           stream.end();
-        } catch (e) {
-          stream.end(e as Error);
+        } catch (error) {
+          stream.end(error as Error);
+          this.log.error('Error while streaming query', { query, error });
         }
       })
       .finally(() => session.close());
     return stream;
+  }
+
+  async resetDatabase(batchSize = 100): Promise<void> {
+    const session = this.getWriteSession();
+    try {
+      await session.run(`
+        CALL apoc.periodic.commit(
+          "MATCH (n) WITH n LIMIT $limit 
+           DETACH DELETE n RETURN count(*)",
+          {limit: ${batchSize}}
+        )`);
+    } finally {
+      await session.close();
+    }
   }
 }

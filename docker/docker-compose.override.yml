@@ -3,6 +3,17 @@ services:
     ports:
       - ${NEO4J_PORT_HTTP}:7474
       - ${NEO4J_PORT_BOLT}:7687
+  neo4j_test:
+    image: neo4j:${NEO4J_VERSION}
+    restart: ${RESTART_POLICY}
+    environment:
+      - NEO4J_server_memory_heap_max__size=1024m
+      - NEO4J_server_memory_pagecache_size=100m
+      - NEO4J_PLUGINS=["apoc"]
+      - NEO4J_AUTH=neo4j/l3tm31n!
+    ports:
+      - 8474:7474
+      - 8687:7687
   elasticsearch:
     ports:
       - ${ELASTICSEARCH_PORT}:9200
