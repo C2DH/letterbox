@@ -25,7 +25,7 @@ jobs:
           NEO4J_AUTH: neo4j/l3tm31n!
           NEO4JLABS_PLUGINS: '["apoc"]'
       elasticsearch:
-        image: elasticsearch/elasticsearch:8.17.3
+        image: elasticsearch:8.17.3
         ports:
           - 9200:9200
         env:
