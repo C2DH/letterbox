@@ -65,10 +65,11 @@ export class DatasetIndexation {
           RETURN  {
             id: id(n),
             message: n.message,
-            people: collect { MATCH (n)<--(:Message)-->(m:Person) RETURN DISTINCT { id: elementId(m), name: m.name } },
-            addresses: collect { MATCH (n)<--(:Message)-->(m:Address) RETURN DISTINCT { id: elementId(m), name: m.name } },
-            companies: collect { MATCH (n)<--(:Message)-->(m:Company) RETURN DISTINCT { id: elementId(m), name: m.name } },
-            countries: collect { MATCH (n)<--(:Message)-->(m:Country) RETURN DISTINCT { id: elementId(m), name: m.name } }
+            year: n.year,
+            people: collect { MATCH (n)-->(m:Person) RETURN DISTINCT { id: elementId(m), name: m.name } },
+            addresses: collect { MATCH (n)-->(m:Address) RETURN DISTINCT { id: elementId(m), name: m.name } },
+            companies: collect { MATCH (n)-->(m:Company) RETURN DISTINCT { id: elementId(m), name: m.name } },
+            countries: collect { MATCH (n)-->(m:Country) RETURN DISTINCT { id: elementId(m), name: m.name } }
           } as result`,
         { ids },
       )

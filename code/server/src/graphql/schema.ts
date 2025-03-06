@@ -6,6 +6,7 @@ import gql from 'graphql-tag';
 
 import { Services } from '../services';
 import { DatasetImport } from '../services/dataset/import';
+import { DatasetIndexation } from '../services/dataset/indexation';
 
 export const typeDefs = gql`
   #
@@ -384,11 +385,13 @@ export const typeDefs = gql`
     Create a graph in the database
     """
     import(fileNamePattern: String): ImportReport
+    index: ImportReport
   }
 `;
 
 const log = getLogger('GraphQl');
 const datasetImport = Services.get(DatasetImport);
+const datasetIndexation = Services.get(DatasetIndexation);
 
 export const resolvers: IResolvers = {
   Query: {
@@ -468,6 +471,9 @@ export const resolvers: IResolvers = {
         ? new RegExp(params.fileNamePattern, 'i')
         : undefined;
       return await datasetImport.doImport(reFileNamePattern);
+    },
+    index: async (_parent: GraphQLObjectType) => {
+      return await datasetIndexation.doIndexation();
     },
   },
 };
