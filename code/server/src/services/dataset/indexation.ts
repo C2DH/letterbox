@@ -111,8 +111,9 @@ export class DatasetIndexation {
             name: n.name,
             addresses: collect { MATCH(n)<--(:Message)-->(m:Address) RETURN DISTINCT { id: elementId(m), name: m.name } LIMIT ${config.elastic.nested_objects_limit} },
             companies: collect { MATCH(n)<--(:Message)-->(m:Company) RETURN DISTINCT { id: elementId(m), name: m.name } LIMIT ${config.elastic.nested_objects_limit} },
-            countries: collect { MATCH(n)<--(:Message)-->(m:Country) RETURN DISTINCT { id: elementId(m), name: m.name } LIMIT ${config.elastic.nested_objects_limit} }
-          } as result`,
+            countries: collect { MATCH(n)<--(:Message)-->(m:Country) RETURN DISTINCT { id: elementId(m), name: m.name } LIMIT ${config.elastic.nested_objects_limit} },
+            years: collect { MATCH(n)<--(m:Message) RETURN DISTINCT m.year LIMIT ${config.elastic.nested_objects_limit} }
+            } as result`,
           { ids },
         )
         .transform(batcher(config.elastic.batchSize))
@@ -152,8 +153,9 @@ export class DatasetIndexation {
             name: n.name,
             people: collect { MATCH(n)<--(:Message)-->(m:Person) RETURN DISTINCT {id: elementId(m), name: m.name} LIMIT ${config.elastic.nested_objects_limit} },
             addresses: collect { MATCH(n)<--(:Message)-->(m:Address) RETURN DISTINCT {id: elementId(m), name: m.name} LIMIT ${config.elastic.nested_objects_limit} },
-            countries: collect { MATCH(n)<--(:Message)-->(m:Country) RETURN DISTINCT {id: elementId(m), name: m.name} LIMIT ${config.elastic.nested_objects_limit} }
-          } as result`,
+            countries: collect { MATCH(n)<--(:Message)-->(m:Country) RETURN DISTINCT {id: elementId(m), name: m.name} LIMIT ${config.elastic.nested_objects_limit} },
+            years: collect { MATCH(n)<--(m:Message) RETURN DISTINCT m.year LIMIT ${config.elastic.nested_objects_limit} }
+            } as result`,
           {},
         )
         .transform(batcher(config.elastic.batchSize))
@@ -193,7 +195,8 @@ export class DatasetIndexation {
             name: n.name,
             people: collect { MATCH(n)<--(:Message)-->(m:Person) RETURN DISTINCT {id: elementId(m), name: m.name} LIMIT ${config.elastic.nested_objects_limit} },
             companies: collect { MATCH(n)<--(:Message)-->(m:Company) RETURN DISTINCT {id: elementId(m), name: m.name} LIMIT ${config.elastic.nested_objects_limit} },
-            countries: collect { MATCH(n)<--(:Message)-->(m:Country) RETURN DISTINCT {id: elementId(m), name: m.name} LIMIT ${config.elastic.nested_objects_limit} }
+            countries: collect { MATCH(n)<--(:Message)-->(m:Country) RETURN DISTINCT {id: elementId(m), name: m.name} LIMIT ${config.elastic.nested_objects_limit} },
+            years: collect { MATCH(n)<--(m:Message) RETURN DISTINCT m.year LIMIT ${config.elastic.nested_objects_limit} }
           } as result`,
           {},
         )
@@ -238,12 +241,13 @@ export class DatasetIndexation {
    * Returns the elastic configuration for a dataset.
    */
   private getIndexConfig(item: ItemType): Omit<estypes.IndicesCreateRequest, 'index'> {
-    const nestedtValue: estypes.MappingNestedProperty = {
+    const nestedValue: estypes.MappingNestedProperty = {
       type: 'nested',
       properties: {
         id: { type: 'keyword' },
         name: { type: 'keyword' },
       },
+      include_in_parent: true,
     };
 
     return {
@@ -282,12 +286,14 @@ export class DatasetIndexation {
                   analyzer: 'IndexAnalyzer',
                   search_analyzer: 'SearchAnalyzer',
                 },
+                year: { type: 'integer' },
               }
             : {}),
-          ...(item !== 'person' ? { people: nestedtValue } : {}),
-          ...(item !== 'address' ? { addresses: nestedtValue } : {}),
-          ...(item !== 'company' ? { companies: nestedtValue } : {}),
-          ...(item !== 'country' ? { countries: nestedtValue } : {}),
+          ...(item !== 'person' ? { people: nestedValue } : {}),
+          ...(item !== 'address' ? { addresses: nestedValue } : {}),
+          ...(item !== 'company' ? { companies: nestedValue } : {}),
+          ...(item !== 'country' ? { countries: nestedValue } : {}),
+          ...(item !== 'message' ? { years: { type: 'integer' } } : {}),
         },
       },
     };
