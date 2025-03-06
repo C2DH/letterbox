@@ -62,15 +62,15 @@ export class DatasetIndexation {
       this.neo4j
         .streamReadQuery<{ id: string }>(
           ` MATCH (n:Message)
-          ${ids && ids.length ? `WHERE elementId(n) IN $ids` : ''}
+          ${ids && ids.length ? `WHERE n.id IN $ids` : ''}
           RETURN  {
-            id: id(n),
+            id: n.id,
             message: n.message,
             year: n.year,
-            people: collect { MATCH (n)-->(m:Person) RETURN DISTINCT { id: elementId(m), name: m.name } LIMIT ${config.elastic.nested_objects_limit} },
-            addresses: collect { MATCH (n)-->(m:Address) RETURN DISTINCT { id: elementId(m), name: m.name } LIMIT ${config.elastic.nested_objects_limit} },
-            companies: collect { MATCH (n)-->(m:Company) RETURN DISTINCT { id: elementId(m), name: m.name } LIMIT ${config.elastic.nested_objects_limit} },
-            countries: collect { MATCH (n)-->(m:Country) RETURN DISTINCT { id: elementId(m), name: m.name } LIMIT ${config.elastic.nested_objects_limit} }
+            people: collect { MATCH (n)-->(m:Person) RETURN DISTINCT m.id + "@" + m.name LIMIT ${config.elastic.nested_objects_limit} },
+            addresses: collect { MATCH (n)-->(m:Address) RETURN DISTINCT m.id + "@" + m.name LIMIT ${config.elastic.nested_objects_limit} },
+            companies: collect { MATCH (n)-->(m:Company) RETURN DISTINCT m.id + "@" + m.name LIMIT ${config.elastic.nested_objects_limit} },
+            countries: collect { MATCH (n)-->(m:Country) RETURN DISTINCT m.id + "@" + m.name LIMIT ${config.elastic.nested_objects_limit} }
           } as result`,
           { ids },
         )
@@ -105,13 +105,13 @@ export class DatasetIndexation {
       this.neo4j
         .streamReadQuery<{ id: string }>(
           ` MATCH (n:Person)
-          ${ids && ids.length ? `WHERE elementId(n) IN $ids` : ''}
+          ${ids && ids.length ? `WHERE n.id IN $ids` : ''}
           RETURN  {
-            id: elementId(n),
+            id: n.id,
             name: n.name,
-            addresses: collect { MATCH(n)<--(:Message)-->(m:Address) RETURN DISTINCT { id: elementId(m), name: m.name } LIMIT ${config.elastic.nested_objects_limit} },
-            companies: collect { MATCH(n)<--(:Message)-->(m:Company) RETURN DISTINCT { id: elementId(m), name: m.name } LIMIT ${config.elastic.nested_objects_limit} },
-            countries: collect { MATCH(n)<--(:Message)-->(m:Country) RETURN DISTINCT { id: elementId(m), name: m.name } LIMIT ${config.elastic.nested_objects_limit} },
+            addresses: collect { MATCH(n)<--(:Message)-->(m:Address) RETURN DISTINCT  m.id + "@" + m.name LIMIT ${config.elastic.nested_objects_limit} },
+            companies: collect { MATCH(n)<--(:Message)-->(m:Company) RETURN DISTINCT  m.id + "@" + m.name LIMIT ${config.elastic.nested_objects_limit} },
+            countries: collect { MATCH(n)<--(:Message)-->(m:Country) RETURN DISTINCT  m.id + "@" + m.name LIMIT ${config.elastic.nested_objects_limit} },
             years: collect { MATCH(n)<--(m:Message) RETURN DISTINCT m.year LIMIT ${config.elastic.nested_objects_limit} }
             } as result`,
           { ids },
@@ -147,13 +147,13 @@ export class DatasetIndexation {
       this.neo4j
         .streamReadQuery<{ id: string }>(
           ` MATCH (n:Company)
-          ${ids && ids.length ? `WHERE elementId(n) IN $ids` : ''}
+          ${ids && ids.length ? `WHERE n.id IN $ids` : ''}
           RETURN  {
-            id: elementId(n),
+            id: n.id,
             name: n.name,
-            people: collect { MATCH(n)<--(:Message)-->(m:Person) RETURN DISTINCT {id: elementId(m), name: m.name} LIMIT ${config.elastic.nested_objects_limit} },
-            addresses: collect { MATCH(n)<--(:Message)-->(m:Address) RETURN DISTINCT {id: elementId(m), name: m.name} LIMIT ${config.elastic.nested_objects_limit} },
-            countries: collect { MATCH(n)<--(:Message)-->(m:Country) RETURN DISTINCT {id: elementId(m), name: m.name} LIMIT ${config.elastic.nested_objects_limit} },
+            people: collect { MATCH(n)<--(:Message)-->(m:Person) RETURN DISTINCT m.id + "@" + m.name LIMIT ${config.elastic.nested_objects_limit} },
+            addresses: collect { MATCH(n)<--(:Message)-->(m:Address) RETURN DISTINCT m.id + "@" + m.name LIMIT ${config.elastic.nested_objects_limit} },
+            countries: collect { MATCH(n)<--(:Message)-->(m:Country) RETURN DISTINCT m.id + "@" + m.name LIMIT ${config.elastic.nested_objects_limit} },
             years: collect { MATCH(n)<--(m:Message) RETURN DISTINCT m.year LIMIT ${config.elastic.nested_objects_limit} }
             } as result`,
           { ids },
@@ -189,13 +189,13 @@ export class DatasetIndexation {
       this.neo4j
         .streamReadQuery<{ id: string }>(
           ` MATCH (n:Address)
-          ${ids && ids.length ? `WHERE elementId(n) IN $ids` : ''}
+          ${ids && ids.length ? `WHERE en.id IN $ids` : ''}
           RETURN  {
-            id: elementId(n),
+            id: n.id,
             name: n.name,
-            people: collect { MATCH(n)<--(:Message)-->(m:Person) RETURN DISTINCT {id: elementId(m), name: m.name} LIMIT ${config.elastic.nested_objects_limit} },
-            companies: collect { MATCH(n)<--(:Message)-->(m:Company) RETURN DISTINCT {id: elementId(m), name: m.name} LIMIT ${config.elastic.nested_objects_limit} },
-            countries: collect { MATCH(n)<--(:Message)-->(m:Country) RETURN DISTINCT {id: elementId(m), name: m.name} LIMIT ${config.elastic.nested_objects_limit} },
+            people: collect { MATCH(n)<--(:Message)-->(m:Person) RETURN DISTINCT m.id + "@" + m.name LIMIT ${config.elastic.nested_objects_limit} },
+            companies: collect { MATCH(n)<--(:Message)-->(m:Company) RETURN DISTINCT m.id + "@" + m.name LIMIT ${config.elastic.nested_objects_limit} },
+            countries: collect { MATCH(n)<--(:Message)-->(m:Country) RETURN DISTINCT m.id + "@" + m.name LIMIT ${config.elastic.nested_objects_limit} },
             years: collect { MATCH(n)<--(m:Message) RETURN DISTINCT m.year LIMIT ${config.elastic.nested_objects_limit} }
           } as result`,
           {},
@@ -223,15 +223,6 @@ export class DatasetIndexation {
    * Returns the elastic configuration for a dataset.
    */
   private getIndexConfig(item: ItemType): Omit<estypes.IndicesCreateRequest, 'index'> {
-    const nestedValue: estypes.MappingNestedProperty = {
-      type: 'nested',
-      properties: {
-        id: { type: 'keyword' },
-        name: { type: 'keyword' },
-      },
-      include_in_parent: true,
-    };
-
     return {
       settings: {
         analysis: {
@@ -271,10 +262,10 @@ export class DatasetIndexation {
                 year: { type: 'integer' },
               }
             : {}),
-          ...(item !== 'person' ? { people: nestedValue } : {}),
-          ...(item !== 'address' ? { addresses: nestedValue } : {}),
-          ...(item !== 'company' ? { companies: nestedValue } : {}),
-          ...(item !== 'country' ? { countries: nestedValue } : {}),
+          ...(item !== 'person' ? { people: { type: 'keyword' } } : {}),
+          ...(item !== 'address' ? { addresses: { type: 'keyword' } } : {}),
+          ...(item !== 'company' ? { companies: { type: 'keyword' } } : {}),
+          ...(item !== 'country' ? { countries: { type: 'keyword' } } : {}),
           ...(item !== 'message' ? { years: { type: 'integer' } } : {}),
         },
       },

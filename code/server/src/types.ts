@@ -1,21 +1,23 @@
 import config from './config';
 
 // This interface MUST be compatible with the "Message" defined in code/server/src/graphql/schema.ts
-export type DataMessage = {
-  fingerprint: string;
+export type DataMessage<T = string> = {
+  id: string;
   year: number;
   filename: string;
   pageNumber: number;
   message: string;
 
-  raw_company: string;
-  raw_company_spare: string;
-  raw_address?: string;
-  raw_address_spare?: string;
-  raw_people?: string[];
-  raw_people_abbr?: string[];
-  raw_countries?: string[];
+  raw_company: T;
+  raw_address?: T;
+  raw_people?: T[];
+  raw_countries?: T[];
+
+  // unused
   raw_message: string;
+  raw_company_spare: string;
+  raw_address_spare?: string;
+  raw_people_abbr?: string[];
 };
 
 export type ItemType = 'message' | 'company' | 'person' | 'address' | 'country';

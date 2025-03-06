@@ -19,14 +19,14 @@ export default {
       // path relative to the data folder
       pathToMessages: '/messages',
       messages_file_glob_pattern: '*.txt',
-      batchSize: 1000,
+      batchSize: 5000,
       iso1FileNameRegexp: /^196[1-5].*/,
       pdfFilenameList: 'pdf_files.txt',
     },
   },
   elastic: {
     node: process.env.ELASTICSEARCH_URL || 'http://localhost:9200/',
-    batchSize: 2000,
+    batchSize: 5000,
     index_prefix: process.env.ELASTICSEARCH_INDEX_PREFIX || '',
     nested_objects_limit: 1000,
   },

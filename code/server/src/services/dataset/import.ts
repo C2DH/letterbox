@@ -113,33 +113,65 @@ export class DatasetImport {
   /**
    * Import a list in records in databases.
    */
-  public async importRecords(records: DataMessage[]) {
+  public async importRecords(data: DataMessage[]) {
+    const records: DataMessage<{ id: string; name: string }>[] = data.map((record) => ({
+      ...record,
+      raw_company: { id: hash(record.raw_company), name: record.raw_company },
+      raw_address: record.raw_address
+        ? { id: hash(record.raw_address), name: record.raw_address }
+        : undefined,
+      raw_people: (record.raw_people || []).map((p) => ({ id: hash(p), name: p })),
+      raw_countries: (record.raw_countries || []).map((c) => ({ id: hash(c), name: c })),
+    }));
+
     // Import into Neo4j
     const result = await this.neo4j.getFirstResultQuery<number>(
       `UNWIND $records as record
-        MERGE (c:Company { name: record.raw_company })
-        MERGE (m:Message { fingerprint: record.fingerprint })
-        SET
-          m.filename = record.filename,
-          m.pageNumber = toInteger(record.pageNumber),
-          m.message = record.message,
-          m.year = toInteger(record.year),
+        // Message creation
+        MERGE (m:Message { id: record.id })
+        SET m = {
+          id: record.id,
+          filename: record.filename,
+          pageNumber: toInteger(record.pageNumber),
+          message: record.message,
+          year: toInteger(record.year),
+          raw_company: record.raw_company.name,
+          raw_address: [a IN coalesce(record.raw_address, []) | a.name],
+          raw_people: [a IN coalesce(record.raw_people, []) | a.name],
+          raw_countries: [a IN coalesce(record.raw_countries, []) | a.name],
+          raw_message: record.raw_message
+        }
 
-          m.raw_company = record.raw_company,
-          m.raw_company_spare = record.raw_company_spare,
-          m.raw_address = record.raw_address,
-          m.raw_address_spare = record.raw_address_spare,
-          m.raw_people = record.raw_people,
-          m.raw_people_abbr = record.raw_people_abbr,
-          m.raw_countries = record.raw_countries
-
+        // Company creation
+        MERGE (c:Company { id: record.raw_company.id })
+        SET c = {
+          id: record.raw_company.id,
+          name: record.raw_company.name
+        }
+        
+        // Create link between message and company
         MERGE (m)-[:CONTAINS]->(c)
 
-        FOREACH (ad IN [aa IN [record.raw_address] WHERE aa IS NOT NULL ] | MERGE (a:Address { name: ad }) MERGE (m)-[:CONTAINS]->(a) )
-        FOREACH (p IN coalesce(record.raw_people, []) | MERGE (person:Person { name: p }) MERGE (m)-[:CONTAINS]->(person))
-        FOREACH (country IN coalesce(record.raw_countries, []) | MERGE (c:Country { name: country }) MERGE (m)-[:CONTAINS]->(c))
+        WITH m, record
+          CALL (m, record) {
+            UNWIND coalesce(record.raw_address, []) as address WITH address WHERE address IS NOT NULL
+              MERGE (a:Address { id: address.id }) ON CREATE SET a.name = address.name
+              MERGE (m)-[:CONTAINS]->(a) 
+          }
 
-        RETURN count(*) as result
+          CALL (m, record) {
+            UNWIND coalesce(record.raw_people, []) as person WITH person WHERE person IS NOT NULL
+              MERGE (p:Person { id: person.id }) ON CREATE SET p.name = person.name
+              MERGE (m)-[:CONTAINS]->(p) 
+          }
+
+          CALL (m, record) {
+            UNWIND coalesce(record.raw_countries, []) as country WITH country WHERE country IS NOT NULL
+              MERGE (c:Country { id: country.id }) ON CREATE SET c.name = country.name
+              MERGE (m)-[:CONTAINS]->(c) 
+          }
+
+          RETURN count(*) as result
       `,
 
       { records },
@@ -181,7 +213,7 @@ export class DatasetImport {
     const fingerprint = hash(JSON.stringify(record, null, 2));
 
     const data = {
-      fingerprint,
+      id: fingerprint,
       year: checkNilOREmptyString(record.year) ? undefined : toNumber(record.year),
       raw_company: this.cleanRecordValue(record.company),
       raw_company_spare: this.cleanRecordValue(record.company_spare),

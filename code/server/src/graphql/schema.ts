@@ -11,12 +11,17 @@ import { DatasetIndexation } from '../services/dataset/indexation';
 export const typeDefs = gql`
   #
   # Define custom Graphql types
-  #
+  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   scalar JSONObject
   scalar JSON
 
+  #
+  # Graph DB schema
+  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
   type Company @node {
-    name: ID! @unique
+    id: ID! @unique
+    name: String!
     messages: [Message!]! @relationship(type: "CONTAINS", direction: IN)
     countries(skip: Int = 0, limit: Int = 50): [Country!]!
       @cypher(
@@ -42,7 +47,8 @@ export const typeDefs = gql`
   }
 
   type Country @node {
-    name: ID! @unique
+    id: ID! @unique
+    name: String!
     messages: [Message!]! @relationship(type: "CONTAINS", direction: IN)
     companies(skip: Int = 0, limit: Int = 50): [Company!]!
       @cypher(
@@ -68,7 +74,8 @@ export const typeDefs = gql`
   }
 
   type Address @node {
-    name: ID! @unique
+    id: ID! @unique
+    name: String!
     messages: [Message!]! @relationship(type: "CONTAINS", direction: IN)
     companies(skip: Int = 0, limit: Int = 50): [Company!]!
       @cypher(
@@ -94,7 +101,8 @@ export const typeDefs = gql`
   }
 
   type Person @node {
-    name: ID! @unique
+    id: ID! @unique
+    name: String!
     messages: [Message!]! @relationship(type: "CONTAINS", direction: IN)
     companies(skip: Int = 0, limit: Int = 50): [Company!]!
       @cypher(
@@ -120,21 +128,17 @@ export const typeDefs = gql`
   }
 
   type Message @node {
-    fingerprint: ID! @unique
-
+    id: ID! @unique
     year: Int!
     filename: String!
     pageNumber: Int!
     message: String!
 
     # saving raw data of the CSV
-
     raw_company: String!
-    raw_company_spare: String!
     raw_address: String!
-    raw_address_spare: String!
-    raw_people: [String]
-    raw_countries: [String]
+    raw_people: [String!]
+    raw_countries: [String!]
     raw_message: String!
 
     company: [Company!]! @relationship(type: "CONTAINS", direction: OUT)
@@ -142,6 +146,10 @@ export const typeDefs = gql`
     persons: [Person!]! @relationship(type: "CONTAINS", direction: OUT)
     countries: [Country!]! @relationship(type: "CONTAINS", direction: OUT)
   }
+
+  #
+  # Inputs
+  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   type ImportReport {
     count: Int!
@@ -385,6 +393,10 @@ export const typeDefs = gql`
     Create a graph in the database
     """
     import(fileNamePattern: String): ImportReport
+
+    """
+    Index the graph in the search engine
+    """
     index: ImportReport
   }
 `;

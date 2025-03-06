@@ -4,11 +4,15 @@ import 'reflect-metadata';
 import { Neo4j } from '../services/neo4j';
 
 const queries = [
-  'CREATE CONSTRAINT Country_name IF NOT EXISTS FOR (n:Country) REQUIRE n.name IS UNIQUE',
-  'CREATE CONSTRAINT Address_name IF NOT EXISTS FOR (n:Address) REQUIRE n.name IS UNIQUE',
-  'CREATE CONSTRAINT Person_name IF NOT EXISTS FOR (n:Person) REQUIRE n.name IS UNIQUE',
-  'CREATE CONSTRAINT Company_name IF NOT EXISTS FOR (n:Company) REQUIRE n.name IS UNIQUE',
-  'CREATE CONSTRAINT Message_fingerprint IF NOT EXISTS FOR (n:Message) REQUIRE n.fingerprint IS UNIQUE',
+  'CREATE CONSTRAINT Country_ID IF NOT EXISTS FOR (n:Country) REQUIRE n.id IS UNIQUE',
+  'CREATE INDEX Country_name IF NOT EXISTS FOR (n:Country) ON (n.name)',
+  'CREATE CONSTRAINT Address_ID IF NOT EXISTS FOR (n:Address) REQUIRE n.id IS UNIQUE',
+  'CREATE INDEX Address_name IF NOT EXISTS FOR (n:Address) ON (n.name)',
+  'CREATE CONSTRAINT Person_ID IF NOT EXISTS FOR (n:Person) REQUIRE n.id IS UNIQUE',
+  'CREATE INDEX Person_name IF NOT EXISTS FOR (n:Person) ON (n.name)',
+  'CREATE CONSTRAINT Company_ID IF NOT EXISTS FOR (n:Company) REQUIRE n.id IS UNIQUE',
+  'CREATE INDEX Company_name IF NOT EXISTS FOR (n:Company) ON (n.name)',
+  'CREATE CONSTRAINT Message_ID IF NOT EXISTS FOR (n:Message) REQUIRE n.id IS UNIQUE',
 ];
 
 async function exec(iteration = 0) {
