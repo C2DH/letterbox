@@ -55,35 +55,42 @@ export class DatasetIndexation {
    * If <code>ids</code> is provided, only the messages with the given ids will be indexed.
    */
   async indexMessages(ids?: string[]): Promise<ImportReport> {
-    let batchNumber = 0;
-    const result: ImportReport = { count: 0, errors: [] };
+    return new Promise((resolve, reject) => {
+      let batchNumber = 0;
+      const result: ImportReport = { count: 0, errors: [] };
 
-    this.neo4j
-      .streamReadQuery<{ id: string }>(
-        ` MATCH (n:Message)
+      this.neo4j
+        .streamReadQuery<{ id: string }>(
+          ` MATCH (n:Message)
           ${ids && ids.length ? `WHERE elementId(n) IN $ids` : ''}
           RETURN  {
             id: id(n),
             message: n.message,
             year: n.year,
-            people: collect { MATCH (n)-->(m:Person) RETURN DISTINCT { id: elementId(m), name: m.name } },
-            addresses: collect { MATCH (n)-->(m:Address) RETURN DISTINCT { id: elementId(m), name: m.name } },
-            companies: collect { MATCH (n)-->(m:Company) RETURN DISTINCT { id: elementId(m), name: m.name } },
-            countries: collect { MATCH (n)-->(m:Country) RETURN DISTINCT { id: elementId(m), name: m.name } }
+            people: collect { MATCH (n)-->(m:Person) RETURN DISTINCT { id: elementId(m), name: m.name } LIMIT ${config.elastic.nested_objects_limit} },
+            addresses: collect { MATCH (n)-->(m:Address) RETURN DISTINCT { id: elementId(m), name: m.name } LIMIT ${config.elastic.nested_objects_limit} },
+            companies: collect { MATCH (n)-->(m:Company) RETURN DISTINCT { id: elementId(m), name: m.name } LIMIT ${config.elastic.nested_objects_limit} },
+            countries: collect { MATCH (n)-->(m:Country) RETURN DISTINCT { id: elementId(m), name: m.name } LIMIT ${config.elastic.nested_objects_limit} }
           } as result`,
-        { ids },
-      )
-      .transform(batcher(config.elastic.batchSize))
-      .forEach(async (batch) => {
-        batchNumber++;
-        this.log.info('Exec batch', batchNumber);
-        const report = await this.es.bulkImport(this.getIndexName('message'), batch);
-        result.count += batch.length;
-        result.errors.push(...report.map((e) => e.error));
-        this.log.info('Batch finished', batchNumber);
-      });
-    this.log.info('Message indexation finished', result);
-    return result;
+          { ids },
+        )
+        .transform(batcher(config.elastic.batchSize))
+        .forEach(
+          async (batch) => {
+            batchNumber++;
+            this.log.info('Exec batch', batchNumber);
+            const report = await this.es.bulkImport(this.getIndexName('message'), batch);
+            result.count += batch.length;
+            result.errors.push(...report.map((e) => e.error));
+            this.log.info('Batch finished', batchNumber);
+          },
+          (error) => {
+            if (error) reject(error);
+            this.log.info('Messages indexation finished', result);
+            resolve(result);
+          },
+        );
+    });
   }
 
   /**
@@ -91,33 +98,40 @@ export class DatasetIndexation {
    * If <code>ids</code> is provided, only the people with the given ids will be indexed.
    */
   async indexPeople(ids?: string[]): Promise<ImportReport> {
-    let batchNumber = 0;
-    const result: ImportReport = { count: 0, errors: [] };
+    return new Promise((resolve, reject) => {
+      let batchNumber = 0;
+      const result: ImportReport = { count: 0, errors: [] };
 
-    this.neo4j
-      .streamReadQuery<{ id: string }>(
-        ` MATCH (n:Person)
+      this.neo4j
+        .streamReadQuery<{ id: string }>(
+          ` MATCH (n:Person)
           ${ids && ids.length ? `WHERE elementId(n) IN $ids` : ''}
           RETURN  {
             id: elementId(n),
             name: n.name,
-            addresses: collect { MATCH(n)<--(:Message)-->(m:Address) RETURN DISTINCT { id: elementId(m), name: m.name } },
-            companies: collect { MATCH(n)<--(:Message)-->(m:Company) RETURN DISTINCT { id: elementId(m), name: m.name } },
-            countries: collect { MATCH(n)<--(:Message)-->(m:Country) RETURN DISTINCT { id: elementId(m), name: m.name } }
+            addresses: collect { MATCH(n)<--(:Message)-->(m:Address) RETURN DISTINCT { id: elementId(m), name: m.name } LIMIT ${config.elastic.nested_objects_limit} },
+            companies: collect { MATCH(n)<--(:Message)-->(m:Company) RETURN DISTINCT { id: elementId(m), name: m.name } LIMIT ${config.elastic.nested_objects_limit} },
+            countries: collect { MATCH(n)<--(:Message)-->(m:Country) RETURN DISTINCT { id: elementId(m), name: m.name } LIMIT ${config.elastic.nested_objects_limit} }
           } as result`,
-        { ids },
-      )
-      .transform(batcher(config.elastic.batchSize))
-      .forEach(async (batch) => {
-        batchNumber++;
-        this.log.info('People exec batch', batchNumber);
-        const report = await this.es.bulkImport(this.getIndexName('person'), batch);
-        result.count += batch.length;
-        result.errors.push(...report.map((e) => e.error));
-        this.log.info('People batch finished', batchNumber);
-      });
-    this.log.info('People indexation finished', result);
-    return result;
+          { ids },
+        )
+        .transform(batcher(config.elastic.batchSize))
+        .forEach(
+          async (batch) => {
+            batchNumber++;
+            this.log.info('People exec batch', batchNumber);
+            const report = await this.es.bulkImport(this.getIndexName('person'), batch);
+            result.count += batch.length;
+            result.errors.push(...report.map((e) => e.error));
+            this.log.info('People batch finished', batchNumber);
+          },
+          (error) => {
+            if (error) reject(error);
+            this.log.info('People indexation finished', result);
+            resolve(result);
+          },
+        );
+    });
   }
 
   /**
@@ -136,9 +150,9 @@ export class DatasetIndexation {
           RETURN  {
             id: elementId(n),
             name: n.name,
-            people: collect { MATCH(n)<--(:Message)-->(m:Person) RETURN DISTINCT {id: elementId(m), name: m.name} },
-            addresses: collect { MATCH(n)<--(:Message)-->(m:Address) RETURN DISTINCT {id: elementId(m), name: m.name} },
-            countries: collect { MATCH(n)<--(:Message)-->(m:Country) RETURN DISTINCT {id: elementId(m), name: m.name} }
+            people: collect { MATCH(n)<--(:Message)-->(m:Person) RETURN DISTINCT {id: elementId(m), name: m.name} LIMIT ${config.elastic.nested_objects_limit} },
+            addresses: collect { MATCH(n)<--(:Message)-->(m:Address) RETURN DISTINCT {id: elementId(m), name: m.name} LIMIT ${config.elastic.nested_objects_limit} },
+            countries: collect { MATCH(n)<--(:Message)-->(m:Country) RETURN DISTINCT {id: elementId(m), name: m.name} LIMIT ${config.elastic.nested_objects_limit} }
           } as result`,
           {},
         )
@@ -177,9 +191,9 @@ export class DatasetIndexation {
           RETURN  {
             id: elementId(n),
             name: n.name,
-            people: collect { MATCH(n)<--(:Message)-->(m:Person) RETURN DISTINCT {id: elementId(m), name: m.name} },
-            companies: collect { MATCH(n)<--(:Message)-->(m:Company) RETURN DISTINCT {id: elementId(m), name: m.name} },
-            countries: collect { MATCH(n)<--(:Message)-->(m:Country) RETURN DISTINCT {id: elementId(m), name: m.name} }
+            people: collect { MATCH(n)<--(:Message)-->(m:Person) RETURN DISTINCT {id: elementId(m), name: m.name} LIMIT ${config.elastic.nested_objects_limit} },
+            companies: collect { MATCH(n)<--(:Message)-->(m:Company) RETURN DISTINCT {id: elementId(m), name: m.name} LIMIT ${config.elastic.nested_objects_limit} },
+            countries: collect { MATCH(n)<--(:Message)-->(m:Country) RETURN DISTINCT {id: elementId(m), name: m.name} LIMIT ${config.elastic.nested_objects_limit} }
           } as result`,
           {},
         )
