@@ -22,6 +22,12 @@ services:
       - xpack.security.enabled=false
     volumes:
       - ${PROJECT_PATH}/docker/elasticsearch/data:/usr/share/elasticsearch/data
+  kibana:
+    image: kibana:${ELASTICSEARCH_VERSION}
+    depends_on:
+      - elasticsearch
+    environment:
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
   project:
       build:
         context: ./project
