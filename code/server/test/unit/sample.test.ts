@@ -5,7 +5,7 @@ import { dropTestDatasets, initTestDatasets } from '../helpers/dataset';
 beforeEach(async () => {
   await initTestDatasets([
     {
-      fingerprint: '1',
+      id: '1',
       year: 2000,
       filename: 'test.pdf',
       pageNumber: 1,
