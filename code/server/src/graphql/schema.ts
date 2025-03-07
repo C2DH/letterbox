@@ -19,6 +19,10 @@ export const typeDefs = gql`
   # Graph DB schema
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+  type RelaionshipProperties @relationshipProperties {
+    deleted: Boolean
+  }
+
   type Company @node {
     id: ID! @unique
     name: String!
@@ -27,21 +31,33 @@ export const typeDefs = gql`
       @cypher(
         columnName: "result"
         statement: """
-        MATCH (this)<--(:Message)-->(n:Country) RETURN DISTINCT n AS result
+        MATCH (this)<-[r1]-(:Message)-[r2]->(n:Country)
+        WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false)
+        RETURN DISTINCT n AS result
+        SKIP $skip
+        LIMIT $limit
         """
       )
     people(skip: Int = 0, limit: Int = 50): [Person!]!
       @cypher(
         columnName: "result"
         statement: """
-        MATCH (this)<--(:Message)-->(n:Person) RETURN DISTINCT n AS result
+        MATCH (this)<-[r1]-(:Message)-[r2]->(n:Person)
+        WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false)
+        RETURN DISTINCT n AS result
+        SKIP $skip
+        LIMIT $limit
         """
       )
     addresses(skip: Int = 0, limit: Int = 50): [Address!]!
       @cypher(
         columnName: "result"
         statement: """
-        MATCH (this)<--(:Message)-->(n:Address) RETURN DISTINCT n AS result SKIP $skip LIMIT $limit
+        MATCH (this)<-[r1]-(:Message)-[r2]->(n:Address)
+        WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false)
+        RETURN DISTINCT n AS result
+        SKIP $skip
+        LIMIT $limit
         """
       )
   }
@@ -54,21 +70,33 @@ export const typeDefs = gql`
       @cypher(
         columnName: "result"
         statement: """
-        MATCH (this)<--(:Message)-->(n:Company) RETURN DISTINCT n AS result
+        MATCH (this)<-[r1]-(:Message)-[r2]->(n:Company)
+        WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false)
+        RETURN DISTINCT n AS result
+        SKIP $skip
+        LIMIT $limit
         """
       )
     people(skip: Int = 0, limit: Int = 50): [Person!]!
       @cypher(
         columnName: "result"
         statement: """
-        MATCH (this)<--(:Message)-->(n:Person) RETURN DISTINCT n AS result
+        MATCH (this)<-[r1]-(:Message)-[r2]->(n:Person)
+        WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false)
+        RETURN DISTINCT n AS result
+        SKIP $skip
+        LIMIT $limit
         """
       )
     addresses(skip: Int = 0, limit: Int = 50): [Address!]!
       @cypher(
         columnName: "result"
         statement: """
-        MATCH (this)<--(:Message)-->(n:Address) RETURN DISTINCT n AS result SKIP $skip LIMIT $limit
+        MATCH (this)<-[r1]-(:Message)-[r2]->(n:Address)
+        WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false)
+        RETURN DISTINCT n AS result
+        SKIP $skip
+        LIMIT $limit
         """
       )
   }
@@ -81,21 +109,33 @@ export const typeDefs = gql`
       @cypher(
         columnName: "result"
         statement: """
-        MATCH (this)<--(:Message)-->(n:Company) RETURN DISTINCT n AS result
+        MATCH (this)<-[r1]-(:Message)-[r2]->(n:Company)
+        WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false)
+        RETURN DISTINCT n AS result
+        SKIP $skip
+        LIMIT $limit
         """
       )
     people(skip: Int = 0, limit: Int = 50): [Person!]!
       @cypher(
         columnName: "result"
         statement: """
-        MATCH (this)<--(:Message)-->(n:Person) RETURN DISTINCT n AS result
+        MATCH (this)<-[r1]-(:Message)-[r2]->(n:Person)
+        WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false)
+        RETURN DISTINCT n AS result
+        SKIP $skip
+        LIMIT $limit
         """
       )
     countries(skip: Int = 0, limit: Int = 50): [Country!]!
       @cypher(
         columnName: "result"
         statement: """
-        MATCH (this)<--(:Message)-->(n:Country) RETURN DISTINCT n AS result SKIP $skip LIMIT $limit
+        MATCH (this)<-[r1]-(:Message)-[r2]->(n:Country)
+        WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false)
+        RETURN DISTINCT n AS result
+        SKIP $skip
+        LIMIT $limit
         """
       )
   }
@@ -108,21 +148,33 @@ export const typeDefs = gql`
       @cypher(
         columnName: "result"
         statement: """
-        MATCH (this)<--(:Message)-->(n:Company) RETURN DISTINCT n AS result
+        MATCH (this)<-[r1]-(:Message)-[r2]->(n:Company)
+        WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false)
+        RETURN DISTINCT n AS result
+        SKIP $skip
+        LIMIT $limit
         """
       )
     addresses(skip: Int = 0, limit: Int = 50): [Address!]!
       @cypher(
         columnName: "result"
         statement: """
-        MATCH (this)<--(:Message)-->(n:Address) RETURN DISTINCT n AS result
+        MATCH (this)<-[r1]-(:Message)-[r2]->(n:Address)
+        WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false)
+        RETURN DISTINCT n AS result
+        SKIP $skip
+        LIMIT $limit
         """
       )
     countries(skip: Int = 0, limit: Int = 50): [Country!]!
       @cypher(
         columnName: "result"
         statement: """
-        MATCH (this)<--(:Message)-->(n:Country) RETURN DISTINCT n AS result SKIP $skip LIMIT $limit
+        MATCH (this)<-[r1]-(:Message)-[r2]->(n:Country)
+        WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false)
+        RETURN DISTINCT n AS result
+        SKIP $skip
+        LIMIT $limit
         """
       )
   }
@@ -141,10 +193,14 @@ export const typeDefs = gql`
     raw_countries: [String!]
     raw_message: String!
 
-    company: [Company!]! @relationship(type: "CONTAINS", direction: OUT)
-    address: Address! @relationship(type: "CONTAINS", direction: OUT)
-    persons: [Person!]! @relationship(type: "CONTAINS", direction: OUT)
-    countries: [Country!]! @relationship(type: "CONTAINS", direction: OUT)
+    company: [Company!]!
+      @relationship(type: "CONTAINS", direction: OUT, properties: "RelaionshipProperties")
+    address: Address!
+      @relationship(type: "CONTAINS", direction: OUT, properties: "RelaionshipProperties")
+    persons: [Person!]!
+      @relationship(type: "CONTAINS", direction: OUT, properties: "RelaionshipProperties")
+    countries: [Country!]!
+      @relationship(type: "CONTAINS", direction: OUT, properties: "RelaionshipProperties")
   }
 
   #

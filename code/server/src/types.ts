@@ -36,7 +36,7 @@ export const EsIndices: Record<ItemType, string> = {
 export const Neo4jLabels: Record<ItemType, string> = {
   message: `Message`,
   company: `Company`,
-  person: `People`,
+  person: `Person`,
   address: `Address`,
   country: `Country`,
 };
