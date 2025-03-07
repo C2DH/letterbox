@@ -163,6 +163,9 @@ export class Neo4j {
     return this.driver.session({ defaultAccessMode: neo4j.session.WRITE, database: this.database });
   }
 
+  /**
+   * Create a stream of result from a cypher query
+   */
   streamReadQuery<T>(query: string, params: Record<string, unknown>): Stream<T> {
     const stream = new Stream<T>();
     const session = this.driver.session({ database: this.database });
@@ -183,15 +186,19 @@ export class Neo4j {
     return stream;
   }
 
+  /**
+   * Reset the database by deleting all nodes and relationships in a batch of size 'batchSize' (default 100).
+   * This function is usefull for testing purpose and to clear the DB.
+   */
   async resetDatabase(batchSize = 100): Promise<void> {
     const session = this.getWriteSession();
     try {
-      await session.run(`
-        CALL apoc.periodic.commit(
-          "MATCH (n) WITH n LIMIT $limit 
-           DETACH DELETE n RETURN count(*)",
-          {limit: ${batchSize}}
-        )`);
+      await session.run(
+        ` CALL apoc.periodic.commit(
+            "MATCH (n) WITH n LIMIT $limit DETACH DELETE n RETURN count(*)",
+            {limit: ${batchSize}}
+          )`,
+      );
     } finally {
       await session.close();
     }

@@ -26,10 +26,10 @@ export class DatasetIndexation {
   /**
    * Index all.
    */
-  async doIndexation(): Promise<ImportReport> {
+  async doIndexation(resetIndices = true): Promise<ImportReport> {
     await Promise.all(
       itemTypes.map((item) =>
-        this.es.createIndex(EsIndices[item], this.getIndexConfig(item), true),
+        this.es.createIndex(EsIndices[item], this.getIndexConfig(item), resetIndices),
       ),
     );
 

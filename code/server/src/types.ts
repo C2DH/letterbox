@@ -32,3 +32,11 @@ export const EsIndices: Record<ItemType, string> = {
   address: `${config.elastic.index_prefix}addresses`,
   country: `${config.elastic.index_prefix}countries`,
 };
+
+export const Neo4jLabels: Record<ItemType, string> = {
+  message: `Message`,
+  company: `Company`,
+  person: `People`,
+  address: `Address`,
+  country: `Country`,
+};

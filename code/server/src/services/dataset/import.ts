@@ -113,7 +113,9 @@ export class DatasetImport {
   /**
    * Import a list in records in databases.
    */
-  public async importRecords(data: DataMessage[]) {
+  public async importRecords(
+    data: DataMessage[],
+  ): Promise<Array<DataMessage<{ id: string; name: string }>>> {
     const records: DataMessage<{ id: string; name: string }>[] = data.map((record) => ({
       ...record,
       raw_company: { id: hash(record.raw_company), name: record.raw_company },
@@ -182,6 +184,8 @@ export class DatasetImport {
         `Error importing records: ${result} records imported instead of ${records.length}`,
       );
     }
+
+    return records;
   }
 
   /**
