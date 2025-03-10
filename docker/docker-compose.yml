@@ -3,6 +3,12 @@ services:
     image: neo4j:${NEO4J_VERSION}
     restart: ${RESTART_POLICY}
     user: "${USER_ID}:${GROUP_ID}"
+    healthcheck:
+      test: wget http://localhost:7474 || exit 1
+      interval: 1s
+      timeout: 10s
+      retries: 20
+      start_period: 20s
     environment:
       - NEO4J_server_memory_heap_max__size=${NEO4J_HEAP}
       - NEO4J_server_memory_pagecache_size=${NEO4J_PAGECACHE}
@@ -36,8 +42,8 @@ services:
       user: node
       restart: ${RESTART_POLICY}
       depends_on:
-      - elasticsearch
-      - neo4j
+        neo4j: 
+          condition: service_healthy
       volumes:
       - ${PROJECT_PATH}/docker/project/entrypoint.sh:/entrypoint.sh
       - ${PROJECT_PATH}/code:/code
