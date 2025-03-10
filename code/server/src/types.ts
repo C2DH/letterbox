@@ -12,12 +12,7 @@ export type DataMessage<T = string> = {
   raw_address?: T;
   raw_people?: T[];
   raw_countries?: T[];
-
-  // unused
   raw_message: string;
-  raw_company_spare: string;
-  raw_address_spare?: string;
-  raw_people_abbr?: string[];
 };
 
 export type ItemType = 'message' | 'company' | 'person' | 'address' | 'country';

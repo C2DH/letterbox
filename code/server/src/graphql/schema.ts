@@ -1,12 +1,16 @@
+import { delegateToSchema } from '@graphql-tools/delegate';
 import { IResolvers } from '@graphql-tools/utils';
 import { notImplemented } from '@hapi/boom';
 import { getLogger } from '@ouestware/node-logger';
-import { GraphQLObjectType } from 'graphql';
+import { GraphQLObjectType, GraphQLResolveInfo, OperationTypeNode } from 'graphql';
 import gql from 'graphql-tag';
+import { head } from 'lodash';
 
 import { Services } from '../services';
+import { DatasetEdition } from '../services/dataset/edition';
 import { DatasetImport } from '../services/dataset/import';
 import { DatasetIndexation } from '../services/dataset/indexation';
+import { type ItemType, Neo4jLabels } from '../types';
 
 export const typeDefs = gql`
   #
@@ -14,6 +18,20 @@ export const typeDefs = gql`
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   scalar JSONObject
   scalar JSON
+
+  enum DataItemType {
+    company
+    address
+    country
+    person
+  }
+
+  union NodeItem = Company | Address | Country | Person
+
+  input NodeIdentification {
+    type: DataItemType!
+    id: ID!
+  }
 
   #
   # Graph DB schema
@@ -442,6 +460,15 @@ export const typeDefs = gql`
       filters: AddressFilters!
       limit: Int!
     ): [TopValue]
+
+    #
+    # Internal methods
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    _getNodesItem: [NodeItem!]!
+      @cypher(
+        statement: "UNWIND $nodes as node MATCH (n:$(node.type) { id: node.id }) RETURN n AS result"
+        columnName: "result"
+      )
   }
 
   type Mutation {
@@ -454,14 +481,54 @@ export const typeDefs = gql`
     Index the graph in the search engine
     """
     index: ImportReport
+
+    """
+    Create a new node on the specified message
+    """
+    createNode(messageId: ID!, type: DataItemType!, name: String!): NodeItem!
+
+    """
+    Rename a node value
+    """
+    renameNode(type: DataItemType!, id: ID!, name: String!): NodeItem!
+
+    """
+    Delete a node
+    """
+    deleteNode(type: DataItemType!, id: ID!): Boolean!
+
+    """
+    Change node's type
+    """
+    changeType(type: DataItemType!, id: ID!, newType: DataItemType!): NodeItem!
+
+    """
+    Split a node
+    """
+    splitNode(type: DataItemType!, id: ID!, values: [String!]!): [NodeItem!]!
+
+    """
+    Merge nodes
+    """
+    mergeNodes(nodes: [NodeIdentification!]!, type: DataItemType!, name: String!): NodeItem!
   }
 `;
 
 const log = getLogger('GraphQl');
 const datasetImport = Services.get(DatasetImport);
 const datasetIndexation = Services.get(DatasetIndexation);
+const datasetEdition = Services.get(DatasetEdition);
 
 export const resolvers: IResolvers = {
+  NodeItem: {
+    __resolveType(
+      obj: { [key: string]: unknown },
+      _ctx: unknown,
+      _resolverInfo: GraphQLResolveInfo,
+    ): string {
+      return (obj['__resolveType'] as string) || (obj['__typename'] as string);
+    },
+  },
   Query: {
     // SEARCH
     searchMessage: async ({ filters, sortBy, limit, from }) => {
@@ -528,12 +595,7 @@ export const resolvers: IResolvers = {
     },
   },
   Mutation: {
-    import: async (
-      _parent: GraphQLObjectType,
-      params: {
-        fileNamePattern?: string;
-      },
-    ) => {
+    import: async (_parent: GraphQLObjectType, params: { fileNamePattern?: string }) => {
       let reFileNamePattern: RegExp | undefined = undefined;
       reFileNamePattern = params.fileNamePattern
         ? new RegExp(params.fileNamePattern, 'i')
@@ -543,5 +605,110 @@ export const resolvers: IResolvers = {
     index: async (_parent: GraphQLObjectType) => {
       return await datasetIndexation.doIndexation();
     },
+
+    /**
+     * Create a new node on the specified message
+     */
+    createNode: async (
+      _parent: GraphQLObjectType,
+      params: { messageId: string; type: ItemType; name: string },
+      ctx: unknown,
+      info: GraphQLResolveInfo,
+    ) => {
+      const node = await datasetEdition.createNode(params.messageId, params.type, params.name);
+      return getGraphQlItem(node.type, node.id, ctx, info);
+    },
+
+    /**
+     * Rename a node value
+     */
+    renameNode: async (
+      _parent: GraphQLObjectType,
+      params: { type: ItemType; id: string; name: string },
+      ctx: unknown,
+      info: GraphQLResolveInfo,
+    ) => {
+      const node = await datasetEdition.renameNode(params.type, params.id, params.name);
+      return getGraphQlItem(node.type, node.id, ctx, info);
+    },
+
+    /**
+     * Delete a node
+     */
+    deleteNode: async (_parent: GraphQLObjectType, params: { type: ItemType; id: string }) => {
+      await datasetEdition.deleteNode(params.type, params.id);
+      return true;
+    },
+
+    /**
+     * Change node's type
+     */
+    changeType: async (
+      _parent: GraphQLObjectType,
+      params: { type: ItemType; id: string; newType: ItemType },
+      ctx: unknown,
+      info: GraphQLResolveInfo,
+    ) => {
+      const node = await datasetEdition.changeNodeType(params.type, params.id, params.newType);
+      return getGraphQlItem(params.newType, node.id, ctx, info);
+    },
+
+    /**
+     * Split a node
+     */
+    splitNode: async (
+      _parent: GraphQLObjectType,
+      params: { type: ItemType; id: string; values: string[] },
+      ctx: unknown,
+      info: GraphQLResolveInfo,
+    ) => {
+      const nodes = await datasetEdition.splitNode(params.type, params.id, params.values);
+      return getGraphQlItems(nodes, ctx, info);
+    },
+
+    /**
+     * Merge nodes
+     */
+    mergeNodes: async (
+      _parent: GraphQLObjectType,
+      params: { nodes: Array<{ type: ItemType; id: string }>; type: ItemType; name: string },
+      ctx: unknown,
+      info: GraphQLResolveInfo,
+    ) => {
+      const node = await datasetEdition.mergeNodes(params.nodes, params.type, params.name);
+      return getGraphQlItem(node.type, node.id, ctx, info);
+    },
   },
 };
+
+async function getGraphQlItems<T>(
+  nodes: Array<{ type: ItemType; id: string }>,
+  ctx: T,
+  info: GraphQLResolveInfo,
+) {
+  // Calling _getGraph query with the good cypherParams
+  const data = await delegateToSchema({
+    schema: info.schema,
+    operation: 'query' as OperationTypeNode,
+    fieldName: '_getNodesItem',
+    context: {
+      ...ctx,
+      cypherParams: { nodes: nodes.map((n) => ({ ...n, type: Neo4jLabels[n.type] })) },
+    },
+    info: info,
+  });
+
+  return data;
+}
+
+async function getGraphQlItem<T>(type: ItemType, id: string, ctx: T, info: GraphQLResolveInfo) {
+  // Calling _getGraph query with the good cypherParams
+  const data = await delegateToSchema({
+    schema: info.schema,
+    operation: 'query' as OperationTypeNode,
+    fieldName: '_getNodesItem',
+    context: { ...ctx, cypherParams: { nodes: [{ id, type: Neo4jLabels[type] }] } },
+    info: info,
+  });
+  return head(data);
+}

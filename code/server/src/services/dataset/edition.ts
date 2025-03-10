@@ -46,7 +46,11 @@ export class DatasetEdition {
   /**
    * Rename a node of type `type` with id `id`.
    */
-  async renameNode(type: ItemType, id: string, name: string): Promise<void> {
+  async renameNode(
+    type: ItemType,
+    id: string,
+    name: string,
+  ): Promise<{ type: ItemType; id: string }> {
     if (type === 'message') throw Boom.badRequest(`Cannot change type of a message`);
 
     const result = await this.neo4j.getFirstResultQuery<number>(
@@ -56,12 +60,18 @@ export class DatasetEdition {
       { id, name },
     );
     if (result !== 1) throw Boom.notFound(`Node ${Neo4jLabels[type]}  with id ${id} not found`);
+
+    return { type, id };
   }
 
   /**
    * Change the type of a node
    */
-  async changeNodeType(type: ItemType, id: string, newType: ItemType): Promise<void> {
+  async changeNodeType(
+    type: ItemType,
+    id: string,
+    newType: ItemType,
+  ): Promise<{ type: ItemType; id: string }> {
     if (type === 'message') throw Boom.badRequest(`Cannot change type of a message node`);
     if (newType === 'message') throw Boom.badRequest(`Cannot change type to message`);
 
@@ -73,6 +83,8 @@ export class DatasetEdition {
       { id },
     );
     if (result !== 1) throw Boom.notFound(`Node ${Neo4jLabels[type]}  with id ${id} not found`);
+
+    return { type, id };
   }
 
   /**
@@ -174,8 +186,8 @@ export class DatasetEdition {
         ` MATCH (n:${Neo4jLabels[type]} { id: $id }) 
           RETURN {
             elementId: elementId(n),
-            inEdges: [(n)<-[r]-(m) WHERE NOT coalesce(r.deleted, false) | { elementId: m.id, type: type(r) }],
-            outEdges: [(n)-[r]->(m) WHERE NOT coalesce(r.deleted, false) | { elementId: m.id, type: type(r) }]
+            inEdges: [(n)<-[r]-(m) WHERE NOT coalesce(r.deleted, false) | { elementId: elementId(m), type: type(r) }],
+            outEdges: [(n)-[r]->(m) WHERE NOT coalesce(r.deleted, false) | { elementId: elementId(m), type: type(r) }]
           } AS result`,
         { id },
       );

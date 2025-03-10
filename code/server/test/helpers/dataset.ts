@@ -1,5 +1,6 @@
 import { faker } from '@faker-js/faker';
 import { v4 as uuid } from 'uuid';
+import { expect } from 'vitest';
 
 import { Services } from '../../src/services';
 import { DatasetImport } from '../../src/services/dataset/import';
@@ -112,12 +113,61 @@ export function generateRandomMessages(
     return {
       ...message,
       raw_message: message.message,
-      raw_company_spare: message.raw_company,
-      raw_address_spare: message.raw_address,
     };
   });
 }
 
+/**
+ * Retrieve the data of a message.
+ */
+export async function getDataMessage(
+  id: string,
+): Promise<null | DataMessage<{ id: string; name: string }>> {
+  const message = await neo4j.getFirstResultQuery<DataMessage<{ id: string; name: string }>>(
+    ` MATCH (n:Message {id: $id}) 
+      RETURN { 
+        id: n.id,
+        year: n.year,
+        filename: n.filename,
+        pageNumber: n.pageNumber,
+        message: n.message,
+        raw_message: n.message,
+        raw_company: head(collect { MATCH (n)-[r]->(m:Company) WHERE NOT coalesce(r.deleted, false) RETURN DISTINCT { id:m.id, name: m.name } }),
+        raw_address: head(collect { MATCH (n)-[r]->(m:Address) WHERE NOT coalesce(r.deleted, false)RETURN DISTINCT { id:m.id, name: m.name } }),
+        raw_people: collect { MATCH (n)-[r]->(m:Person) WHERE NOT coalesce(r.deleted, false) RETURN DISTINCT { id:m.id, name: m.name } },
+        raw_countries: collect { MATCH (n)-[r]->(m:Country) WHERE NOT coalesce(r.deleted, false) RETURN DISTINCT { id:m.id, name: m.name } }
+      } AS result`,
+    { id },
+  );
+  return message;
+}
+
+export async function checkMessage(
+  messageId: string,
+  message: DataMessage<{ id: string; name: string }>,
+) {
+  const data = await getDataMessage(messageId);
+  console.log(data);
+
+  expect(data).not.toBeNull();
+  if (data) {
+    expect(message.id).toStrictEqual(data.id);
+    expect(message.year).toStrictEqual(data.year);
+    expect(message.filename).toStrictEqual(data.filename);
+    expect(message.pageNumber).toStrictEqual(data.pageNumber);
+    expect(message.message).toStrictEqual(data.message);
+    expect(message.raw_message).toStrictEqual(data.raw_message);
+    expect(message.raw_company).toStrictEqual(data.raw_company);
+    expect(message.raw_address).toStrictEqual(data.raw_address);
+
+    expect(message.raw_people?.sort(sortById)).toStrictEqual(data.raw_people?.sort(sortById));
+    expect(message.raw_countries?.sort(sortById)).toStrictEqual(data.raw_countries?.sort(sortById));
+  }
+}
+
+function sortById<T extends { id: string }>(a: T, b: T): number {
+  return a.id < b.id ? 1 : -1;
+}
 function getRandomSetItem<T>(set: Set<T>): T {
   const items = Array.from(set);
   return items[Math.floor(Math.random() * items.length)];
