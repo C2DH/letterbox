@@ -1,6 +1,6 @@
 {
     "verbose": true,
-    "exec": "npm run lint && tsx src/index.ts ",
+    "exec": "npm run lint && npm run generate && tsx src/index.ts ",
     "watch": [
       "src"
     ],
