@@ -27,20 +27,44 @@ export class DatasetEdition {
     messageId: string,
     type: ItemType,
     name: string,
-  ): Promise<{ type: ItemType; id: string }> {
+  ): Promise<{ type: ItemType; id: string; impactedMessages: string[] }> {
     if (type === 'message') throw Boom.badRequest(`Cannot create node of type message`);
 
     const nodeId = uuid();
-    const result = await this.neo4j.getFirstResultQuery(
-      ` MATCH (n:Message {id: $messageId}) 
-          CREATE (n)-[:CONTAINS]->(:${Neo4jLabels[type]} { id: $id, name: $name })
-          RETURN  count(*) AS result`,
+    const impactedMessages = await this.neo4j.getFirstResultQuery<string[]>(
+      ` MATCH (m:Message {id: $messageId}) 
+          CREATE (m)-[:CONTAINS]->(n:${Neo4jLabels[type]} { id: $id, name: $name })
+          RETURN  collect { MATCH (n)<-[:CONTAINS { deleted:false }]-(msg:Message) RETURN msg.id } AS result`,
       { messageId, id: nodeId, name },
     );
-    if (result !== 1)
+    if (!impactedMessages)
       throw Boom.notFound(`Node ${Neo4jLabels['message']} with id ${messageId} not found`);
 
-    return { type, id: nodeId };
+    return { type, id: nodeId, impactedMessages };
+  }
+
+  /**
+   * Attached a node of type `type` with name `name`,
+   * linked to the message with id `messageId`.
+   */
+  async linkNode(
+    messageId: string,
+    type: ItemType,
+    id: string,
+  ): Promise<{ type: ItemType; id: string; impactedMessages: string[] }> {
+    if (type === 'message') throw Boom.badRequest(`Cannot link a node of type message`);
+
+    const impactedMessages = await this.neo4j.getFirstResultQuery<string[]>(
+      ` MATCH (m:Message {id: $messageId}) 
+        MATCH (n:${Neo4jLabels[type]} {id: $id}) 
+        MERGE (m)-[:CONTAINS]->(n)
+        RETURN  collect { MATCH (n)<-[:CONTAINS { deleted:false }]-(msg:Message) RETURN msg.id } AS result`,
+      { messageId, id },
+    );
+    if (!impactedMessages)
+      throw Boom.notFound(`Node ${Neo4jLabels['message']} with id ${messageId} not found`);
+
+    return { type, id, impactedMessages };
   }
 
   /**
@@ -50,18 +74,19 @@ export class DatasetEdition {
     type: ItemType,
     id: string,
     name: string,
-  ): Promise<{ type: ItemType; id: string }> {
+  ): Promise<{ type: ItemType; id: string; impactedMessages: string[] }> {
     if (type === 'message') throw Boom.badRequest(`Cannot change type of a message`);
 
-    const result = await this.neo4j.getFirstResultQuery<number>(
+    const impactedMessages = await this.neo4j.getFirstResultQuery<string[]>(
       ` MATCH (n:${Neo4jLabels[type]} { id: $id })
         SET n.name = $name
-        RETURN  count(*) AS result`,
+        RETURN  collect { MATCH (n)<-[:CONTAINS { deleted:false }]-(msg:Message) RETURN msg.id } AS result`,
       { id, name },
     );
-    if (result !== 1) throw Boom.notFound(`Node ${Neo4jLabels[type]}  with id ${id} not found`);
+    if (!impactedMessages)
+      throw Boom.notFound(`Node ${Neo4jLabels[type]}  with id ${id} not found`);
 
-    return { type, id };
+    return { type, id, impactedMessages };
   }
 
   /**
@@ -71,26 +96,31 @@ export class DatasetEdition {
     type: ItemType,
     id: string,
     newType: ItemType,
-  ): Promise<{ type: ItemType; id: string }> {
+  ): Promise<{ type: ItemType; id: string; impactedMessages: string[] }> {
     if (type === 'message') throw Boom.badRequest(`Cannot change type of a message node`);
     if (newType === 'message') throw Boom.badRequest(`Cannot change type to message`);
 
-    const result = await this.neo4j.getFirstResultQuery<number>(
+    const impactedMessages = await this.neo4j.getFirstResultQuery<string[]>(
       ` MATCH (n:${Neo4jLabels[type]} { id: $id })
         REMOVE n:${Neo4jLabels[type]}
         SET n:${Neo4jLabels[newType]}
-        RETURN  count(*) AS result`,
+        RETURN  collect { MATCH (n)<-[:CONTAINS { deleted:false }]-(msg:Message) RETURN msg.id } AS result`,
       { id },
     );
-    if (result !== 1) throw Boom.notFound(`Node ${Neo4jLabels[type]}  with id ${id} not found`);
+    if (!impactedMessages)
+      throw Boom.notFound(`Node ${Neo4jLabels[type]}  with id ${id} not found`);
 
-    return { type, id };
+    return { type, id, impactedMessages };
   }
 
   /**
    * Delete a node.
    */
-  async deleteNode(type: ItemType, id: string, tx?: Transaction): Promise<void> {
+  async deleteNode(
+    type: ItemType,
+    id: string,
+    tx?: Transaction,
+  ): Promise<{ impactedMessages: string[] }> {
     if (type === 'message') throw Boom.badRequest(`Cannot change type of a message node`);
 
     const query = `
@@ -98,11 +128,14 @@ export class DatasetEdition {
       OPTIONAL MATCH (n)-[r]-() SET r.deleted = true
       RETURN count(*) AS result`;
 
-    const result = await (tx
-      ? this.neo4j.getTxFirstResultQuery<number>(tx, query, { id })
-      : this.neo4j.getFirstResultQuery<number>(query, { id }));
+    const impactedMessages = await (tx
+      ? this.neo4j.getTxFirstResultQuery<string[]>(tx, query, { id })
+      : this.neo4j.getFirstResultQuery<string[]>(query, { id }));
 
-    if (!result) throw Boom.notFound(`Node ${Neo4jLabels[type]}  with id ${id} not found`);
+    if (!impactedMessages)
+      throw Boom.notFound(`Node ${Neo4jLabels[type]}  with id ${id} not found`);
+
+    return { impactedMessages };
   }
 
   /**
@@ -112,7 +145,7 @@ export class DatasetEdition {
     nodes: Array<{ type: ItemType; id: string }>,
     targetType: ItemType,
     targetName: string,
-  ): Promise<{ type: ItemType; id: string }> {
+  ): Promise<{ type: ItemType; id: string; impactedMessages: string[] }> {
     if (nodes.some((n) => n.type === 'message'))
       throw Boom.badRequest(`Cannot do merge on message nodes`);
 
@@ -142,19 +175,22 @@ export class DatasetEdition {
       );
 
       // Merge the nodes
-      await this.neo4j.getTxFirstResultQuery<number>(
+      const impactedMessages = await this.neo4j.getTxFirstResultQuery<string[]>(
         tx,
         ` MATCH (n) WHERE elementId(n) IN $nodeIds
-          WITH collect(n) AS nodes
-            CALL apoc.refactor.mergeNodes(nodes, {properties:'discard', mergeRels:true}) YIELD node 
-            RETURN count(*) AS result`,
+          WITH 
+            collect(n) AS nodes,
+            collect { MATCH (n)<-[:CONTAINS { deleted:false }]-(msg:Message) RETURN msg.id } AS impactedMessages
+            
+              CALL apoc.refactor.mergeNodes(nodes, {properties:'discard', mergeRels:true}) YIELD node 
+              RETURN impactedMessages AS result`,
         { nodeIds: [targetElementId, ...nodeElementIds] },
       );
 
       await tx.commit();
 
       // Returned the created merged node
-      return { type: targetType, id: targetId };
+      return { type: targetType, id: targetId, impactedMessages: impactedMessages ?? [] };
     } catch (e) {
       await tx.rollback();
       throw e;
@@ -170,7 +206,7 @@ export class DatasetEdition {
     type: ItemType,
     id: string,
     newNames: string[],
-  ): Promise<Array<{ type: ItemType; id: string }>> {
+  ): Promise<{ nodes: Array<{ type: ItemType; id: string }>; impactedMessages: string[] }> {
     if (type === 'message') throw Boom.badRequest(`Cannot change type of a message node`);
 
     const session = this.neo4j.getWriteSession();
@@ -181,13 +217,15 @@ export class DatasetEdition {
         elementId: string;
         inEdges: Array<{ elementId: string; type: string }>;
         outEdges: Array<{ elementId: string; type: string }>;
+        impactedMessages: string[];
       }>(
         tx,
         ` MATCH (n:${Neo4jLabels[type]} { id: $id }) 
           RETURN {
             elementId: elementId(n),
             inEdges: [(n)<-[r]-(m) WHERE NOT coalesce(r.deleted, false) | { elementId: elementId(m), type: type(r) }],
-            outEdges: [(n)-[r]->(m) WHERE NOT coalesce(r.deleted, false) | { elementId: elementId(m), type: type(r) }]
+            outEdges: [(n)-[r]->(m) WHERE NOT coalesce(r.deleted, false) | { elementId: elementId(m), type: type(r) }],
+            impactedMessages: collect { MATCH (n)<-[:CONTAINS { deleted:false }]-(msg:Message) RETURN msg.id }
           } AS result`,
         { id },
       );
@@ -221,7 +259,10 @@ export class DatasetEdition {
       await tx.commit();
 
       // return the list of node created
-      return newNodes.map((n) => ({ type, id: n.id }));
+      return {
+        nodes: newNodes.map((n) => ({ type, id: n.id })),
+        impactedMessages: data.impactedMessages,
+      };
     } catch (e) {
       await tx.rollback();
       throw e;

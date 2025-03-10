@@ -217,12 +217,12 @@ describe('Dataset edition', () => {
 
       // Do the split
       // ~~~~~~~~~~~~~~~~~~~~~~
-      const nodes = await edition.splitNode('person', person.id, names);
+      const data = await edition.splitNode('person', person.id, names);
 
       // Check created nodes
       // ~~~~~~~~~~~~~~~~~~~~~~
-      expect(nodes.length).toBe(3);
-      for (const person of nodes) {
+      expect(data.nodes.length).toBe(3);
+      for (const person of data.nodes) {
         await expect(getItemData('person', person.id)).resolves.not.toBeNull();
       }
       // Check that the original node has been deleted
@@ -233,7 +233,7 @@ describe('Dataset edition', () => {
         ...message,
         raw_people: [
           ...(message.raw_people?.slice(1) || []),
-          ...nodes.map((n, index) => ({ id: n.id, name: names[index] })),
+          ...data.nodes.map((n, index) => ({ id: n.id, name: names[index] })),
         ],
       });
     });

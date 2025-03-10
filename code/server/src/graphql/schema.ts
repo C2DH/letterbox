@@ -190,8 +190,8 @@ export const resolvers: Resolvers<unknown> = {
      * Split a node
      */
     splitNode: async (_root, { type, id, values }, context, info) => {
-      const nodes = await datasetEdition.splitNode(type, id, values);
-      const data = await getGraphQlItems(nodes, context, info);
+      const result = await datasetEdition.splitNode(type, id, values);
+      const data = await getGraphQlItems(result.nodes, context, info);
       if (data.length !== values.length)
         throw Boom.internal(`Split in ${values.length} nodes but got ${data.length}`);
       return data;
