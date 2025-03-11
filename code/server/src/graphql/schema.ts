@@ -1,16 +1,20 @@
 import * as path from 'path';
+import { SearchHit } from '@elastic/elasticsearch';
 import { delegateToSchema } from '@graphql-tools/delegate';
+import { ExtractField } from '@graphql-tools/wrap';
 import Boom, { notImplemented } from '@hapi/boom';
+import { Filter } from '@ouestware/facets';
 import { getLogger } from '@ouestware/node-logger';
 import { GraphQLResolveInfo, OperationTypeNode } from 'graphql';
-import { head } from 'lodash';
+import { capitalize, head } from 'lodash';
 import { readFileSync } from 'node:fs';
 
 import { Services } from '../services';
 import { DatasetEdition } from '../services/dataset/edition';
 import { DatasetImport } from '../services/dataset/import';
 import { DatasetIndexation } from '../services/dataset/indexation';
-import { type ItemType, Neo4jLabels } from '../types';
+import { Elastic } from '../services/elastic';
+import { EsIndices, type ItemType, Neo4jLabels } from '../types';
 import { type NodeItem, Resolvers } from './generated/types';
 
 export const typeDefs = readFileSync(path.resolve(__dirname, './schema.graphql'), 'utf8');
@@ -19,27 +23,45 @@ const log = getLogger('GraphQl');
 const datasetImport = Services.get(DatasetImport);
 const datasetIndexation = Services.get(DatasetIndexation);
 const datasetEdition = Services.get(DatasetEdition);
+const elasticSearch = Services.get(Elastic);
 
 /**
  * Deletegate part of the graphql query to dynamically return NodeItems
  */
 async function getGraphQlItems<T>(
-  nodes: Array<{ type: ItemType; id: string }>,
+  type: ItemType,
+  ids: string[],
   ctx: T,
   info: GraphQLResolveInfo,
+  fromQueryPath?: string[],
 ) {
+  const query = `_get${capitalize(type)}Items`;
+
+  // TODO: cast transforms correctly
+  const transforms = fromQueryPath
+    ? [
+        // take the subfield `user` of this query and put it as root for delegate query
+        new ExtractField({
+          from: [query, 'results'],
+          to: [query],
+        }),
+      ]
+    : undefined;
+
   const data = await delegateToSchema({
     schema: info.schema,
     operation: 'query' as OperationTypeNode,
-    fieldName: '_getNodesItem',
+    fieldName: query,
     context: {
       ...ctx,
-      cypherParams: { nodes: nodes.map((n) => ({ ...n, type: Neo4jLabels[n.type] })) },
+      cypherParams: { ids },
     },
     info: info,
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    transforms,
   });
-
-  return data as unknown as NodeItem[];
+  return data.map((d: object) => ({ __typename: Neo4jLabels[type], ...d }) as unknown as NodeItem);
 }
 
 /**
@@ -51,11 +73,12 @@ async function getGraphQlItem<T>(
   ctx: T,
   info: GraphQLResolveInfo,
 ): Promise<NodeItem | undefined> {
+  const query = `_get${capitalize(type)}Items`;
   const data = await delegateToSchema({
     schema: info.schema,
     operation: 'query' as OperationTypeNode,
-    fieldName: '_getNodesItem',
-    context: { ...ctx, cypherParams: { nodes: [{ id, type: Neo4jLabels[type] }] } },
+    fieldName: query,
+    context: { ...ctx, cypherParams: { ids: [id] } },
     info: info,
   });
   return head(data);
@@ -74,26 +97,63 @@ export const resolvers: Resolvers<unknown> = {
   },
   Query: {
     // SEARCH
-    searchMessage: async (_root, { filters, sortBy, limit, from }, _context, _info) => {
-      log.debug(`TODO: search(${JSON.stringify({ filters, sortBy, limit, from })})`);
-      throw notImplemented();
+    search: async (
+      _root,
+      { itemType, filters, sortBy, limit, from, scrollTimeout },
+      _context,
+      _info,
+    ) => {
+      const sort = sortBy ? elasticSearch.formatSort(sortBy) : undefined;
+      const { total, results, scrollId } = await elasticSearch.search(
+        EsIndices[itemType as ItemType],
+        '',
+        filters as Record<string, Filter>,
+        {
+          from,
+          size: limit || 10,
+          sort,
+          sources: [],
+          scrollTimeout,
+          mapFn: (hit: SearchHit) => ({ id: hit._id }),
+        },
+      );
+
+      const resultAugmented = await getGraphQlItems(
+        itemType,
+        results.map((r) => r.id),
+        _context,
+        _info,
+        ['results'],
+      );
+
+      return {
+        total,
+        results: resultAugmented,
+        scrollId,
+      };
     },
-    searchCompany: async (_root, { filters, sortBy, limit, from }, _context, _info) => {
-      log.debug(`TODO: search(${JSON.stringify({ filters, sortBy, limit, from })})`);
-      throw notImplemented();
+    // SCROLL for paginating over more than 10k items
+    scroll: async (_root, { itemType, scrollId, scrollTimeout }, _context, _info) => {
+      const { total, results } = await elasticSearch.scroll(scrollId, {
+        scrollTimeout,
+        mapFn: (hit: SearchHit) => ({ id: hit._id }),
+      });
+
+      const resultAugmented = await getGraphQlItems(
+        itemType,
+        results.map((r) => r.id),
+        _context,
+        _info,
+        ['results'],
+      );
+
+      return {
+        total,
+        results: resultAugmented,
+        scrollId,
+      };
     },
-    searchPeople: async (_root, { filters, sortBy, limit, from }, _context, _info) => {
-      log.debug(`TODO: search(${JSON.stringify({ filters, sortBy, limit, from })})`);
-      throw notImplemented();
-    },
-    searchAddress: async (_root, { filters, sortBy, limit, from }, _context, _info) => {
-      log.debug(`TODO: search(${JSON.stringify({ filters, sortBy, limit, from })})`);
-      throw notImplemented();
-    },
-    searchCountry: async (_root, { filters, sortBy, limit, from }, _context, _info) => {
-      log.debug(`TODO: search(${JSON.stringify({ filters, sortBy, limit, from })})`);
-      throw notImplemented();
-    },
+
     // COUNT
     countMessage: async (_root, { filters, byYear }, _context, _info) => {
       log.debug(`TODO: count(${JSON.stringify({ filters, byYear })})`);

@@ -6,6 +6,7 @@ export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: 
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
 export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> = { [_ in K]?: never };
 export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
+export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 export type RequireFields<T, K extends keyof T> = Omit<T, K> & { [P in K]-?: NonNullable<T[P]> };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
@@ -42,17 +43,6 @@ export type AddressCountriesArgs = {
 export type AddressPeopleArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   skip?: InputMaybe<Scalars['Int']['input']>;
-};
-
-export type AddressFilters = {
-  addressName?: InputMaybe<ContentFilter>;
-  companies?: InputMaybe<KeywordsFilter>;
-  companyName?: InputMaybe<ContentFilter>;
-  countries?: InputMaybe<KeywordsFilter>;
-  date?: InputMaybe<DateFilter>;
-  messageContent?: InputMaybe<ContentFilter>;
-  people?: InputMaybe<KeywordsFilter>;
-  peopleName?: InputMaybe<ContentFilter>;
 };
 
 export enum AddressMetadata {
@@ -100,28 +90,10 @@ export type CompanyPeopleArgs = {
   skip?: InputMaybe<Scalars['Int']['input']>;
 };
 
-export type CompanyFilters = {
-  addressName?: InputMaybe<ContentFilter>;
-  addresses?: InputMaybe<KeywordsFilter>;
-  companyName?: InputMaybe<ContentFilter>;
-  countries?: InputMaybe<KeywordsFilter>;
-  date?: InputMaybe<DateFilter>;
-  messageContent?: InputMaybe<ContentFilter>;
-  people?: InputMaybe<KeywordsFilter>;
-  peopleName?: InputMaybe<ContentFilter>;
-};
-
 export enum CompanyMetadata {
   Address = 'address',
   Country = 'country',
   People = 'people'
-}
-
-export enum CompanySortByMethods {
-  Alphabetic = 'ALPHABETIC',
-  Date = 'DATE',
-  NbMessages = 'NB_MESSAGES',
-  Score = 'SCORE'
 }
 
 export type ContentFilter = {
@@ -163,17 +135,6 @@ export type CountryPeopleArgs = {
   skip?: InputMaybe<Scalars['Int']['input']>;
 };
 
-export type CountryFilters = {
-  addressName?: InputMaybe<ContentFilter>;
-  addresses?: InputMaybe<KeywordsFilter>;
-  companies?: InputMaybe<KeywordsFilter>;
-  companyName?: InputMaybe<ContentFilter>;
-  date?: InputMaybe<DateFilter>;
-  messageContent?: InputMaybe<ContentFilter>;
-  people?: InputMaybe<KeywordsFilter>;
-  peopleName?: InputMaybe<ContentFilter>;
-};
-
 export enum CountryMetadata {
   Address = 'address',
   Company = 'company',
@@ -184,6 +145,7 @@ export enum DataItemType {
   Address = 'address',
   Company = 'company',
   Country = 'country',
+  Message = 'message',
   Person = 'person'
 }
 
@@ -192,6 +154,11 @@ export type DateFilter = {
   min?: InputMaybe<Scalars['Int']['input']>;
   type: FilterTypes;
 };
+
+export enum EsSortDirection {
+  Asc = 'asc',
+  Desc = 'desc'
+}
 
 export enum FilterTypes {
   Boolean = 'boolean',
@@ -231,28 +198,11 @@ export type Message = {
   year: Scalars['Int']['output'];
 };
 
-export type MessageFilters = {
-  addressName?: InputMaybe<ContentFilter>;
-  addresses?: InputMaybe<KeywordsFilter>;
-  companies?: InputMaybe<KeywordsFilter>;
-  companyName?: InputMaybe<ContentFilter>;
-  countries?: InputMaybe<KeywordsFilter>;
-  date?: InputMaybe<DateFilter>;
-  messageContent?: InputMaybe<ContentFilter>;
-  people?: InputMaybe<KeywordsFilter>;
-  peopleName?: InputMaybe<ContentFilter>;
-};
-
 export enum MessageMetadata {
   Address = 'address',
   Company = 'company',
   Country = 'country',
   People = 'people'
-}
-
-export enum MessageSortByMethods {
-  Date = 'DATE',
-  Score = 'SCORE'
 }
 
 export type Mutation = {
@@ -326,23 +276,12 @@ export type NodeIdentification = {
   type: DataItemType;
 };
 
-export type NodeItem = Address | Company | Country | Person;
+export type NodeItem = Address | Company | Country | Message | Person;
 
 export type NumberFilter = {
   max?: InputMaybe<Scalars['Float']['input']>;
   min?: InputMaybe<Scalars['Float']['input']>;
   type: FilterTypes;
-};
-
-export type PeopleFilters = {
-  addressName?: InputMaybe<ContentFilter>;
-  addresses?: InputMaybe<KeywordsFilter>;
-  companies?: InputMaybe<KeywordsFilter>;
-  companyName?: InputMaybe<ContentFilter>;
-  countries?: InputMaybe<KeywordsFilter>;
-  date?: InputMaybe<DateFilter>;
-  messageContent?: InputMaybe<ContentFilter>;
-  peopleName?: InputMaybe<ContentFilter>;
 };
 
 export enum PeopleMetadata {
@@ -381,19 +320,20 @@ export type PersonCountriesArgs = {
 
 export type Query = {
   __typename?: 'Query';
-  _getNodesItem: Array<NodeItem>;
+  _getAddressItems: Array<Address>;
+  _getCompanyItems: Array<Company>;
+  _getCountryItems: Array<Country>;
+  _getMessageItems: Array<Message>;
+  _getPersonItems: Array<Person>;
   countAddress?: Maybe<CountResult>;
   countCompany?: Maybe<CountResult>;
   countCountry?: Maybe<CountResult>;
   /** Count Items respecting a set of filters, option to add count by year */
   countMessage?: Maybe<CountResult>;
   countPeople?: Maybe<CountResult>;
-  searchAddress?: Maybe<Array<Maybe<Address>>>;
-  searchCompany?: Maybe<Array<Maybe<Company>>>;
-  searchCountry?: Maybe<Array<Maybe<Country>>>;
+  scroll?: Maybe<SearchResults>;
   /** Search for Items using a set of filters */
-  searchMessage?: Maybe<Array<Maybe<Message>>>;
-  searchPeople?: Maybe<Array<Maybe<Person>>>;
+  search?: Maybe<SearchResults>;
   topAddressMetadata?: Maybe<Array<Maybe<TopValue>>>;
   topCompanyMetadata?: Maybe<Array<Maybe<TopValue>>>;
   topCountryMetadata?: Maybe<Array<Maybe<TopValue>>>;
@@ -405,104 +345,81 @@ export type Query = {
 
 export type QueryCountAddressArgs = {
   byYear?: InputMaybe<Scalars['Boolean']['input']>;
-  filters: AddressFilters;
+  filters: SearchFilters;
 };
 
 
 export type QueryCountCompanyArgs = {
   byYear?: InputMaybe<Scalars['Boolean']['input']>;
-  filters: CompanyFilters;
+  filters: SearchFilters;
 };
 
 
 export type QueryCountCountryArgs = {
   byYear?: InputMaybe<Scalars['Boolean']['input']>;
-  filters: CountryFilters;
+  filters: SearchFilters;
 };
 
 
 export type QueryCountMessageArgs = {
   byYear?: InputMaybe<Scalars['Boolean']['input']>;
-  filters: MessageFilters;
+  filters: SearchFilters;
 };
 
 
 export type QueryCountPeopleArgs = {
   byYear?: InputMaybe<Scalars['Boolean']['input']>;
-  filters: PeopleFilters;
+  filters: SearchFilters;
 };
 
 
-export type QuerySearchAddressArgs = {
-  filters: AddressFilters;
-  from?: InputMaybe<Scalars['Int']['input']>;
-  limit: Scalars['Int']['input'];
-  sortBy?: InputMaybe<SortByMethods>;
+export type QueryScrollArgs = {
+  itemType: DataItemType;
+  scrollId: Scalars['String']['input'];
+  scrollTimeout?: InputMaybe<Scalars['String']['input']>;
 };
 
 
-export type QuerySearchCompanyArgs = {
-  filters: CompanyFilters;
+export type QuerySearchArgs = {
+  filters: SearchFilters;
   from?: InputMaybe<Scalars['Int']['input']>;
-  limit: Scalars['Int']['input'];
-  sortBy?: InputMaybe<CompanySortByMethods>;
-};
-
-
-export type QuerySearchCountryArgs = {
-  filters: CountryFilters;
-  from?: InputMaybe<Scalars['Int']['input']>;
-  limit: Scalars['Int']['input'];
-  sortBy?: InputMaybe<SortByMethods>;
-};
-
-
-export type QuerySearchMessageArgs = {
-  filters: MessageFilters;
-  from?: InputMaybe<Scalars['Int']['input']>;
-  limit: Scalars['Int']['input'];
-  sortBy?: InputMaybe<MessageSortByMethods>;
-};
-
-
-export type QuerySearchPeopleArgs = {
-  filters: PeopleFilters;
-  from?: InputMaybe<Scalars['Int']['input']>;
-  limit: Scalars['Int']['input'];
-  sortBy?: InputMaybe<SortByMethods>;
+  itemType: DataItemType;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  scrollTimeout?: InputMaybe<Scalars['String']['input']>;
+  sortBy?: InputMaybe<Array<InputMaybe<SortBy>>>;
 };
 
 
 export type QueryTopAddressMetadataArgs = {
-  filters: AddressFilters;
+  filters: SearchFilters;
   limit: Scalars['Int']['input'];
   metadataModel: AddressMetadata;
 };
 
 
 export type QueryTopCompanyMetadataArgs = {
-  filters: CompanyFilters;
+  filters: SearchFilters;
   limit: Scalars['Int']['input'];
   metadataModel: CompanyMetadata;
 };
 
 
 export type QueryTopCountryMetadataArgs = {
-  filters: CountryFilters;
+  filters: SearchFilters;
   limit: Scalars['Int']['input'];
   metadataModel: CountryMetadata;
 };
 
 
 export type QueryTopMessageMetadataArgs = {
-  filters: MessageFilters;
+  filters: SearchFilters;
   limit: Scalars['Int']['input'];
   metadataModel: MessageMetadata;
 };
 
 
 export type QueryTopPeopleMetadataArgs = {
-  filters: PeopleFilters;
+  filters: SearchFilters;
   limit: Scalars['Int']['input'];
   metadataModel: PeopleMetadata;
 };
@@ -512,13 +429,30 @@ export type RelaionshipProperties = {
   deleted?: Maybe<Scalars['Boolean']['output']>;
 };
 
-export enum SortByMethods {
-  Alphabetic = 'ALPHABETIC',
-  Date = 'DATE',
-  NbCompanies = 'NB_COMPANIES',
-  NbMessages = 'NB_MESSAGES',
-  Score = 'SCORE'
-}
+export type SearchFilters = {
+  addressName?: InputMaybe<ContentFilter>;
+  addresses?: InputMaybe<KeywordsFilter>;
+  companies?: InputMaybe<KeywordsFilter>;
+  companyName?: InputMaybe<ContentFilter>;
+  countries?: InputMaybe<KeywordsFilter>;
+  messageContent?: InputMaybe<ContentFilter>;
+  people?: InputMaybe<KeywordsFilter>;
+  peopleName?: InputMaybe<ContentFilter>;
+  year?: InputMaybe<DateFilter>;
+  years?: InputMaybe<DateFilter>;
+};
+
+export type SearchResults = {
+  __typename?: 'SearchResults';
+  results: Array<Maybe<NodeItem>>;
+  scrollId?: Maybe<Scalars['String']['output']>;
+  total: Scalars['Int']['output'];
+};
+
+export type SortBy = {
+  direction: EsSortDirection;
+  field: Scalars['String']['input'];
+};
 
 export type TopValue = {
   __typename?: 'TopValue';
@@ -602,29 +536,26 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 
 /** Mapping of union types */
 export type ResolversUnionTypes<_RefType extends Record<string, unknown>> = {
-  NodeItem: ( Address ) | ( Company ) | ( Country ) | ( Person );
+  NodeItem: ( Address ) | ( Company ) | ( Country ) | ( Message ) | ( Person );
 };
 
 
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = {
   Address: ResolverTypeWrapper<Address>;
-  AddressFilters: AddressFilters;
   AddressMetadata: AddressMetadata;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
   BooleanFilter: BooleanFilter;
   BoundingBoxFilter: BoundingBoxFilter;
   Company: ResolverTypeWrapper<Company>;
-  CompanyFilters: CompanyFilters;
   CompanyMetadata: CompanyMetadata;
-  CompanySortByMethods: CompanySortByMethods;
   ContentFilter: ContentFilter;
   CountResult: ResolverTypeWrapper<CountResult>;
   Country: ResolverTypeWrapper<Country>;
-  CountryFilters: CountryFilters;
   CountryMetadata: CountryMetadata;
   DataItemType: DataItemType;
   DateFilter: DateFilter;
+  EsSortDirection: EsSortDirection;
   FilterTypes: FilterTypes;
   Float: ResolverTypeWrapper<Scalars['Float']['output']>;
   ID: ResolverTypeWrapper<Scalars['ID']['output']>;
@@ -632,19 +563,18 @@ export type ResolversTypes = {
   Int: ResolverTypeWrapper<Scalars['Int']['output']>;
   KeywordsFilter: KeywordsFilter;
   Message: ResolverTypeWrapper<Message>;
-  MessageFilters: MessageFilters;
   MessageMetadata: MessageMetadata;
-  MessageSortByMethods: MessageSortByMethods;
   Mutation: ResolverTypeWrapper<{}>;
   NodeIdentification: NodeIdentification;
   NodeItem: ResolverTypeWrapper<ResolversUnionTypes<ResolversTypes>['NodeItem']>;
   NumberFilter: NumberFilter;
-  PeopleFilters: PeopleFilters;
   PeopleMetadata: PeopleMetadata;
   Person: ResolverTypeWrapper<Person>;
   Query: ResolverTypeWrapper<{}>;
   RelaionshipProperties: ResolverTypeWrapper<RelaionshipProperties>;
-  SortByMethods: SortByMethods;
+  SearchFilters: SearchFilters;
+  SearchResults: ResolverTypeWrapper<Omit<SearchResults, 'results'> & { results: Array<Maybe<ResolversTypes['NodeItem']>> }>;
+  SortBy: SortBy;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
   TopValue: ResolverTypeWrapper<TopValue>;
   YearCountResult: ResolverTypeWrapper<YearCountResult>;
@@ -653,16 +583,13 @@ export type ResolversTypes = {
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = {
   Address: Address;
-  AddressFilters: AddressFilters;
   Boolean: Scalars['Boolean']['output'];
   BooleanFilter: BooleanFilter;
   BoundingBoxFilter: BoundingBoxFilter;
   Company: Company;
-  CompanyFilters: CompanyFilters;
   ContentFilter: ContentFilter;
   CountResult: CountResult;
   Country: Country;
-  CountryFilters: CountryFilters;
   DateFilter: DateFilter;
   Float: Scalars['Float']['output'];
   ID: Scalars['ID']['output'];
@@ -670,15 +597,16 @@ export type ResolversParentTypes = {
   Int: Scalars['Int']['output'];
   KeywordsFilter: KeywordsFilter;
   Message: Message;
-  MessageFilters: MessageFilters;
   Mutation: {};
   NodeIdentification: NodeIdentification;
   NodeItem: ResolversUnionTypes<ResolversParentTypes>['NodeItem'];
   NumberFilter: NumberFilter;
-  PeopleFilters: PeopleFilters;
   Person: Person;
   Query: {};
   RelaionshipProperties: RelaionshipProperties;
+  SearchFilters: SearchFilters;
+  SearchResults: Omit<SearchResults, 'results'> & { results: Array<Maybe<ResolversParentTypes['NodeItem']>> };
+  SortBy: SortBy;
   String: Scalars['String']['output'];
   TopValue: TopValue;
   YearCountResult: YearCountResult;
@@ -756,7 +684,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 };
 
 export type NodeItemResolvers<ContextType = any, ParentType extends ResolversParentTypes['NodeItem'] = ResolversParentTypes['NodeItem']> = {
-  __resolveType: TypeResolveFn<'Address' | 'Company' | 'Country' | 'Person', ParentType, ContextType>;
+  __resolveType: TypeResolveFn<'Address' | 'Company' | 'Country' | 'Message' | 'Person', ParentType, ContextType>;
 };
 
 export type PersonResolvers<ContextType = any, ParentType extends ResolversParentTypes['Person'] = ResolversParentTypes['Person']> = {
@@ -770,17 +698,18 @@ export type PersonResolvers<ContextType = any, ParentType extends ResolversParen
 };
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
-  _getNodesItem?: Resolver<Array<ResolversTypes['NodeItem']>, ParentType, ContextType>;
+  _getAddressItems?: Resolver<Array<ResolversTypes['Address']>, ParentType, ContextType>;
+  _getCompanyItems?: Resolver<Array<ResolversTypes['Company']>, ParentType, ContextType>;
+  _getCountryItems?: Resolver<Array<ResolversTypes['Country']>, ParentType, ContextType>;
+  _getMessageItems?: Resolver<Array<ResolversTypes['Message']>, ParentType, ContextType>;
+  _getPersonItems?: Resolver<Array<ResolversTypes['Person']>, ParentType, ContextType>;
   countAddress?: Resolver<Maybe<ResolversTypes['CountResult']>, ParentType, ContextType, RequireFields<QueryCountAddressArgs, 'filters'>>;
   countCompany?: Resolver<Maybe<ResolversTypes['CountResult']>, ParentType, ContextType, RequireFields<QueryCountCompanyArgs, 'filters'>>;
   countCountry?: Resolver<Maybe<ResolversTypes['CountResult']>, ParentType, ContextType, RequireFields<QueryCountCountryArgs, 'filters'>>;
   countMessage?: Resolver<Maybe<ResolversTypes['CountResult']>, ParentType, ContextType, RequireFields<QueryCountMessageArgs, 'filters'>>;
   countPeople?: Resolver<Maybe<ResolversTypes['CountResult']>, ParentType, ContextType, RequireFields<QueryCountPeopleArgs, 'filters'>>;
-  searchAddress?: Resolver<Maybe<Array<Maybe<ResolversTypes['Address']>>>, ParentType, ContextType, RequireFields<QuerySearchAddressArgs, 'filters' | 'limit'>>;
-  searchCompany?: Resolver<Maybe<Array<Maybe<ResolversTypes['Company']>>>, ParentType, ContextType, RequireFields<QuerySearchCompanyArgs, 'filters' | 'limit'>>;
-  searchCountry?: Resolver<Maybe<Array<Maybe<ResolversTypes['Country']>>>, ParentType, ContextType, RequireFields<QuerySearchCountryArgs, 'filters' | 'limit'>>;
-  searchMessage?: Resolver<Maybe<Array<Maybe<ResolversTypes['Message']>>>, ParentType, ContextType, RequireFields<QuerySearchMessageArgs, 'filters' | 'limit'>>;
-  searchPeople?: Resolver<Maybe<Array<Maybe<ResolversTypes['Person']>>>, ParentType, ContextType, RequireFields<QuerySearchPeopleArgs, 'filters' | 'limit'>>;
+  scroll?: Resolver<Maybe<ResolversTypes['SearchResults']>, ParentType, ContextType, RequireFields<QueryScrollArgs, 'itemType' | 'scrollId'>>;
+  search?: Resolver<Maybe<ResolversTypes['SearchResults']>, ParentType, ContextType, RequireFields<QuerySearchArgs, 'filters' | 'itemType'>>;
   topAddressMetadata?: Resolver<Maybe<Array<Maybe<ResolversTypes['TopValue']>>>, ParentType, ContextType, RequireFields<QueryTopAddressMetadataArgs, 'filters' | 'limit' | 'metadataModel'>>;
   topCompanyMetadata?: Resolver<Maybe<Array<Maybe<ResolversTypes['TopValue']>>>, ParentType, ContextType, RequireFields<QueryTopCompanyMetadataArgs, 'filters' | 'limit' | 'metadataModel'>>;
   topCountryMetadata?: Resolver<Maybe<Array<Maybe<ResolversTypes['TopValue']>>>, ParentType, ContextType, RequireFields<QueryTopCountryMetadataArgs, 'filters' | 'limit' | 'metadataModel'>>;
@@ -790,6 +719,13 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
 
 export type RelaionshipPropertiesResolvers<ContextType = any, ParentType extends ResolversParentTypes['RelaionshipProperties'] = ResolversParentTypes['RelaionshipProperties']> = {
   deleted?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type SearchResultsResolvers<ContextType = any, ParentType extends ResolversParentTypes['SearchResults'] = ResolversParentTypes['SearchResults']> = {
+  results?: Resolver<Array<Maybe<ResolversTypes['NodeItem']>>, ParentType, ContextType>;
+  scrollId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  total?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -818,6 +754,7 @@ export type Resolvers<ContextType = any> = {
   Person?: PersonResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
   RelaionshipProperties?: RelaionshipPropertiesResolvers<ContextType>;
+  SearchResults?: SearchResultsResolvers<ContextType>;
   TopValue?: TopValueResolvers<ContextType>;
   YearCountResult?: YearCountResultResolvers<ContextType>;
 };

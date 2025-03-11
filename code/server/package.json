@@ -24,7 +24,7 @@
     "@ouestware/async": "^0.0.1-alpha.1",
     "@ouestware/facets": "^0.0.1-alpha.1",
     "@ouestware/facets-server": "^0.0.1-alpha.1",
-    "@ouestware/node-elasticsearch": "^0.0.1-alpha.2",
+    "@ouestware/node-elasticsearch": "git@gitlab.com:ouestware/typescript-utils.git#letterbox",
     "@ouestware/node-logger": "^0.0.1-alpha.2",
     "csv-parse": "^5.6.0",
     "express": "^4.21.0",

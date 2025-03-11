@@ -6,9 +6,10 @@ enum DataItemType {
   address
   country
   person
+  message
 }
 
-union NodeItem = Company | Address | Country | Person
+union NodeItem = Company | Address | Country | Person | Message
 
 input NodeIdentification {
   type: DataItemType!
@@ -256,76 +257,29 @@ input BooleanFilter {
   value: Boolean!
 }
 
-input MessageFilters {
-  date: DateFilter
+input SearchFilters {
+  year: DateFilter
+  years: DateFilter
   messageContent: ContentFilter
   companies: KeywordsFilter
   companyName: ContentFilter
   people: KeywordsFilter
   peopleName: ContentFilter
   addresses: KeywordsFilter
-  addressName: ContentFilter
-  countries: KeywordsFilter
-}
-input CompanyFilters {
-  date: DateFilter
-  messageContent: ContentFilter
-  companyName: ContentFilter
-  people: KeywordsFilter
-  peopleName: ContentFilter
-  addresses: KeywordsFilter
-  addressName: ContentFilter
-  countries: KeywordsFilter
-}
-input PeopleFilters {
-  date: DateFilter
-  messageContent: ContentFilter
-  companies: KeywordsFilter
-  companyName: ContentFilter
-  peopleName: ContentFilter
-  addresses: KeywordsFilter
-  addressName: ContentFilter
-  countries: KeywordsFilter
-}
-input CountryFilters {
-  date: DateFilter
-  messageContent: ContentFilter
-  companies: KeywordsFilter
-  companyName: ContentFilter
-  people: KeywordsFilter
-  peopleName: ContentFilter
-  addresses: KeywordsFilter
-  addressName: ContentFilter
-}
-input AddressFilters {
-  date: DateFilter
-  messageContent: ContentFilter
-  companies: KeywordsFilter
-  companyName: ContentFilter
-  people: KeywordsFilter
-  peopleName: ContentFilter
   addressName: ContentFilter
   countries: KeywordsFilter
 }
 
 # SORT
 
-enum SortByMethods {
-  NB_MESSAGES
-  NB_COMPANIES
-  ALPHABETIC
-  SCORE
-  DATE
+enum EsSortDirection {
+  asc
+  desc
 }
-enum MessageSortByMethods {
-  SCORE
-  DATE
-}
-enum CompanySortByMethods {
-  NB_MESSAGES
-  ALPHABETIC
-  SCORE
-  DATE
+
+input SortBy {
+  field: String!
+  direction: EsSortDirection!
 }
 
 # TOP INPUTS
@@ -359,6 +313,12 @@ enum PeopleMetadata {
 
 # RETURN TYPE
 
+type SearchResults {
+  total: Int!
+  results: [NodeItem]!
+  scrollId: String
+}
+
 type TopValue {
   id: String!
   label: String!
@@ -379,66 +339,78 @@ type CountResult {
 
 type Query {
   "Search for Items using a set of filters"
-  searchMessage(
-    filters: MessageFilters!
-    sortBy: MessageSortByMethods
-    limit: Int!
+  search(
+    itemType: DataItemType!
+    filters: SearchFilters!
+    sortBy: [SortBy]
+    limit: Int
     from: Int
-  ): [Message]
+    scrollTimeout: String
+  ): SearchResults
 
-  searchCompany(
-    filters: CompanyFilters!
-    sortBy: CompanySortByMethods
-    limit: Int!
-    from: Int
-  ): [Company]
-
-  searchPeople(filters: PeopleFilters!, sortBy: SortByMethods, limit: Int!, from: Int): [Person]
-
-  searchCountry(filters: CountryFilters!, sortBy: SortByMethods, limit: Int!, from: Int): [Country]
-
-  searchAddress(filters: AddressFilters!, sortBy: SortByMethods, limit: Int!, from: Int): [Address]
+  scroll(itemType: DataItemType!, scrollId: String!, scrollTimeout: String): SearchResults
 
   "Count Items respecting a set of filters, option to add count by year"
-  countMessage(filters: MessageFilters!, byYear: Boolean): CountResult
-  countCompany(filters: CompanyFilters!, byYear: Boolean): CountResult
-  countPeople(filters: PeopleFilters!, byYear: Boolean): CountResult
-  countCountry(filters: CountryFilters!, byYear: Boolean): CountResult
-  countAddress(filters: AddressFilters!, byYear: Boolean): CountResult
+  countMessage(filters: SearchFilters!, byYear: Boolean): CountResult
+  countCompany(filters: SearchFilters!, byYear: Boolean): CountResult
+  countPeople(filters: SearchFilters!, byYear: Boolean): CountResult
+  countCountry(filters: SearchFilters!, byYear: Boolean): CountResult
+  countAddress(filters: SearchFilters!, byYear: Boolean): CountResult
 
   "Retrieve Top metadata values in Items which respect a set of filters"
   topMessageMetadata(
     metadataModel: MessageMetadata!
-    filters: MessageFilters!
+    filters: SearchFilters!
     limit: Int!
   ): [TopValue]
   topCompanyMetadata(
     metadataModel: CompanyMetadata!
-    filters: CompanyFilters!
+    filters: SearchFilters!
     limit: Int!
   ): [TopValue]
   topPeopleMetadata(
     metadataModel: PeopleMetadata!
-    filters: PeopleFilters!
+    filters: SearchFilters!
     limit: Int!
   ): [TopValue]
   topCountryMetadata(
     metadataModel: CountryMetadata!
-    filters: CountryFilters!
+    filters: SearchFilters!
     limit: Int!
   ): [TopValue]
   topAddressMetadata(
     metadataModel: AddressMetadata!
-    filters: AddressFilters!
+    filters: SearchFilters!
     limit: Int!
   ): [TopValue]
 
   #
   # Internal methods
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  _getNodesItem: [NodeItem!]!
+
+  _getMessageItems: [Message!]!
     @cypher(
-      statement: "UNWIND $nodes as node MATCH (n:$(node.type) { id: node.id }) RETURN n AS result"
+      statement: "UNWIND $ids as id MATCH (n:Message { id: id }) RETURN n AS result"
+      columnName: "result"
+    )
+  _getCompanyItems: [Company!]!
+    @cypher(
+      statement: "UNWIND $ids as id MATCH (n:Company { id: id }) RETURN n AS result"
+      columnName: "result"
+    )
+  _getPersonItems: [Person!]!
+    @cypher(
+      statement: "UNWIND $ids as id MATCH (n:Person { id: id }) RETURN n AS result"
+      columnName: "result"
+    )
+  _getCountryItems: [Country!]!
+    @cypher(
+      statement: "UNWIND $ids as id MATCH (n:Country { id: id }) RETURN n AS result"
+      columnName: "result"
+    )
+  _getAddressItems: [Address!]!
+    @cypher(
+      statement: "UNWIND $ids as id MATCH (n:Address { id: id }) RETURN n AS result"
       columnName: "result"
     )
 }
