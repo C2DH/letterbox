@@ -17,6 +17,13 @@ const es = Services.get(Elastic);
 const neo4j = Services.get(Neo4j);
 
 /**
+ * Init Es
+ */
+export async function initElastic() {
+  await datasetIndexation.createIndices();
+}
+
+/**
  * Init the database with the given messages.
  */
 export async function initTestDataset(

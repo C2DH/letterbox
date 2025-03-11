@@ -45,7 +45,6 @@ export class DatasetEdition {
     );
 
     // Do the re-indexation
-    console.log('impacteddddd', result);
     await this.indexation.indexMessagesInCascade(result ?? []);
 
     return { type, id: nodeId };

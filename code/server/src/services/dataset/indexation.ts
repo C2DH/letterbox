@@ -24,15 +24,18 @@ export class DatasetIndexation {
     @inject(Elastic) public es: Elastic,
   ) {}
 
-  /**
-   * Index all.
-   */
-  async doIndexation(resetIndices = true): Promise<ImportReport> {
+  async createIndices(resetIndices = true): Promise<void> {
     await Promise.all(
       itemTypes.map((item) =>
         this.es.createIndex(EsIndices[item], this.getIndexConfig(item), resetIndices),
       ),
     );
+  }
+  /**
+   * Index all.
+   */
+  async doIndexation(resetIndices = true): Promise<ImportReport> {
+    await this.createIndices(resetIndices);
 
     const results = await Promise.all([
       this.indexMessages(),

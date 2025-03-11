@@ -1,6 +1,6 @@
 import { afterEach } from 'node:test';
 import { v4 as uuid } from 'uuid';
-import { describe, expect, test } from 'vitest';
+import { beforeAll, describe, expect, test } from 'vitest';
 
 import type { DataMessage, ItemType } from '../..//src/types';
 import { Services } from '../../src/services';
@@ -9,8 +9,13 @@ import {
   checkMessage,
   cleanTestDataset,
   getItemData,
+  initElastic,
   initTestWithRandomDataset,
 } from '../helpers/dataset';
+
+beforeAll(async () => {
+  await initElastic();
+});
 
 afterEach(async () => {
   await cleanTestDataset();
