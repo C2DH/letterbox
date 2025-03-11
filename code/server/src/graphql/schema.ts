@@ -162,8 +162,8 @@ export const resolvers: Resolvers<unknown> = {
      * Rename a node value
      */
     renameNode: async (_root, { type, id, name }, context, info) => {
-      const node = await datasetEdition.renameNode(type, id, name);
-      const data = await getGraphQlItem(node.type, node.id, context, info);
+      await datasetEdition.renameNode(type, id, name);
+      const data = await getGraphQlItem(type, id, context, info);
       if (!data) throw Boom.internal(`Node ${type} ${id} not found`);
       return data;
     },
