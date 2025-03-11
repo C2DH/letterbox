@@ -141,14 +141,20 @@ export class DatasetImport {
           raw_address: [a IN coalesce(record.raw_address, []) | a.name],
           raw_people: [a IN coalesce(record.raw_people, []) | a.name],
           raw_countries: [a IN coalesce(record.raw_countries, []) | a.name],
-          raw_message: record.raw_message
+          raw_message: record.raw_message,
+          // times
+          created: datetime(),
+          updated: datetime()
         }
 
         // Company creation
         MERGE (c:Company { id: record.raw_company.id })
         SET c = {
           id: record.raw_company.id,
-          name: record.raw_company.name
+          name: record.raw_company.name,
+          // times
+          created: datetime(),
+          updated: datetime()
         }
         
         // Create link between message and company
@@ -157,19 +163,34 @@ export class DatasetImport {
         WITH m, record
           CALL (m, record) {
             UNWIND coalesce(record.raw_address, []) as address WITH address WHERE address IS NOT NULL
-              MERGE (a:Address { id: address.id }) ON CREATE SET a.name = address.name
+              MERGE (a:Address { id: address.id }) 
+                ON CREATE SET 
+                  a.name = address.name,
+                  // times
+                  a.created = datetime(),
+                  a.updated = datetime()
               MERGE (m)-[:CONTAINS]->(a) 
           }
 
           CALL (m, record) {
             UNWIND coalesce(record.raw_people, []) as person WITH person WHERE person IS NOT NULL
-              MERGE (p:Person { id: person.id }) ON CREATE SET p.name = person.name
+              MERGE (p:Person { id: person.id }) 
+                ON CREATE SET 
+                  p.name = person.name,
+                  // times
+                  p.created = datetime(),
+                  p.updated = datetime()
               MERGE (m)-[:CONTAINS]->(p) 
           }
 
           CALL (m, record) {
             UNWIND coalesce(record.raw_countries, []) as country WITH country WHERE country IS NOT NULL
-              MERGE (c:Country { id: country.id }) ON CREATE SET c.name = country.name
+              MERGE (c:Country { id: country.id }) 
+                ON CREATE SET 
+                  c.name = country.name,
+                  // times
+                  c.created = datetime(),
+                  c.updated = datetime()
               MERGE (m)-[:CONTAINS]->(c) 
           }
 

@@ -45,11 +45,11 @@ describe('Dataset edition', () => {
     test('Should fail on "Message" node', async () => {
       const messages = await initTestWithRandomDataset(1);
       const message = messages[0];
-      expect(edition.renameNode('message', message.id, '')).rejects.toThrowError();
+      await expect(edition.renameNode('message', message.id, '')).rejects.toThrowError();
     });
 
     test('Should fail with not found node', async () => {
-      expect(edition.renameNode('company', uuid(), '')).rejects.toThrowError();
+      await expect(edition.renameNode('company', uuid(), '')).rejects.toThrowError();
     });
   });
 
@@ -75,11 +75,11 @@ describe('Dataset edition', () => {
     test('Should fail on "Message" node', async () => {
       const messages = await initTestWithRandomDataset(1);
       const message = messages[0];
-      expect(edition.changeNodeType('message', message.id, 'person')).rejects.toThrowError();
+      await expect(edition.changeNodeType('message', message.id, 'person')).rejects.toThrowError();
     });
 
     test('Should fail with not found node', async () => {
-      expect(edition.changeNodeType('company', uuid(), 'person')).rejects.toThrowError();
+      await expect(edition.changeNodeType('company', uuid(), 'person')).rejects.toThrowError();
     });
   });
 
@@ -87,7 +87,7 @@ describe('Dataset edition', () => {
    * Test the Create edition feature.
    */
   describe('Create', () => {
-    test('should work', async () => {
+    test('Create a new person node on a message should work', async () => {
       const messages = await initTestWithRandomDataset(1);
       const message = messages[0];
       const name = `My name ${Date.now()}`;
@@ -111,11 +111,11 @@ describe('Dataset edition', () => {
     test('Should fail on "Message" node', async () => {
       const messages = await initTestWithRandomDataset(1);
       const message = messages[0];
-      expect(edition.createNode(message.id, 'message', '')).rejects.toThrowError();
+      await expect(edition.createNode(message.id, 'message', '')).rejects.toThrowError();
     });
 
     test('Should fail with not found message', async () => {
-      expect(edition.createNode(`${Date.now()}`, 'person', '')).rejects.toThrowError();
+      await expect(edition.createNode(`${Date.now()}`, 'person', '')).rejects.toThrowError();
     });
   });
 
@@ -133,7 +133,7 @@ describe('Dataset edition', () => {
 
       // Checks
       // ~~~~~~~~~~~~~~~~~~~~~~
-      const deletedNode = await getItemData('company', message.raw_company.id);
+      const deletedNode = await getItemData('company', message.raw_company.id, true);
       expect(deletedNode!.deleted).toBe(true);
       // Check the shape of the message
       await checkMessage(message.id, {
@@ -145,11 +145,11 @@ describe('Dataset edition', () => {
     test('Should fail on "Message" node', async () => {
       const messages = await initTestWithRandomDataset(1);
       const message = messages[0];
-      expect(edition.deleteNode('message', message.id)).rejects.toThrowError();
+      await expect(edition.deleteNode('message', message.id)).rejects.toThrowError();
     });
 
     test('Should fail with not found node', async () => {
-      expect(edition.deleteNode('company', `${Date.now()}`)).rejects.toThrowError();
+      await expect(edition.deleteNode('company', `${Date.now()}`)).rejects.toThrowError();
     });
   });
 
@@ -157,7 +157,7 @@ describe('Dataset edition', () => {
    * Test the merge edition feature.
    */
   describe('Merge', () => {
-    test('should work', async () => {
+    test('Merging all people of a message should work', async () => {
       const messages = await initTestWithRandomDataset(1);
       const message = messages[0];
       const people = message.raw_people!;
@@ -192,7 +192,7 @@ describe('Dataset edition', () => {
       const people = messages[0].raw_people!;
       const nodeName = `My name ${Date.now()}`;
 
-      expect(
+      await expect(
         edition.mergeNodes(
           [
             ...people.map((p) => ({ type: 'person' as ItemType, id: p.id })),
@@ -226,8 +226,9 @@ describe('Dataset edition', () => {
         await expect(getItemData('person', person.id)).resolves.not.toBeNull();
       }
       // Check that the original node has been deleted
-      const deletedNode = await getItemData('person', person.id);
+      const deletedNode = await getItemData('person', person.id, true);
       expect(deletedNode!.deleted).toBe(true);
+
       // Check the shape of the message
       await checkMessage(message.id, {
         ...message,

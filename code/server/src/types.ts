@@ -19,7 +19,11 @@ export type ItemType = 'message' | 'company' | 'person' | 'address' | 'country';
 export const itemTypes: ItemType[] = ['message', 'company', 'person', 'address', 'country'];
 
 export type ImportReport = { count: number; errors: string[] };
+export type NodeItemDefinition = { type: ItemType; id: string };
 
+/**
+ * List of the ES indices.
+ */
 export const EsIndices: Record<ItemType, string> = {
   message: `${config.elastic.index_prefix}messages`,
   company: `${config.elastic.index_prefix}companies`,
@@ -28,6 +32,9 @@ export const EsIndices: Record<ItemType, string> = {
   country: `${config.elastic.index_prefix}countries`,
 };
 
+/**
+ * Labels of Neo4j nodes.
+ */
 export const Neo4jLabels: Record<ItemType, string> = {
   message: `Message`,
   company: `Company`,

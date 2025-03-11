@@ -56,26 +56,13 @@ export class DatasetIndexation {
    * Index messages.
    * If <code>ids</code> is provided, only the messages with the given ids will be indexed.
    */
-  async indexMessages(batchSize?: number, ids?: string[]): Promise<ImportReport> {
+  async indexMessages(ids?: string[], batchSize?: number): Promise<ImportReport> {
     return new Promise((resolve, reject) => {
       let batchNumber = 0;
       const result: ImportReport = { count: 0, errors: [] };
 
       this.neo4j
-        .streamReadQuery<{ id: string }>(
-          ` MATCH (n:Message)
-          ${ids && ids.length ? `WHERE n.id IN $ids` : ''}
-          RETURN  {
-            id: n.id,
-            message: n.message,
-            year: n.year,
-            people: collect { MATCH (n)-->(m:Person) RETURN DISTINCT m.id + "@" + m.name  },
-            addresses: collect { MATCH (n)-->(m:Address) RETURN DISTINCT m.id + "@" + m.name  },
-            companies: collect { MATCH (n)-->(m:Company) RETURN DISTINCT m.id + "@" + m.name  },
-            countries: collect { MATCH (n)-->(m:Country) RETURN DISTINCT m.id + "@" + m.name  }
-          } as result`,
-          { ids },
-        )
+        .streamReadQuery<{ id: string }>(this.getIndexMessagesQuery(ids), { ids })
         .transform(batcher(batchSize || config.elastic.batchSize))
         .forEach(
           async (batch) => {
@@ -96,6 +83,39 @@ export class DatasetIndexation {
   }
 
   /**
+   * Index messages.
+   * If <code>ids</code> is provided, only the messages with the given ids will be indexed.
+   */
+  async indexMessagesInCascade(ids: string[]): Promise<void> {
+    await this.indexMessages(ids);
+    const impacted = await this.neo4j.getFirstResultQuery<{
+      companies: string[];
+      people: string[];
+      addresses: string[];
+      countries: [];
+    }>(
+      ` MATCH (n:Message) WHERE n.id IN $ids
+        RETURN 
+          {
+            companies: collect { MATCH (n)-[r:CONTAINS]->(m:Company) WHERE NOT coalesce(r.deleted) AND NOT coalesce(m.deleted) RETURN DISTINCT m.id },
+            people:    collect { MATCH (n)-[r:CONTAINS]->(m:Person)  WHERE NOT coalesce(r.deleted) AND NOT coalesce(m.deleted) RETURN DISTINCT m.id },
+            addresses: collect { MATCH (n)-[r:CONTAINS]->(m:Address) WHERE NOT coalesce(r.deleted) AND NOT coalesce(m.deleted) RETURN DISTINCT m.id },
+            countries: collect { MATCH (n)-[r:CONTAINS]->(m:Country) WHERE NOT coalesce(r.deleted) AND NOT coalesce(m.deleted) RETURN DISTINCT m.id }
+          } AS result
+      `,
+      { ids },
+    );
+    if (impacted) {
+      await Promise.all([
+        this.indexCompanies(impacted.companies),
+        this.indexPeople(impacted.people),
+        this.indexAddresses(impacted.addresses),
+        this.indexCountries(impacted.countries),
+      ]);
+    }
+  }
+
+  /**
    * Index people.
    * If <code>ids</code> is provided, only the people with the given ids will be indexed.
    */
@@ -105,19 +125,7 @@ export class DatasetIndexation {
       const result: ImportReport = { count: 0, errors: [] };
 
       this.neo4j
-        .streamReadQuery<{ id: string; name: string }>(
-          ` MATCH (n:Person)
-          ${ids && ids.length ? `WHERE n.id IN $ids` : ''}
-          RETURN  {
-            id: n.id,
-            name: n.name,
-            addresses: collect { MATCH(n)<--(:Message)-->(m:Address) RETURN DISTINCT  m.id + "@" + m.name  },
-            companies: collect { MATCH(n)<--(:Message)-->(m:Company) RETURN DISTINCT  m.id + "@" + m.name  },
-            countries: collect { MATCH(n)<--(:Message)-->(m:Country) RETURN DISTINCT  m.id + "@" + m.name  },
-            years: collect { MATCH(n)<--(m:Message) RETURN DISTINCT m.year  }
-            } as result`,
-          { ids },
-        )
+        .streamReadQuery<{ id: string; name: string }>(this.getIndexPeopleQuery(ids), { ids })
         .map((doc) => {
           return { ...doc, fingerprint: fingerprint(doc.name) };
         })
@@ -150,19 +158,7 @@ export class DatasetIndexation {
       const result: ImportReport = { count: 0, errors: [] };
 
       this.neo4j
-        .streamReadQuery<{ id: string; name: string }>(
-          ` MATCH (n:Company)
-          ${ids && ids.length ? `WHERE n.id IN $ids` : ''}
-          RETURN  {
-            id: n.id,
-            name: n.name,
-            people: collect { MATCH(n)<--(:Message)-->(m:Person) RETURN DISTINCT m.id + "@" + m.name  },
-            addresses: collect { MATCH(n)<--(:Message)-->(m:Address) RETURN DISTINCT m.id + "@" + m.name  },
-            countries: collect { MATCH(n)<--(:Message)-->(m:Country) RETURN DISTINCT m.id + "@" + m.name  },
-            years: collect { MATCH(n)<--(m:Message) RETURN DISTINCT m.year  }
-            } as result`,
-          { ids },
-        )
+        .streamReadQuery<{ id: string; name: string }>(this.getIndexCompaniesQuery(ids), { ids })
         .map((doc) => {
           return { ...doc, fingerprint: fingerprint(doc.name) };
         })
@@ -195,19 +191,7 @@ export class DatasetIndexation {
       const result: ImportReport = { count: 0, errors: [] };
 
       this.neo4j
-        .streamReadQuery<{ id: string; name: string }>(
-          ` MATCH (n:Address)
-          ${ids && ids.length ? `WHERE n.id IN $ids` : ''}
-          RETURN  {
-            id: n.id,
-            name: n.name,
-            people: collect { MATCH(n)<--(:Message)-->(m:Person) RETURN DISTINCT m.id + "@" + m.name  },
-            companies: collect { MATCH(n)<--(:Message)-->(m:Company) RETURN DISTINCT m.id + "@" + m.name  },
-            countries: collect { MATCH(n)<--(:Message)-->(m:Country) RETURN DISTINCT m.id + "@" + m.name  },
-            years: collect { MATCH(n)<--(m:Message) RETURN DISTINCT m.year  }
-          } as result`,
-          {},
-        )
+        .streamReadQuery<{ id: string; name: string }>(this.getIndexAddressesQuery(ids), {})
         .map((doc) => {
           return { ...doc, fingerprint: fingerprint(doc.name) };
         })
@@ -240,36 +224,110 @@ export class DatasetIndexation {
       const result: ImportReport = { count: 0, errors: [] };
 
       this.neo4j
-        .streamReadQuery<{ id: string }>(
-          ` MATCH (n:Country) 
-          ${ids && ids.length ? `WHERE n.id IN $ids` : ''}
-          RETURN  {
-            id: n.id,
-            name: n.name,
-            people: collect { MATCH(n)<--(:Message)-->(m:Person) RETURN DISTINCT m.id + "@" + m.name  LIMIT ${config.elastic.nested_objects_limit}},
-            companies: collect { MATCH(n)<--(:Message)-->(m:Company) RETURN DISTINCT m.id + "@" + m.name LIMIT ${config.elastic.nested_objects_limit} },
-            addresses: collect { MATCH(n)<--(:Message)-->(m:Address) RETURN DISTINCT m.id + "@" + m.name LIMIT ${config.elastic.nested_objects_limit} },
-            years: collect { MATCH(n)<--(m:Message) RETURN DISTINCT m.year  }
-          } as result`,
-          {},
-        )
+        .streamReadQuery<{ id: string }>(this.getIndexCountriesQuery(ids), {})
         .transform(batcher(config.elastic.batchSize))
         .forEach(
           async (batch) => {
             batchNumber++;
-            this.log.info('Address exec batch', batchNumber);
-            const report = await this.es.bulkImport(EsIndices['address'], batch);
+            this.log.info('Country exec batch', batchNumber);
+            const report = await this.es.bulkImport(EsIndices['country'], batch);
             result.count += batch.length;
             result.errors.push(...report.map((e) => e.error));
-            this.log.info('Address batch finished', batchNumber);
+            this.log.info('Country batch finished', batchNumber);
           },
           (error) => {
             if (error) reject(error);
-            this.log.info('Address indexation finished', result);
+            this.log.info('Country indexation finished', result);
             resolve(result);
           },
         );
     });
+  }
+
+  /**
+   * Return the cypher query to index people.
+   */
+  getIndexMessagesQuery(ids?: string[]) {
+    return `
+      MATCH (n:Message)
+      ${ids && ids.length ? `WHERE n.id IN $ids` : ''}
+      RETURN  {
+        id: n.id,
+        message: n.message,
+        year: n.year,
+        people:    collect { MATCH (n)-[r:CONTAINS]->(m:Person)  WHERE NOT coalesce(r.deleted) AND NOT coalesce(m.deleted) RETURN DISTINCT m.id + "@" + m.name  },
+        addresses: collect { MATCH (n)-[r:CONTAINS]->(m:Address) WHERE NOT coalesce(r.deleted) AND NOT coalesce(m.deleted) RETURN DISTINCT m.id + "@" + m.name  },
+        companies: collect { MATCH (n)-[r:CONTAINS]->(m:Company) WHERE NOT coalesce(r.deleted) AND NOT coalesce(m.deleted) RETURN DISTINCT m.id + "@" + m.name  },
+        countries: collect { MATCH (n)-[r:CONTAINS]->(m:Country) WHERE NOT coalesce(r.deleted) AND NOT coalesce(m.deleted) RETURN DISTINCT m.id + "@" + m.name  }
+      } as result`;
+  }
+
+  /**
+   * Return the cypher query to index people.
+   */
+  getIndexPeopleQuery(ids?: string[]) {
+    return `
+      MATCH (n:Person)
+      ${ids && ids.length ? `WHERE n.id IN $ids` : ''}
+      RETURN  {
+        id: n.id,
+        name: n.name,
+        addresses: collect { MATCH (n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Address) WHERE NOT coalesce(r1.deleted) AND  NOT coalesce(r2.deleted) AND NOT coalesce(m.deleted) RETURN DISTINCT  m.id + "@" + m.name  },
+        companies: collect { MATCH (n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Company) WHERE NOT coalesce(r1.deleted) AND  NOT coalesce(r2.deleted) AND NOT coalesce(m.deleted) RETURN DISTINCT  m.id + "@" + m.name  },
+        countries: collect { MATCH (n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Country) WHERE NOT coalesce(r1.deleted) AND  NOT coalesce(r2.deleted) AND NOT coalesce(m.deleted) RETURN DISTINCT  m.id + "@" + m.name  },
+        years:     collect { MATCH (n)<--(m:Message) RETURN DISTINCT m.year  }
+      } as result`;
+  }
+
+  /**
+   * Return the cypher query to index company.
+   */
+  getIndexCompaniesQuery(ids?: string[]) {
+    return `
+      MATCH (n:Company)
+      ${ids && ids.length ? `WHERE n.id IN $ids` : ''}
+      RETURN  {
+        id: n.id,
+        name: n.name,
+        people:    collect { MATCH (n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Person)  WHERE NOT coalesce(r1.deleted) AND  NOT coalesce(r2.deleted) AND NOT coalesce(m.deleted) RETURN DISTINCT m.id + "@" + m.name  },
+        addresses: collect { MATCH (n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Address) WHERE NOT coalesce(r1.deleted) AND  NOT coalesce(r2.deleted) AND NOT coalesce(m.deleted) RETURN DISTINCT m.id + "@" + m.name  },
+        countries: collect { MATCH (n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Country) WHERE NOT coalesce(r1.deleted) AND  NOT coalesce(r2.deleted) AND NOT coalesce(m.deleted) RETURN DISTINCT m.id + "@" + m.name  },
+        years:     collect { MATCH (n)<--(m:Message) RETURN DISTINCT m.year  }
+      } as result`;
+  }
+
+  /**
+   * Return the cypher query to index addresses.
+   */
+  getIndexAddressesQuery(ids?: string[]) {
+    return `
+      MATCH (n:Address)
+      ${ids && ids.length ? `WHERE n.id IN $ids` : ''}
+      RETURN  {
+        id: n.id,
+        name: n.name,
+        people:    collect { MATCH(n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Person)  WHERE NOT coalesce(r1.deleted) AND  NOT coalesce(r2.deleted) AND NOT coalesce(m.deleted) RETURN DISTINCT m.id + "@" + m.name  },
+        companies: collect { MATCH(n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Company) WHERE NOT coalesce(r1.deleted) AND  NOT coalesce(r2.deleted) AND NOT coalesce(m.deleted) RETURN DISTINCT m.id + "@" + m.name  },
+        countries: collect { MATCH(n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Country) WHERE NOT coalesce(r1.deleted) AND  NOT coalesce(r2.deleted) AND NOT coalesce(m.deleted) RETURN DISTINCT m.id + "@" + m.name  },
+        years:     collect { MATCH(n)<--(m:Message) RETURN DISTINCT m.year  }
+      } as result`;
+  }
+
+  /**
+   * Return the cypher query to index country.
+   */
+  getIndexCountriesQuery(ids?: string[]) {
+    return `
+      MATCH (n:Country) 
+      ${ids && ids.length ? `WHERE n.id IN $ids` : ''}
+      RETURN  {
+        id: n.id,
+        name: n.name,
+        people:    collect { MATCH (n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Person)  WHERE NOT coalesce(r1.deleted) AND  NOT coalesce(r2.deleted) AND NOT coalesce(m.deleted) RETURN DISTINCT m.id + "@" + m.name  LIMIT ${config.elastic.nested_objects_limit}},
+        companies: collect { MATCH (n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Company) WHERE NOT coalesce(r1.deleted) AND  NOT coalesce(r2.deleted) AND NOT coalesce(m.deleted) RETURN DISTINCT m.id + "@" + m.name LIMIT ${config.elastic.nested_objects_limit} },
+        addresses: collect { MATCH (n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Address) WHERE NOT coalesce(r1.deleted) AND  NOT coalesce(r2.deleted) AND NOT coalesce(m.deleted) RETURN DISTINCT m.id + "@" + m.name LIMIT ${config.elastic.nested_objects_limit} },
+        years:     collect { MATCH (n)<--(m:Message) RETURN DISTINCT m.year  }
+      } as result`;
   }
 
   /**

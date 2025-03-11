@@ -1,15 +1,19 @@
 import { faker } from '@faker-js/faker';
+import { omit } from 'lodash';
 import { v4 as uuid } from 'uuid';
 import { expect } from 'vitest';
 
 import { Services } from '../../src/services';
 import { DatasetImport } from '../../src/services/dataset/import';
 import { DatasetIndexation } from '../../src/services/dataset/indexation';
+import { Elastic } from '../../src/services/elastic';
 import { Neo4j } from '../../src/services/neo4j';
-import { DataMessage, ItemType, Neo4jLabels } from '../../src/types';
+import { DataMessage, EsIndices, ItemType, Neo4jLabels } from '../../src/types';
 
 const datasetIndexation = Services.get(DatasetIndexation);
 const datasetImport = Services.get(DatasetImport);
+
+const es = Services.get(Elastic);
 const neo4j = Services.get(Neo4j);
 
 /**
@@ -54,12 +58,13 @@ export async function cleanTestDataset(): Promise<void> {
 export async function getItemData(
   type: ItemType,
   id: string,
+  includeDeleted = false,
 ): Promise<null | Record<string, unknown>> {
   return await neo4j.getFirstResultQuery<Record<string, unknown>>(
-    `MATCH (n:${Neo4jLabels[type]} {id: $id}) RETURN n { .*} AS result`,
-    {
-      id,
-    },
+    ` MATCH (n:${Neo4jLabels[type]} { id: $id }) 
+      ${!includeDeleted ? 'WHERE NOT coalesce(n.deleted, false)' : ''}
+      RETURN n { .*} AS result`,
+    { id },
   );
 }
 
@@ -147,7 +152,6 @@ export async function checkMessage(
   message: DataMessage<{ id: string; name: string }>,
 ) {
   const data = await getDataMessage(messageId);
-  console.log(data);
 
   expect(data).not.toBeNull();
   if (data) {
@@ -162,7 +166,59 @@ export async function checkMessage(
 
     expect(message.raw_people?.sort(sortById)).toStrictEqual(data.raw_people?.sort(sortById));
     expect(message.raw_countries?.sort(sortById)).toStrictEqual(data.raw_countries?.sort(sortById));
+
+    await checkMessageIndexation(messageId);
   }
+}
+
+export async function checkMessageIndexation(id: string) {
+  await es.client.indices.flush({ index: EsIndices['message'] });
+  await es.client.indices.flush({ index: EsIndices['company'] });
+  await es.client.indices.flush({ index: EsIndices['people'] });
+  await es.client.indices.flush({ index: EsIndices['country'] });
+  await es.client.indices.flush({ index: EsIndices['address'] });
+
+  const data = await getDataMessage(id);
+  if (!data) throw new Error('Message not found');
+
+  await checkItemIndexation('message', id);
+  if (data.raw_company) await checkItemIndexation('company', data.raw_company.id);
+  if (data.raw_address) await checkItemIndexation('address', data.raw_address.id);
+  for (const person of data.raw_people || []) {
+    await checkItemIndexation('person', person.id);
+  }
+  for (const country of data.raw_countries || []) {
+    await checkItemIndexation('country', country.id);
+  }
+}
+
+async function checkItemIndexation(type: ItemType, id: string) {
+  let indexName: string = EsIndices['message'];
+  let indexQuery: string = datasetIndexation.getIndexMessagesQuery([id]);
+  switch (type) {
+    case 'company':
+      indexName = EsIndices['company'];
+      indexQuery = datasetIndexation.getIndexCompaniesQuery([id]);
+      break;
+    case 'address':
+      indexName = EsIndices['address'];
+      indexQuery = datasetIndexation.getIndexAddressesQuery([id]);
+      break;
+    case 'person':
+      indexName = EsIndices['person'];
+      indexQuery = datasetIndexation.getIndexPeopleQuery([id]);
+      break;
+    case 'country':
+      indexName = EsIndices['country'];
+      indexQuery = datasetIndexation.getIndexCountriesQuery([id]);
+      break;
+  }
+  const neoData = await neo4j.getFirstResultQuery<Record<string, unknown>>(indexQuery, {
+    ids: [id],
+  });
+  if (!neoData) throw new Error(`${type} / ${id} not found in Neo4j`);
+  const esData = await es.getDocument<Record<string, unknown>>(indexName, id);
+  expect(omit(esData, ['fingerprint']), `Bad ES value for ${type}/${id}`).toStrictEqual(neoData);
 }
 
 function sortById<T extends { id: string }>(a: T, b: T): number {
