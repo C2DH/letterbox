@@ -1,5 +1,5 @@
 import * as path from 'path';
-import { SearchHit } from '@elastic/elasticsearch';
+import { estypes } from '@elastic/elasticsearch';
 import { delegateToSchema } from '@graphql-tools/delegate';
 import { ExtractField } from '@graphql-tools/wrap';
 import Boom, { notImplemented } from '@hapi/boom';
@@ -114,13 +114,13 @@ export const resolvers: Resolvers<unknown> = {
           sort,
           sources: [],
           scrollTimeout,
-          mapFn: (hit: SearchHit) => ({ id: hit._id }),
+          mapFn: (hit: estypes.SearchHit) => ({ id: hit._id }),
         },
       );
 
       const resultAugmented = await getGraphQlItems(
         itemType,
-        results.map((r) => r.id),
+        results.filter((r): r is { id: string } => r.id !== undefined).map((r) => r.id),
         _context,
         _info,
         ['results'],
@@ -136,12 +136,12 @@ export const resolvers: Resolvers<unknown> = {
     scroll: async (_root, { itemType, scrollId, scrollTimeout }, _context, _info) => {
       const { total, results } = await elasticSearch.scroll(scrollId, {
         scrollTimeout,
-        mapFn: (hit: SearchHit) => ({ id: hit._id }),
+        mapFn: (hit: estypes.SearchHit) => ({ id: hit._id }),
       });
 
       const resultAugmented = await getGraphQlItems(
         itemType,
-        results.map((r) => r.id),
+        results.filter((r): r is { id: string } => r.id !== undefined).map((r) => r.id),
         _context,
         _info,
         ['results'],
@@ -251,7 +251,12 @@ export const resolvers: Resolvers<unknown> = {
      */
     splitNode: async (_root, { type, id, values }, context, info) => {
       const result = await datasetEdition.splitNode(type, id, values);
-      const data = await getGraphQlItems(result.nodes, context, info);
+      const data = await getGraphQlItems(
+        type,
+        result.nodes.map((n) => n.id),
+        context,
+        info,
+      );
       if (data.length !== values.length)
         throw Boom.internal(`Split in ${values.length} nodes but got ${data.length}`);
       return data;
