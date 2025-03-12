@@ -3,9 +3,8 @@ import * as path from 'path';
 import { estypes } from '@elastic/elasticsearch';
 import { delegateToSchema } from '@graphql-tools/delegate';
 import { ExtractField } from '@graphql-tools/wrap';
-import Boom, { notImplemented } from '@hapi/boom';
+import Boom from '@hapi/boom';
 import { Filter } from '@ouestware/facets';
-import { getLogger } from '@ouestware/node-logger';
 import { GraphQLResolveInfo, OperationTypeNode } from 'graphql';
 import { capitalize, head } from 'lodash';
 
@@ -19,7 +18,6 @@ import { Resolvers, type NodeItem } from './generated/types';
 
 export const typeDefs = readFileSync(path.resolve(__dirname, './schema.graphql'), 'utf8');
 
-const log = getLogger('GraphQl');
 const datasetImport = Services.get(DatasetImport);
 const datasetIndexation = Services.get(DatasetIndexation);
 const datasetEdition = Services.get(DatasetEdition);
@@ -154,47 +152,23 @@ export const resolvers: Resolvers<unknown> = {
       };
     },
 
-    // COUNT
-    countMessage: async (_root, { filters, byYear }, _context, _info) => {
-      log.debug(`TODO: count(${JSON.stringify({ filters, byYear })})`);
-      throw notImplemented();
-    },
-    countCompany: async (_root, { filters, byYear }, _context, _info) => {
-      log.debug(`TODO: count(${JSON.stringify({ filters, byYear })})`);
-      throw notImplemented();
-    },
-    countPeople: async (_root, { filters, byYear }, _context, _info) => {
-      log.debug(`TODO: count(${JSON.stringify({ filters, byYear })})`);
-      throw notImplemented();
-    },
-    countAddress: async (_root, { filters, byYear }, _context, _info) => {
-      log.debug(`TODO: count(${JSON.stringify({ filters, byYear })})`);
-      throw notImplemented();
-    },
-    countCountry: async (_root, { filters, byYear }, _context, _info) => {
-      log.debug(`TODO: count(${JSON.stringify({ filters, byYear })})`);
-      throw notImplemented();
-    },
     // TOP
-    topMessageMetadata: async (_root, { metadataModel, filters, limit }, _context, _info) => {
-      log.debug(`TODO: search(${JSON.stringify({ metadataModel, filters, limit })})`);
-      throw notImplemented();
-    },
-    topCompanyMetadata: async (_root, { metadataModel, filters, limit }, _context, _info) => {
-      log.debug(`TODO: search(${JSON.stringify({ metadataModel, filters, limit })})`);
-      throw notImplemented();
-    },
-    topPeopleMetadata: async (_root, { metadataModel, filters, limit }, _context, _info) => {
-      log.debug(`TODO: search(${JSON.stringify({ metadataModel, filters, limit })})`);
-      throw notImplemented();
-    },
-    topAddressMetadata: async (_root, { metadataModel, filters, limit }, _context, _info) => {
-      log.debug(`TODO: search(${JSON.stringify({ metadataModel, filters, limit })})`);
-      throw notImplemented();
-    },
-    topCountryMetadata: async (_root, { metadataModel, filters, limit }, _context, _info) => {
-      log.debug(`TODO: search(${JSON.stringify({ metadataModel, filters, limit })})`);
-      throw notImplemented();
+    aggregate: async (
+      _root,
+      { itemType, field, query, includes, filters, size },
+      _context,
+      _info,
+    ) => {
+      const results = await elasticSearch.fieldAggregation(
+        EsIndices[itemType],
+        field,
+        filters as Record<string, Filter>,
+        query,
+        includes,
+        size,
+      );
+
+      return elasticSearch.formatAggregationResults(field, results);
     },
   },
   Mutation: {

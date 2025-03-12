@@ -312,31 +312,13 @@ input SortBy {
 
 # TOP INPUTS
 
-enum MessageMetadata {
-  company
+enum AggregationFields {
+  companies
   people
-  country
-  address
-}
-enum AddressMetadata {
-  company
-  people
-  country
-}
-enum CountryMetadata {
-  company
-  people
-  address
-}
-enum CompanyMetadata {
-  people
-  address
-  country
-}
-enum PeopleMetadata {
-  company
-  address
-  country
+  countries
+  addresses
+  years
+  year
 }
 
 # RETURN TYPE
@@ -349,14 +331,26 @@ type SearchResults
   results: [NodeItem]!
   scrollId: String
 }
-
-type TopValue
+type AggregateValue
   @query(read: false, aggregate: false)
   @mutation(operations: [])
   @subscription(events: []) {
   id: String!
   label: String!
   count: Int!
+}
+
+type AggregateResults {
+  total: Int!
+  values: [AggregateValue!]!
+}
+
+type AggregateResults
+  @query(read: false, aggregate: false)
+  @mutation(operations: [])
+  @subscription(events: []) {
+  total: Int!
+  values: [AggregateValue!]!
 }
 
 type YearCountResult
@@ -389,40 +383,14 @@ type Query {
   ): SearchResults
 
   scroll(itemType: DataItemType!, scrollId: String!, scrollTimeout: String): SearchResults
-
-  "Count Items respecting a set of filters, option to add count by year"
-  countMessage(filters: SearchFilters!, byYear: Boolean): CountResult
-  countCompany(filters: SearchFilters!, byYear: Boolean): CountResult
-  countPeople(filters: SearchFilters!, byYear: Boolean): CountResult
-  countCountry(filters: SearchFilters!, byYear: Boolean): CountResult
-  countAddress(filters: SearchFilters!, byYear: Boolean): CountResult
-
-  "Retrieve Top metadata values in Items which respect a set of filters"
-  topMessageMetadata(
-    metadataModel: MessageMetadata!
-    filters: SearchFilters!
-    limit: Int!
-  ): [TopValue]
-  topCompanyMetadata(
-    metadataModel: CompanyMetadata!
-    filters: SearchFilters!
-    limit: Int!
-  ): [TopValue]
-  topPeopleMetadata(
-    metadataModel: PeopleMetadata!
-    filters: SearchFilters!
-    limit: Int!
-  ): [TopValue]
-  topCountryMetadata(
-    metadataModel: CountryMetadata!
-    filters: SearchFilters!
-    limit: Int!
-  ): [TopValue]
-  topAddressMetadata(
-    metadataModel: AddressMetadata!
-    filters: SearchFilters!
-    limit: Int!
-  ): [TopValue]
+  aggregate(
+    itemType: DataItemType!
+    field: AggregationFields!
+    query: String
+    includes: String
+    filters: SearchFilters
+    size: Int
+  ): AggregateResults!
 
   #
   # Internal methods

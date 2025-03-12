@@ -45,10 +45,26 @@ export type AddressPeopleArgs = {
   skip?: InputMaybe<Scalars['Int']['input']>;
 };
 
-export enum AddressMetadata {
-  Company = 'company',
-  Country = 'country',
-  People = 'people'
+export type AggregateResults = {
+  __typename?: 'AggregateResults';
+  total: Scalars['Int']['output'];
+  values: Array<AggregateValue>;
+};
+
+export type AggregateValue = {
+  __typename?: 'AggregateValue';
+  count: Scalars['Int']['output'];
+  id: Scalars['String']['output'];
+  label: Scalars['String']['output'];
+};
+
+export enum AggregationFields {
+  Addresses = 'addresses',
+  Companies = 'companies',
+  Countries = 'countries',
+  People = 'people',
+  Year = 'year',
+  Years = 'years'
 }
 
 export type BooleanFilter = {
@@ -90,12 +106,6 @@ export type CompanyPeopleArgs = {
   skip?: InputMaybe<Scalars['Int']['input']>;
 };
 
-export enum CompanyMetadata {
-  Address = 'address',
-  Country = 'country',
-  People = 'people'
-}
-
 export type ContentFilter = {
   query: Scalars['String']['input'];
   type: FilterTypes;
@@ -134,12 +144,6 @@ export type CountryPeopleArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   skip?: InputMaybe<Scalars['Int']['input']>;
 };
-
-export enum CountryMetadata {
-  Address = 'address',
-  Company = 'company',
-  People = 'people'
-}
 
 export enum DataItemType {
   Address = 'address',
@@ -197,13 +201,6 @@ export type Message = {
   raw_people?: Maybe<Array<Scalars['String']['output']>>;
   year: Scalars['Int']['output'];
 };
-
-export enum MessageMetadata {
-  Address = 'address',
-  Company = 'company',
-  Country = 'country',
-  People = 'people'
-}
 
 export type Mutation = {
   __typename?: 'Mutation';
@@ -284,12 +281,6 @@ export type NumberFilter = {
   type: FilterTypes;
 };
 
-export enum PeopleMetadata {
-  Address = 'address',
-  Company = 'company',
-  Country = 'country'
-}
-
 export type Person = {
   __typename?: 'Person';
   addresses: Array<Address>;
@@ -325,51 +316,20 @@ export type Query = {
   _getCountryItems: Array<Country>;
   _getMessageItems: Array<Message>;
   _getPersonItems: Array<Person>;
-  countAddress?: Maybe<CountResult>;
-  countCompany?: Maybe<CountResult>;
-  countCountry?: Maybe<CountResult>;
-  /** Count Items respecting a set of filters, option to add count by year */
-  countMessage?: Maybe<CountResult>;
-  countPeople?: Maybe<CountResult>;
+  aggregate: AggregateResults;
   scroll?: Maybe<SearchResults>;
   /** Search for Items using a set of filters */
   search?: Maybe<SearchResults>;
-  topAddressMetadata?: Maybe<Array<Maybe<TopValue>>>;
-  topCompanyMetadata?: Maybe<Array<Maybe<TopValue>>>;
-  topCountryMetadata?: Maybe<Array<Maybe<TopValue>>>;
-  /** Retrieve Top metadata values in Items which respect a set of filters */
-  topMessageMetadata?: Maybe<Array<Maybe<TopValue>>>;
-  topPeopleMetadata?: Maybe<Array<Maybe<TopValue>>>;
 };
 
 
-export type QueryCountAddressArgs = {
-  byYear?: InputMaybe<Scalars['Boolean']['input']>;
-  filters: SearchFilters;
-};
-
-
-export type QueryCountCompanyArgs = {
-  byYear?: InputMaybe<Scalars['Boolean']['input']>;
-  filters: SearchFilters;
-};
-
-
-export type QueryCountCountryArgs = {
-  byYear?: InputMaybe<Scalars['Boolean']['input']>;
-  filters: SearchFilters;
-};
-
-
-export type QueryCountMessageArgs = {
-  byYear?: InputMaybe<Scalars['Boolean']['input']>;
-  filters: SearchFilters;
-};
-
-
-export type QueryCountPeopleArgs = {
-  byYear?: InputMaybe<Scalars['Boolean']['input']>;
-  filters: SearchFilters;
+export type QueryAggregateArgs = {
+  field: AggregationFields;
+  filters?: InputMaybe<SearchFilters>;
+  includes?: InputMaybe<Scalars['String']['input']>;
+  itemType: DataItemType;
+  query?: InputMaybe<Scalars['String']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
@@ -387,41 +347,6 @@ export type QuerySearchArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   scrollTimeout?: InputMaybe<Scalars['String']['input']>;
   sortBy?: InputMaybe<Array<InputMaybe<SortBy>>>;
-};
-
-
-export type QueryTopAddressMetadataArgs = {
-  filters: SearchFilters;
-  limit: Scalars['Int']['input'];
-  metadataModel: AddressMetadata;
-};
-
-
-export type QueryTopCompanyMetadataArgs = {
-  filters: SearchFilters;
-  limit: Scalars['Int']['input'];
-  metadataModel: CompanyMetadata;
-};
-
-
-export type QueryTopCountryMetadataArgs = {
-  filters: SearchFilters;
-  limit: Scalars['Int']['input'];
-  metadataModel: CountryMetadata;
-};
-
-
-export type QueryTopMessageMetadataArgs = {
-  filters: SearchFilters;
-  limit: Scalars['Int']['input'];
-  metadataModel: MessageMetadata;
-};
-
-
-export type QueryTopPeopleMetadataArgs = {
-  filters: SearchFilters;
-  limit: Scalars['Int']['input'];
-  metadataModel: PeopleMetadata;
 };
 
 export type RelaionshipProperties = {
@@ -452,13 +377,6 @@ export type SearchResults = {
 export type SortBy = {
   direction: EsSortDirection;
   field: Scalars['String']['input'];
-};
-
-export type TopValue = {
-  __typename?: 'TopValue';
-  count: Scalars['Int']['output'];
-  id: Scalars['String']['output'];
-  label: Scalars['String']['output'];
 };
 
 export type YearCountResult = {
@@ -543,16 +461,16 @@ export type ResolversUnionTypes<_RefType extends Record<string, unknown>> = {
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = {
   Address: ResolverTypeWrapper<Address>;
-  AddressMetadata: AddressMetadata;
+  AggregateResults: ResolverTypeWrapper<AggregateResults>;
+  AggregateValue: ResolverTypeWrapper<AggregateValue>;
+  AggregationFields: AggregationFields;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
   BooleanFilter: BooleanFilter;
   BoundingBoxFilter: BoundingBoxFilter;
   Company: ResolverTypeWrapper<Company>;
-  CompanyMetadata: CompanyMetadata;
   ContentFilter: ContentFilter;
   CountResult: ResolverTypeWrapper<CountResult>;
   Country: ResolverTypeWrapper<Country>;
-  CountryMetadata: CountryMetadata;
   DataItemType: DataItemType;
   DateFilter: DateFilter;
   EsSortDirection: EsSortDirection;
@@ -563,12 +481,10 @@ export type ResolversTypes = {
   Int: ResolverTypeWrapper<Scalars['Int']['output']>;
   KeywordsFilter: KeywordsFilter;
   Message: ResolverTypeWrapper<Message>;
-  MessageMetadata: MessageMetadata;
   Mutation: ResolverTypeWrapper<{}>;
   NodeIdentification: NodeIdentification;
   NodeItem: ResolverTypeWrapper<ResolversUnionTypes<ResolversTypes>['NodeItem']>;
   NumberFilter: NumberFilter;
-  PeopleMetadata: PeopleMetadata;
   Person: ResolverTypeWrapper<Person>;
   Query: ResolverTypeWrapper<{}>;
   RelaionshipProperties: ResolverTypeWrapper<RelaionshipProperties>;
@@ -576,13 +492,14 @@ export type ResolversTypes = {
   SearchResults: ResolverTypeWrapper<Omit<SearchResults, 'results'> & { results: Array<Maybe<ResolversTypes['NodeItem']>> }>;
   SortBy: SortBy;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
-  TopValue: ResolverTypeWrapper<TopValue>;
   YearCountResult: ResolverTypeWrapper<YearCountResult>;
 };
 
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = {
   Address: Address;
+  AggregateResults: AggregateResults;
+  AggregateValue: AggregateValue;
   Boolean: Scalars['Boolean']['output'];
   BooleanFilter: BooleanFilter;
   BoundingBoxFilter: BoundingBoxFilter;
@@ -608,7 +525,6 @@ export type ResolversParentTypes = {
   SearchResults: Omit<SearchResults, 'results'> & { results: Array<Maybe<ResolversParentTypes['NodeItem']>> };
   SortBy: SortBy;
   String: Scalars['String']['output'];
-  TopValue: TopValue;
   YearCountResult: YearCountResult;
 };
 
@@ -619,6 +535,19 @@ export type AddressResolvers<ContextType = any, ParentType extends ResolversPare
   messages?: Resolver<Array<ResolversTypes['Message']>, ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   people?: Resolver<Array<ResolversTypes['Person']>, ParentType, ContextType, RequireFields<AddressPeopleArgs, 'limit' | 'skip'>>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type AggregateResultsResolvers<ContextType = any, ParentType extends ResolversParentTypes['AggregateResults'] = ResolversParentTypes['AggregateResults']> = {
+  total?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  values?: Resolver<Array<ResolversTypes['AggregateValue']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type AggregateValueResolvers<ContextType = any, ParentType extends ResolversParentTypes['AggregateValue'] = ResolversParentTypes['AggregateValue']> = {
+  count?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  label?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -703,18 +632,9 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   _getCountryItems?: Resolver<Array<ResolversTypes['Country']>, ParentType, ContextType>;
   _getMessageItems?: Resolver<Array<ResolversTypes['Message']>, ParentType, ContextType>;
   _getPersonItems?: Resolver<Array<ResolversTypes['Person']>, ParentType, ContextType>;
-  countAddress?: Resolver<Maybe<ResolversTypes['CountResult']>, ParentType, ContextType, RequireFields<QueryCountAddressArgs, 'filters'>>;
-  countCompany?: Resolver<Maybe<ResolversTypes['CountResult']>, ParentType, ContextType, RequireFields<QueryCountCompanyArgs, 'filters'>>;
-  countCountry?: Resolver<Maybe<ResolversTypes['CountResult']>, ParentType, ContextType, RequireFields<QueryCountCountryArgs, 'filters'>>;
-  countMessage?: Resolver<Maybe<ResolversTypes['CountResult']>, ParentType, ContextType, RequireFields<QueryCountMessageArgs, 'filters'>>;
-  countPeople?: Resolver<Maybe<ResolversTypes['CountResult']>, ParentType, ContextType, RequireFields<QueryCountPeopleArgs, 'filters'>>;
+  aggregate?: Resolver<ResolversTypes['AggregateResults'], ParentType, ContextType, RequireFields<QueryAggregateArgs, 'field' | 'itemType'>>;
   scroll?: Resolver<Maybe<ResolversTypes['SearchResults']>, ParentType, ContextType, RequireFields<QueryScrollArgs, 'itemType' | 'scrollId'>>;
   search?: Resolver<Maybe<ResolversTypes['SearchResults']>, ParentType, ContextType, RequireFields<QuerySearchArgs, 'filters' | 'itemType'>>;
-  topAddressMetadata?: Resolver<Maybe<Array<Maybe<ResolversTypes['TopValue']>>>, ParentType, ContextType, RequireFields<QueryTopAddressMetadataArgs, 'filters' | 'limit' | 'metadataModel'>>;
-  topCompanyMetadata?: Resolver<Maybe<Array<Maybe<ResolversTypes['TopValue']>>>, ParentType, ContextType, RequireFields<QueryTopCompanyMetadataArgs, 'filters' | 'limit' | 'metadataModel'>>;
-  topCountryMetadata?: Resolver<Maybe<Array<Maybe<ResolversTypes['TopValue']>>>, ParentType, ContextType, RequireFields<QueryTopCountryMetadataArgs, 'filters' | 'limit' | 'metadataModel'>>;
-  topMessageMetadata?: Resolver<Maybe<Array<Maybe<ResolversTypes['TopValue']>>>, ParentType, ContextType, RequireFields<QueryTopMessageMetadataArgs, 'filters' | 'limit' | 'metadataModel'>>;
-  topPeopleMetadata?: Resolver<Maybe<Array<Maybe<ResolversTypes['TopValue']>>>, ParentType, ContextType, RequireFields<QueryTopPeopleMetadataArgs, 'filters' | 'limit' | 'metadataModel'>>;
 };
 
 export type RelaionshipPropertiesResolvers<ContextType = any, ParentType extends ResolversParentTypes['RelaionshipProperties'] = ResolversParentTypes['RelaionshipProperties']> = {
@@ -729,13 +649,6 @@ export type SearchResultsResolvers<ContextType = any, ParentType extends Resolve
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
-export type TopValueResolvers<ContextType = any, ParentType extends ResolversParentTypes['TopValue'] = ResolversParentTypes['TopValue']> = {
-  count?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  label?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
-
 export type YearCountResultResolvers<ContextType = any, ParentType extends ResolversParentTypes['YearCountResult'] = ResolversParentTypes['YearCountResult']> = {
   count?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   year?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
@@ -744,6 +657,8 @@ export type YearCountResultResolvers<ContextType = any, ParentType extends Resol
 
 export type Resolvers<ContextType = any> = {
   Address?: AddressResolvers<ContextType>;
+  AggregateResults?: AggregateResultsResolvers<ContextType>;
+  AggregateValue?: AggregateValueResolvers<ContextType>;
   Company?: CompanyResolvers<ContextType>;
   CountResult?: CountResultResolvers<ContextType>;
   Country?: CountryResolvers<ContextType>;
@@ -755,7 +670,6 @@ export type Resolvers<ContextType = any> = {
   Query?: QueryResolvers<ContextType>;
   RelaionshipProperties?: RelaionshipPropertiesResolvers<ContextType>;
   SearchResults?: SearchResultsResolvers<ContextType>;
-  TopValue?: TopValueResolvers<ContextType>;
   YearCountResult?: YearCountResultResolvers<ContextType>;
 };
 
