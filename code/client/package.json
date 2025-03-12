@@ -5,13 +5,15 @@
   "type": "module",
   "scripts": {
     "clean": "rimraf dist .eslintcache",
-    "build": "tsc && vite build",
-    "dev": "vite --host",
+    "generate": "graphql-codegen",
+    "build": "npm run generate && tsc && vite build",
+    "dev": "concurrently -n dev,generate \"vite --host\" \"npm run generate -- --watch\"",
     "start": "npm run build && vite preview --host",
-    "lint": "npx eslint 'src/**/*.{ts,tsx}' --no-ignore --cache"
+    "lint": "eslint 'src/**/*.{ts,tsx}' --cache"
   },
   "dependencies": {
     "@apollo/client": "^3.13.4",
+    "@graphql-codegen/typescript-react-apollo": "^4.3.2",
     "@ouestware/facets": "^0.0.1-alpha.4",
     "@ouestware/facets-client": "^0.0.1-alpha.11",
     "@ouestware/hooks": "^0.0.1-alpha.3",

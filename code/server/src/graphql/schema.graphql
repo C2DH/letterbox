@@ -22,98 +22,8 @@ input NodeIdentification {
 }
 
 #
-# Graph DB schema
+# Item Address
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-type RelaionshipProperties @relationshipProperties {
-  deleted: Boolean
-}
-
-type Company
-  @node
-  @query(read: true, aggregate: false)
-  @mutation(operations: [])
-  @subscription(events: []) {
-  id: ID! @unique
-  name: String!
-  messages: [Message!]! @relationship(type: "CONTAINS", direction: IN)
-  countries(skip: Int = 0, limit: Int = 50): [Country!]!
-    @cypher(
-      columnName: "result"
-      statement: """
-      MATCH (this)<-[r1]-(:Message)-[r2]->(n:Country)
-      WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false)
-      RETURN DISTINCT n AS result
-      SKIP $skip
-      LIMIT $limit
-      """
-    )
-  people(skip: Int = 0, limit: Int = 50): [Person!]!
-    @cypher(
-      columnName: "result"
-      statement: """
-      MATCH (this)<-[r1]-(:Message)-[r2]->(n:Person)
-      WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false)
-      RETURN DISTINCT n AS result
-      SKIP $skip
-      LIMIT $limit
-      """
-    )
-  addresses(skip: Int = 0, limit: Int = 50): [Address!]!
-    @cypher(
-      columnName: "result"
-      statement: """
-      MATCH (this)<-[r1]-(:Message)-[r2]->(n:Address)
-      WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false)
-      RETURN DISTINCT n AS result
-      SKIP $skip
-      LIMIT $limit
-      """
-    )
-}
-
-type Country
-  @node
-  @query(read: true, aggregate: false)
-  @mutation(operations: [])
-  @subscription(events: []) {
-  id: ID! @unique
-  name: String!
-  messages: [Message!]! @relationship(type: "CONTAINS", direction: IN)
-  companies(skip: Int = 0, limit: Int = 50): [Company!]!
-    @cypher(
-      columnName: "result"
-      statement: """
-      MATCH (this)<-[r1]-(:Message)-[r2]->(n:Company)
-      WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false)
-      RETURN DISTINCT n AS result
-      SKIP $skip
-      LIMIT $limit
-      """
-    )
-  people(skip: Int = 0, limit: Int = 50): [Person!]!
-    @cypher(
-      columnName: "result"
-      statement: """
-      MATCH (this)<-[r1]-(:Message)-[r2]->(n:Person)
-      WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false)
-      RETURN DISTINCT n AS result
-      SKIP $skip
-      LIMIT $limit
-      """
-    )
-  addresses(skip: Int = 0, limit: Int = 50): [Address!]!
-    @cypher(
-      columnName: "result"
-      statement: """
-      MATCH (this)<-[r1]-(:Message)-[r2]->(n:Address)
-      WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false)
-      RETURN DISTINCT n AS result
-      SKIP $skip
-      LIMIT $limit
-      """
-    )
-}
 
 type Address
   @node
@@ -122,35 +32,97 @@ type Address
   @subscription(events: []) {
   id: ID! @unique
   name: String!
-  messages: [Message!]! @relationship(type: "CONTAINS", direction: IN)
-  companies(skip: Int = 0, limit: Int = 50): [Company!]!
+
+  #
+  # Message relationships
+  #
+  messagesCount: Int!
+    @cypher(
+      columnName: "result"
+      statement: """
+      MATCH (this)<-[r]-(n:Message)
+      WHERE NOT coalesce(r.deleted, false)
+      RETURN COUNT(DISTINCT n) AS result
+      """
+    )
+  messages(skip: Int = 0, limit: Int = 20): [Message!]!
+    @cypher(
+      columnName: "result"
+      statement: """
+      MATCH (this)<-[r]-(n:Message)
+      WHERE NOT coalesce(r.deleted, false)
+      RETURN DISTINCT n AS result
+      SKIP $skip
+      LIMIT $limit
+      """
+    )
+
+  #
+  # Company relationships
+  #
+  companiesCount: Int!
     @cypher(
       columnName: "result"
       statement: """
       MATCH (this)<-[r1]-(:Message)-[r2]->(n:Company)
-      WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false)
-      RETURN DISTINCT n AS result
-      SKIP $skip
-      LIMIT $limit
+      WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false) AND NOT coalesce(n.deleted, false)
+      RETURN COUNT(DISTINCT n) AS result
       """
     )
-  people(skip: Int = 0, limit: Int = 50): [Person!]!
+  companies(skip: Int = 0, limit: Int = 20): [Company!]!
     @cypher(
       columnName: "result"
       statement: """
-      MATCH (this)<-[r1]-(:Message)-[r2]->(n:Person)
-      WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false)
+      MATCH (this)<-[r1]-(:Message)-[r2]->(n:Company)
+      WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false) AND NOT coalesce(n.deleted, false)
       RETURN DISTINCT n AS result
       SKIP $skip
       LIMIT $limit
       """
     )
-  countries(skip: Int = 0, limit: Int = 50): [Country!]!
+
+  #
+  # Country relationships
+  #
+  countriesCount: Int!
     @cypher(
       columnName: "result"
       statement: """
       MATCH (this)<-[r1]-(:Message)-[r2]->(n:Country)
-      WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false)
+      WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false) AND NOT coalesce(n.deleted, false)
+      RETURN COUNT(DISTINCT n) AS result
+      """
+    )
+  countries(skip: Int = 0, limit: Int = 20): [Country!]!
+    @cypher(
+      columnName: "result"
+      statement: """
+      MATCH (this)<-[r1]-(:Message)-[r2]->(n:Country)
+      WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false) AND NOT coalesce(n.deleted, false)
+      RETURN DISTINCT n AS result
+      SKIP $skip
+      LIMIT $limit
+      """
+    )
+
+  #
+  # People relationships
+  #
+  peopleCount: Int!
+    @cypher(
+      columnName: "result"
+      statement: """
+      MATCH (this)<-[r1]-(:Message)-[r2]->(n:Person)
+      WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false) AND NOT coalesce(n.deleted, false)
+      RETURN COUNT(DISTINCT n) AS result
+      """
+    )
+  people(skip: Int = 0, limit: Int = 20): [Person!]!
+    @cypher(
+      columnName: "result"
+      statement: """
+      MATCH (this)<-[r1]-(:Message)-[r2]->(n:Person)
+      WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false) AND NOT coalesce(n.deleted, false)
       RETURN DISTINCT n AS result
       SKIP $skip
       LIMIT $limit
@@ -158,26 +130,55 @@ type Address
     )
 }
 
-type Person
+#
+# Item Company
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+type Company
   @node
   @query(read: true, aggregate: false)
   @mutation(operations: [])
   @subscription(events: []) {
   id: ID! @unique
   name: String!
-  messages: [Message!]! @relationship(type: "CONTAINS", direction: IN)
-  companies(skip: Int = 0, limit: Int = 50): [Company!]!
+
+  #
+  # Message relationships
+  #
+  messagesCount: Int!
     @cypher(
       columnName: "result"
       statement: """
-      MATCH (this)<-[r1]-(:Message)-[r2]->(n:Company)
-      WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false)
+      MATCH (this)<-[r]-(n:Message)
+      WHERE NOT coalesce(r.deleted, false)
+      RETURN COUNT(DISTINCT n) AS result
+      """
+    )
+  messages(skip: Int = 0, limit: Int = 20): [Message!]!
+    @cypher(
+      columnName: "result"
+      statement: """
+      MATCH (this)<-[r]-(n:Message)
+      WHERE NOT coalesce(r.deleted, false)
       RETURN DISTINCT n AS result
       SKIP $skip
       LIMIT $limit
       """
     )
-  addresses(skip: Int = 0, limit: Int = 50): [Address!]!
+
+  #
+  # Address relationships
+  #
+  addressesCount: Int!
+    @cypher(
+      columnName: "result"
+      statement: """
+      MATCH (this)<-[r1]-(:Message)-[r2]->(n:Address)
+      WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false) AND NOT coalesce(n.deleted, false)
+      RETURN COUNT(DISTINCT n) AS result
+      """
+    )
+  addresses(skip: Int = 0, limit: Int = 20): [Address!]!
     @cypher(
       columnName: "result"
       statement: """
@@ -188,18 +189,168 @@ type Person
       LIMIT $limit
       """
     )
-  countries(skip: Int = 0, limit: Int = 50): [Country!]!
+
+  #
+  # Country relationships
+  #
+  countriesCount: Int!
     @cypher(
       columnName: "result"
       statement: """
       MATCH (this)<-[r1]-(:Message)-[r2]->(n:Country)
-      WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false)
+      WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false) AND NOT coalesce(n.deleted, false)
+      RETURN COUNT(DISTINCT n) AS result
+      """
+    )
+  countries(skip: Int = 0, limit: Int = 20): [Country!]!
+    @cypher(
+      columnName: "result"
+      statement: """
+      MATCH (this)<-[r1]-(:Message)-[r2]->(n:Country)
+      WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false) AND NOT coalesce(n.deleted, false)
+      RETURN DISTINCT n AS result
+      SKIP $skip
+      LIMIT $limit
+      """
+    )
+
+  #
+  # People relationships
+  #
+  peopleCount: Int!
+    @cypher(
+      columnName: "result"
+      statement: """
+      MATCH (this)<-[r1]-(:Message)-[r2]->(n:Person)
+      WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false) AND NOT coalesce(n.deleted, false)
+      RETURN COUNT(DISTINCT n) AS result
+      """
+    )
+  people(skip: Int = 0, limit: Int = 20): [Person!]!
+    @cypher(
+      columnName: "result"
+      statement: """
+      MATCH (this)<-[r1]-(:Message)-[r2]->(n:Person)
+      WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false) AND NOT coalesce(n.deleted, false)
       RETURN DISTINCT n AS result
       SKIP $skip
       LIMIT $limit
       """
     )
 }
+
+#
+# Item Country
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+type Country
+  @node
+  @query(read: true, aggregate: false)
+  @mutation(operations: [])
+  @subscription(events: []) {
+  id: ID! @unique
+  name: String!
+
+  #
+  # Message relationships
+  #
+  messagesCount: Int!
+    @cypher(
+      columnName: "result"
+      statement: """
+      MATCH (this)<-[r]-(n:Message)
+      WHERE NOT coalesce(r.deleted, false)
+      RETURN COUNT(DISTINCT n) AS result
+      """
+    )
+  messages(skip: Int = 0, limit: Int = 20): [Message!]!
+    @cypher(
+      columnName: "result"
+      statement: """
+      MATCH (this)<-[r]-(n:Message)
+      WHERE NOT coalesce(r.deleted, false)
+      RETURN DISTINCT n AS result
+      SKIP $skip
+      LIMIT $limit
+      """
+    )
+
+  #
+  # Address relationships
+  #
+  addressesCount: Int!
+    @cypher(
+      columnName: "result"
+      statement: """
+      MATCH (this)<-[r1]-(:Message)-[r2]->(n:Address)
+      WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false) AND NOT coalesce(n.deleted, false)
+      RETURN COUNT(DISTINCT n) AS result
+      """
+    )
+  addresses(skip: Int = 0, limit: Int = 20): [Address!]!
+    @cypher(
+      columnName: "result"
+      statement: """
+      MATCH (this)<-[r1]-(:Message)-[r2]->(n:Address)
+      WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false)
+      RETURN DISTINCT n AS result
+      SKIP $skip
+      LIMIT $limit
+      """
+    )
+
+  #
+  # Company relationships
+  #
+  companiesCount: Int!
+    @cypher(
+      columnName: "result"
+      statement: """
+      MATCH (this)<-[r1]-(:Message)-[r2]->(n:Company)
+      WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false) AND NOT coalesce(n.deleted, false)
+      RETURN COUNT(DISTINCT n) AS result
+      """
+    )
+  companies(skip: Int = 0, limit: Int = 20): [Company!]!
+    @cypher(
+      columnName: "result"
+      statement: """
+      MATCH (this)<-[r1]-(:Message)-[r2]->(n:Company)
+      WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false) AND NOT coalesce(n.deleted, false)
+      RETURN DISTINCT n AS result
+      SKIP $skip
+      LIMIT $limit
+      """
+    )
+
+  #
+  # People relationships
+  #
+  peopleCount: Int!
+    @cypher(
+      columnName: "result"
+      statement: """
+      MATCH (this)<-[r1]-(:Message)-[r2]->(n:Person)
+      WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false) AND NOT coalesce(n.deleted, false)
+      RETURN COUNT(DISTINCT n) AS result
+      """
+    )
+  people(skip: Int = 0, limit: Int = 20): [Person!]!
+    @cypher(
+      columnName: "result"
+      statement: """
+      MATCH (this)<-[r1]-(:Message)-[r2]->(n:Person)
+      WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false) AND NOT coalesce(n.deleted, false)
+      RETURN DISTINCT n AS result
+      SKIP $skip
+      LIMIT $limit
+      """
+    )
+}
+
+#
+# Item Message
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 type Message
   @node
@@ -219,14 +370,210 @@ type Message
   raw_countries: [String!]
   raw_message: String!
 
-  company: [Company!]!
-    @relationship(type: "CONTAINS", direction: OUT, properties: "RelaionshipProperties")
-  address: Address!
-    @relationship(type: "CONTAINS", direction: OUT, properties: "RelaionshipProperties")
-  persons: [Person!]!
-    @relationship(type: "CONTAINS", direction: OUT, properties: "RelaionshipProperties")
-  countries: [Country!]!
-    @relationship(type: "CONTAINS", direction: OUT, properties: "RelaionshipProperties")
+  #
+  # Address relationships
+  #
+  addressesCount: Int!
+    @cypher(
+      columnName: "result"
+      statement: """
+      MATCH (this)-[r]->(n:Address)
+      WHERE NOT coalesce(r.deleted, false) AND NOT coalesce(n.deleted, false)
+      RETURN COUNT(DISTINCT n) AS result
+      """
+    )
+  addresses(skip: Int = 0, limit: Int = 20): [Address!]!
+    @cypher(
+      columnName: "result"
+      statement: """
+      MATCH (this)-[r]->(n:Address)
+      WHERE NOT coalesce(r.deleted, false) AND NOT coalesce(n.deleted, false)
+      RETURN DISTINCT n AS result
+      SKIP $skip
+      LIMIT $limit
+      """
+    )
+
+  #
+  # Company relationships
+  #
+  companiesCount: Int!
+    @cypher(
+      columnName: "result"
+      statement: """
+      MATCH (this)-[r]->(n:Company)
+      WHERE NOT coalesce(r.deleted, false)  AND NOT coalesce(n.deleted, false)
+      RETURN COUNT(DISTINCT n) AS result
+      """
+    )
+  companies(skip: Int = 0, limit: Int = 20): [Company!]!
+    @cypher(
+      columnName: "result"
+      statement: """
+      MATCH (this)-[r]->(n:Company)
+      WHERE NOT coalesce(r.deleted, false) AND NOT coalesce(n.deleted, false)
+      RETURN DISTINCT n AS result
+      SKIP $skip
+      LIMIT $limit
+      """
+    )
+
+  #
+  # Country relationships
+  #
+  countriesCount: Int!
+    @cypher(
+      columnName: "result"
+      statement: """
+      MATCH (this)-[r]->(n:Country)
+      WHERE NOT coalesce(r.deleted, false) AND NOT coalesce(n.deleted, false)
+      RETURN COUNT(DISTINCT n) AS result
+      """
+    )
+  countries(skip: Int = 0, limit: Int = 20): [Country!]!
+    @cypher(
+      columnName: "result"
+      statement: """
+      MATCH (this)-[r]->(n:Country)
+      WHERE NOT coalesce(r.deleted, false) AND NOT coalesce(n.deleted, false)
+      RETURN DISTINCT n AS result
+      SKIP $skip
+      LIMIT $limit
+      """
+    )
+
+  #
+  # People relationships
+  #
+  peopleCount: Int!
+    @cypher(
+      columnName: "result"
+      statement: """
+      MATCH (this)-[r]->(n:Person)
+      WHERE NOT coalesce(r.deleted, false) AND NOT coalesce(n.deleted, false)
+      RETURN COUNT(DISTINCT n) AS result
+      """
+    )
+  people(skip: Int = 0, limit: Int = 20): [Person!]!
+    @cypher(
+      columnName: "result"
+      statement: """
+      MATCH (this)-[r]->(n:Person)
+      WHERE NOT coalesce(r.deleted, false) AND NOT coalesce(n.deleted, false)
+      RETURN DISTINCT n AS result
+      SKIP $skip
+      LIMIT $limit
+      """
+    )
+}
+
+#
+# Item Person
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+type Person
+  @node
+  @query(read: true, aggregate: false)
+  @mutation(operations: [])
+  @subscription(events: []) {
+  id: ID! @unique
+  name: String!
+
+  #
+  # Message relationships
+  #
+  messagesCount: Int!
+    @cypher(
+      columnName: "result"
+      statement: """
+      MATCH (this)<-[r]-(n:Message)
+      WHERE NOT coalesce(r.deleted, false)
+      RETURN COUNT(DISTINCT n) AS result
+      """
+    )
+  messages(skip: Int = 0, limit: Int = 20): [Message!]!
+    @cypher(
+      columnName: "result"
+      statement: """
+      MATCH (this)<-[r]-(n:Message)
+      WHERE NOT coalesce(r.deleted, false)
+      RETURN DISTINCT n AS result
+      SKIP $skip
+      LIMIT $limit
+      """
+    )
+
+  #
+  # Address relationships
+  #
+  addressesCount: Int!
+    @cypher(
+      columnName: "result"
+      statement: """
+      MATCH (this)<-[r1]-(:Message)-[r2]->(n:Address)
+      WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false) AND NOT coalesce(n.deleted, false)
+      RETURN COUNT(DISTINCT n) AS result
+      """
+    )
+  addresses(skip: Int = 0, limit: Int = 20): [Address!]!
+    @cypher(
+      columnName: "result"
+      statement: """
+      MATCH (this)<-[r1]-(:Message)-[r2]->(n:Address)
+      WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false) AND NOT coalesce(n.deleted, false)
+      RETURN DISTINCT n AS result
+      SKIP $skip
+      LIMIT $limit
+      """
+    )
+
+  #
+  # Company relationships
+  #
+  companiesCount: Int!
+    @cypher(
+      columnName: "result"
+      statement: """
+      MATCH (this)<-[r1]-(:Message)-[r2]->(n:Company)
+      WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false) AND NOT coalesce(n.deleted, false)
+      RETURN COUNT(DISTINCT n) AS result
+      """
+    )
+  companies(skip: Int = 0, limit: Int = 20): [Company!]!
+    @cypher(
+      columnName: "result"
+      statement: """
+      MATCH (this)<-[r1]-(:Message)-[r2]->(n:Company)
+      WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false) AND NOT coalesce(n.deleted, false)
+      RETURN DISTINCT n AS result
+      SKIP $skip
+      LIMIT $limit
+      """
+    )
+
+  #
+  # Country relationships
+  #
+  countriesCount: Int!
+    @cypher(
+      columnName: "result"
+      statement: """
+      MATCH (this)<-[r1]-(:Message)-[r2]->(n:Country)
+      WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false) AND NOT coalesce(n.deleted, false)
+      RETURN COUNT(DISTINCT n) AS result
+      """
+    )
+  countries(skip: Int = 0, limit: Int = 20): [Country!]!
+    @cypher(
+      columnName: "result"
+      statement: """
+      MATCH (this)<-[r1]-(:Message)-[r2]->(n:Country)
+      WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false) AND NOT coalesce(n.deleted, false)
+      RETURN DISTINCT n AS result
+      SKIP $skip
+      LIMIT $limit
+      """
+    )
 }
 
 #

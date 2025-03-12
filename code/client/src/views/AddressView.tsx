@@ -3,41 +3,41 @@ import { Link, useParams } from 'react-router-dom';
 
 import { Breadcrumb } from '../components/Breadcrumb';
 import { ListWithLoadMore, type ListWithLoadMoreProps } from '../components/ListWithLoadMore';
-import { type GetCompanyByIdQuery } from '../core/graphql';
-import { useGetCompanyById } from '../hooks/useCompany';
+import { type GetAddressByIdQuery } from '../core/graphql';
+import { useGetAddressById } from '../hooks/useAddress';
 import { Layout } from './layout';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type RelatedDefinition<T = any> = { title: string } & ListWithLoadMoreProps<T>;
 
-export const CompanyView: FC = () => {
+export const AddressView: FC = () => {
   const { id } = useParams();
-  const { loading, company, fetchAddresses, fetchCountries, fetchMessages, fetchPeople } =
-    useGetCompanyById(id);
+  const { loading, address, fetchCompanies, fetchCountries, fetchMessages, fetchPeople } =
+    useGetAddressById(id);
 
   const breadcrumbItems = useMemo(
-    () => [{ content: 'Company' }, { content: company?.name || '' }],
-    [company?.name],
+    () => [{ content: 'Address' }, { content: address?.name || '' }],
+    [address?.name],
   );
 
-  const relatedItems: Array<RelatedDefinition> = company
+  const relatedItems: Array<RelatedDefinition> = address
     ? [
         {
-          title: `Addresses (${company.addressesCount})`,
-          data: company.addresses,
-          total: company.addressesCount,
-          fetch: fetchAddresses,
-          getItemKey: (address) => address.id,
-          renderItem: (address) => (
+          title: `Companies (${address.companiesCount})`,
+          data: address.companies,
+          total: address.companiesCount,
+          fetch: fetchCompanies,
+          getItemKey: (n) => n.id,
+          renderItem: (company) => (
             <div>
-              <Link to={`/address/${address.id}`}>{address.name}</Link>
+              <Link to={`/company/${company.id}`}>{company.name}</Link>
             </div>
           ),
-        } as RelatedDefinition<GetCompanyByIdQuery['result'][0]['addresses'][0]>,
+        } as RelatedDefinition<GetAddressByIdQuery['result'][0]['companies'][0]>,
         {
-          title: `Countries (${company.countriesCount})`,
-          data: company.countries,
-          total: company.countriesCount,
+          title: `Countries (${address.countriesCount})`,
+          data: address.countries,
+          total: address.countriesCount,
           fetch: fetchCountries,
           getItemKey: (country) => country.id,
           renderItem: (country) => (
@@ -45,11 +45,11 @@ export const CompanyView: FC = () => {
               <Link to={`/country/${country.id}`}>{country.name}</Link>
             </div>
           ),
-        } as RelatedDefinition<GetCompanyByIdQuery['result'][0]['countries'][0]>,
+        } as RelatedDefinition<GetAddressByIdQuery['result'][0]['countries'][0]>,
         {
-          title: `People (${company.peopleCount})`,
-          data: company.people,
-          total: company.peopleCount,
+          title: `People (${address.peopleCount})`,
+          data: address.people,
+          total: address.peopleCount,
           fetch: fetchPeople,
           getItemKey: (person) => person.id,
           renderItem: (person) => (
@@ -57,11 +57,11 @@ export const CompanyView: FC = () => {
               <Link to={`/person/${person.id}`}>{person.name}</Link>
             </div>
           ),
-        } as RelatedDefinition<GetCompanyByIdQuery['result'][0]['people'][0]>,
+        } as RelatedDefinition<GetAddressByIdQuery['result'][0]['people'][0]>,
         {
-          title: `Messages (${company.messagesCount})`,
-          data: company.messages,
-          total: company.messagesCount,
+          title: `Messages (${address.messagesCount})`,
+          data: address.messages,
+          total: address.messagesCount,
           fetch: fetchMessages,
           getItemKey: (msg) => msg.id,
           renderItem: (msg) => (
@@ -69,16 +69,16 @@ export const CompanyView: FC = () => {
               <Link to={`/message/${msg.id}`}>{msg.id}</Link>
             </div>
           ),
-        } as RelatedDefinition<GetCompanyByIdQuery['result'][0]['messages'][0]>,
+        } as RelatedDefinition<GetAddressByIdQuery['result'][0]['messages'][0]>,
       ]
     : [];
 
   return (
     <Layout loading={loading}>
       <Breadcrumb items={breadcrumbItems} />
-      {company && (
+      {address && (
         <>
-          <h1>Company {company?.name}</h1>
+          <h1>Address {address?.name}</h1>
 
           <div className="container">
             <h2>Related items</h2>

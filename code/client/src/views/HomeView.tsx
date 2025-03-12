@@ -1,11 +1,11 @@
 import { FC } from 'react';
 
-import { PageLayout } from './layout';
+import { Layout } from './layout';
 
 export const HomeView: FC = () => {
   return (
-    <PageLayout>
+    <Layout>
       <h1>Hello World</h1>
-    </PageLayout>
+    </Layout>
   );
 };

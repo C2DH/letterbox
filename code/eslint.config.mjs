@@ -9,7 +9,9 @@ import tseslint from "typescript-eslint";
 export default tseslint.config(
   {
     files: ["**/*.{ts,tsx}"], 
-    ignores: ["**/build/*", "**/dist/*", "**/lib/*", "**/generated/*"] 
+  },
+  {
+    ignores: ["**/build/*", "**/dist/*", "**/lib/*", "**/generated/*"] ,
   },
   eslintjs.configs.recommended,
   tseslint.configs.recommended,

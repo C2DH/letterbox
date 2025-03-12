@@ -5,7 +5,7 @@ const config: CodegenConfig = {
   documents: ['src/**/*.ts([x])?', '!src/core/graphql/generated/*'],
   generates: {
     './src/core/graphql/generated/': {
-      plugins: [],
+      plugins: ['typescript', 'typescript-operations'],
       preset: 'client',
       presetConfig: {
         fragmentMasking: false,

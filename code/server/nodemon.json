@@ -5,5 +5,5 @@
       "src"
     ],
     "ignore": [],
-    "ext": "*.ts"
+    "ext": "*"
   }

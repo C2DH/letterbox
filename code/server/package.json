@@ -7,7 +7,7 @@
     "build": "npm run clean && npm run generate &&  tsc",
     "init": "tsx src/bin/neo4j-schema",
     "start": "npm run init && nodemon",
-    "lint": "npx eslint 'src/**/*.ts' --ignore-pattern src/graphql/generated/** --cache",
+    "lint": "eslint 'src/**/*.ts' --ignore-pattern src/graphql/generated/** --cache",
     "test": "vitest",
     "generate": "graphql-codegen",
     "dataset:import": "tsx src/bin/dataset-import",

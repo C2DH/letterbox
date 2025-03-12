@@ -20,11 +20,15 @@ export type Scalars = {
 export type Address = {
   __typename?: 'Address';
   companies: Array<Company>;
+  companiesCount: Scalars['Int']['output'];
   countries: Array<Country>;
+  countriesCount: Scalars['Int']['output'];
   id: Scalars['ID']['output'];
   messages: Array<Message>;
+  messagesCount: Scalars['Int']['output'];
   name: Scalars['String']['output'];
   people: Array<Person>;
+  peopleCount: Scalars['Int']['output'];
 };
 
 
@@ -35,6 +39,12 @@ export type AddressCompaniesArgs = {
 
 
 export type AddressCountriesArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type AddressMessagesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   skip?: InputMaybe<Scalars['Int']['input']>;
 };
@@ -81,11 +91,15 @@ export type BoundingBoxFilter = {
 export type Company = {
   __typename?: 'Company';
   addresses: Array<Address>;
+  addressesCount: Scalars['Int']['output'];
   countries: Array<Country>;
+  countriesCount: Scalars['Int']['output'];
   id: Scalars['ID']['output'];
   messages: Array<Message>;
+  messagesCount: Scalars['Int']['output'];
   name: Scalars['String']['output'];
   people: Array<Person>;
+  peopleCount: Scalars['Int']['output'];
 };
 
 
@@ -96,6 +110,12 @@ export type CompanyAddressesArgs = {
 
 
 export type CompanyCountriesArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type CompanyMessagesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   skip?: InputMaybe<Scalars['Int']['input']>;
 };
@@ -120,11 +140,15 @@ export type CountResult = {
 export type Country = {
   __typename?: 'Country';
   addresses: Array<Address>;
+  addressesCount: Scalars['Int']['output'];
   companies: Array<Company>;
+  companiesCount: Scalars['Int']['output'];
   id: Scalars['ID']['output'];
   messages: Array<Message>;
+  messagesCount: Scalars['Int']['output'];
   name: Scalars['String']['output'];
   people: Array<Person>;
+  peopleCount: Scalars['Int']['output'];
 };
 
 
@@ -135,6 +159,12 @@ export type CountryAddressesArgs = {
 
 
 export type CountryCompaniesArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type CountryMessagesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   skip?: InputMaybe<Scalars['Int']['input']>;
 };
@@ -186,20 +216,48 @@ export type KeywordsFilter = {
 
 export type Message = {
   __typename?: 'Message';
-  address: Address;
-  company: Array<Company>;
+  addresses: Array<Address>;
+  addressesCount: Scalars['Int']['output'];
+  companies: Array<Company>;
+  companiesCount: Scalars['Int']['output'];
   countries: Array<Country>;
+  countriesCount: Scalars['Int']['output'];
   filename: Scalars['String']['output'];
   id: Scalars['ID']['output'];
   message: Scalars['String']['output'];
   pageNumber: Scalars['Int']['output'];
-  persons: Array<Person>;
+  people: Array<Person>;
+  peopleCount: Scalars['Int']['output'];
   raw_address: Scalars['String']['output'];
   raw_company: Scalars['String']['output'];
   raw_countries?: Maybe<Array<Scalars['String']['output']>>;
   raw_message: Scalars['String']['output'];
   raw_people?: Maybe<Array<Scalars['String']['output']>>;
   year: Scalars['Int']['output'];
+};
+
+
+export type MessageAddressesArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type MessageCompaniesArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type MessageCountriesArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type MessagePeopleArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type Mutation = {
@@ -284,10 +342,14 @@ export type NumberFilter = {
 export type Person = {
   __typename?: 'Person';
   addresses: Array<Address>;
+  addressesCount: Scalars['Int']['output'];
   companies: Array<Company>;
+  companiesCount: Scalars['Int']['output'];
   countries: Array<Country>;
+  countriesCount: Scalars['Int']['output'];
   id: Scalars['ID']['output'];
   messages: Array<Message>;
+  messagesCount: Scalars['Int']['output'];
   name: Scalars['String']['output'];
 };
 
@@ -305,6 +367,12 @@ export type PersonCompaniesArgs = {
 
 
 export type PersonCountriesArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type PersonMessagesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   skip?: InputMaybe<Scalars['Int']['input']>;
 };
@@ -347,11 +415,6 @@ export type QuerySearchArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   scrollTimeout?: InputMaybe<Scalars['String']['input']>;
   sortBy?: InputMaybe<Array<InputMaybe<SortBy>>>;
-};
-
-export type RelaionshipProperties = {
-  __typename?: 'RelaionshipProperties';
-  deleted?: Maybe<Scalars['Boolean']['output']>;
 };
 
 export type SearchFilters = {
@@ -487,7 +550,6 @@ export type ResolversTypes = {
   NumberFilter: NumberFilter;
   Person: ResolverTypeWrapper<Person>;
   Query: ResolverTypeWrapper<{}>;
-  RelaionshipProperties: ResolverTypeWrapper<RelaionshipProperties>;
   SearchFilters: SearchFilters;
   SearchResults: ResolverTypeWrapper<Omit<SearchResults, 'results'> & { results: Array<Maybe<ResolversTypes['NodeItem']>> }>;
   SortBy: SortBy;
@@ -520,7 +582,6 @@ export type ResolversParentTypes = {
   NumberFilter: NumberFilter;
   Person: Person;
   Query: {};
-  RelaionshipProperties: RelaionshipProperties;
   SearchFilters: SearchFilters;
   SearchResults: Omit<SearchResults, 'results'> & { results: Array<Maybe<ResolversParentTypes['NodeItem']>> };
   SortBy: SortBy;
@@ -530,11 +591,15 @@ export type ResolversParentTypes = {
 
 export type AddressResolvers<ContextType = any, ParentType extends ResolversParentTypes['Address'] = ResolversParentTypes['Address']> = {
   companies?: Resolver<Array<ResolversTypes['Company']>, ParentType, ContextType, RequireFields<AddressCompaniesArgs, 'limit' | 'skip'>>;
+  companiesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   countries?: Resolver<Array<ResolversTypes['Country']>, ParentType, ContextType, RequireFields<AddressCountriesArgs, 'limit' | 'skip'>>;
+  countriesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
-  messages?: Resolver<Array<ResolversTypes['Message']>, ParentType, ContextType>;
+  messages?: Resolver<Array<ResolversTypes['Message']>, ParentType, ContextType, RequireFields<AddressMessagesArgs, 'limit' | 'skip'>>;
+  messagesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   people?: Resolver<Array<ResolversTypes['Person']>, ParentType, ContextType, RequireFields<AddressPeopleArgs, 'limit' | 'skip'>>;
+  peopleCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -553,11 +618,15 @@ export type AggregateValueResolvers<ContextType = any, ParentType extends Resolv
 
 export type CompanyResolvers<ContextType = any, ParentType extends ResolversParentTypes['Company'] = ResolversParentTypes['Company']> = {
   addresses?: Resolver<Array<ResolversTypes['Address']>, ParentType, ContextType, RequireFields<CompanyAddressesArgs, 'limit' | 'skip'>>;
+  addressesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   countries?: Resolver<Array<ResolversTypes['Country']>, ParentType, ContextType, RequireFields<CompanyCountriesArgs, 'limit' | 'skip'>>;
+  countriesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
-  messages?: Resolver<Array<ResolversTypes['Message']>, ParentType, ContextType>;
+  messages?: Resolver<Array<ResolversTypes['Message']>, ParentType, ContextType, RequireFields<CompanyMessagesArgs, 'limit' | 'skip'>>;
+  messagesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   people?: Resolver<Array<ResolversTypes['Person']>, ParentType, ContextType, RequireFields<CompanyPeopleArgs, 'limit' | 'skip'>>;
+  peopleCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -569,11 +638,15 @@ export type CountResultResolvers<ContextType = any, ParentType extends Resolvers
 
 export type CountryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Country'] = ResolversParentTypes['Country']> = {
   addresses?: Resolver<Array<ResolversTypes['Address']>, ParentType, ContextType, RequireFields<CountryAddressesArgs, 'limit' | 'skip'>>;
+  addressesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   companies?: Resolver<Array<ResolversTypes['Company']>, ParentType, ContextType, RequireFields<CountryCompaniesArgs, 'limit' | 'skip'>>;
+  companiesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
-  messages?: Resolver<Array<ResolversTypes['Message']>, ParentType, ContextType>;
+  messages?: Resolver<Array<ResolversTypes['Message']>, ParentType, ContextType, RequireFields<CountryMessagesArgs, 'limit' | 'skip'>>;
+  messagesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   people?: Resolver<Array<ResolversTypes['Person']>, ParentType, ContextType, RequireFields<CountryPeopleArgs, 'limit' | 'skip'>>;
+  peopleCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -584,14 +657,18 @@ export type ImportReportResolvers<ContextType = any, ParentType extends Resolver
 };
 
 export type MessageResolvers<ContextType = any, ParentType extends ResolversParentTypes['Message'] = ResolversParentTypes['Message']> = {
-  address?: Resolver<ResolversTypes['Address'], ParentType, ContextType>;
-  company?: Resolver<Array<ResolversTypes['Company']>, ParentType, ContextType>;
-  countries?: Resolver<Array<ResolversTypes['Country']>, ParentType, ContextType>;
+  addresses?: Resolver<Array<ResolversTypes['Address']>, ParentType, ContextType, RequireFields<MessageAddressesArgs, 'limit' | 'skip'>>;
+  addressesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  companies?: Resolver<Array<ResolversTypes['Company']>, ParentType, ContextType, RequireFields<MessageCompaniesArgs, 'limit' | 'skip'>>;
+  companiesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  countries?: Resolver<Array<ResolversTypes['Country']>, ParentType, ContextType, RequireFields<MessageCountriesArgs, 'limit' | 'skip'>>;
+  countriesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   filename?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   message?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   pageNumber?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  persons?: Resolver<Array<ResolversTypes['Person']>, ParentType, ContextType>;
+  people?: Resolver<Array<ResolversTypes['Person']>, ParentType, ContextType, RequireFields<MessagePeopleArgs, 'limit' | 'skip'>>;
+  peopleCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   raw_address?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   raw_company?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   raw_countries?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;
@@ -618,10 +695,14 @@ export type NodeItemResolvers<ContextType = any, ParentType extends ResolversPar
 
 export type PersonResolvers<ContextType = any, ParentType extends ResolversParentTypes['Person'] = ResolversParentTypes['Person']> = {
   addresses?: Resolver<Array<ResolversTypes['Address']>, ParentType, ContextType, RequireFields<PersonAddressesArgs, 'limit' | 'skip'>>;
+  addressesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   companies?: Resolver<Array<ResolversTypes['Company']>, ParentType, ContextType, RequireFields<PersonCompaniesArgs, 'limit' | 'skip'>>;
+  companiesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   countries?: Resolver<Array<ResolversTypes['Country']>, ParentType, ContextType, RequireFields<PersonCountriesArgs, 'limit' | 'skip'>>;
+  countriesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
-  messages?: Resolver<Array<ResolversTypes['Message']>, ParentType, ContextType>;
+  messages?: Resolver<Array<ResolversTypes['Message']>, ParentType, ContextType, RequireFields<PersonMessagesArgs, 'limit' | 'skip'>>;
+  messagesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
@@ -635,11 +716,6 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   aggregate?: Resolver<ResolversTypes['AggregateResults'], ParentType, ContextType, RequireFields<QueryAggregateArgs, 'field' | 'itemType'>>;
   scroll?: Resolver<Maybe<ResolversTypes['SearchResults']>, ParentType, ContextType, RequireFields<QueryScrollArgs, 'itemType' | 'scrollId'>>;
   search?: Resolver<Maybe<ResolversTypes['SearchResults']>, ParentType, ContextType, RequireFields<QuerySearchArgs, 'filters' | 'itemType'>>;
-};
-
-export type RelaionshipPropertiesResolvers<ContextType = any, ParentType extends ResolversParentTypes['RelaionshipProperties'] = ResolversParentTypes['RelaionshipProperties']> = {
-  deleted?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type SearchResultsResolvers<ContextType = any, ParentType extends ResolversParentTypes['SearchResults'] = ResolversParentTypes['SearchResults']> = {
@@ -668,7 +744,6 @@ export type Resolvers<ContextType = any> = {
   NodeItem?: NodeItemResolvers<ContextType>;
   Person?: PersonResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
-  RelaionshipProperties?: RelaionshipPropertiesResolvers<ContextType>;
   SearchResults?: SearchResultsResolvers<ContextType>;
   YearCountResult?: YearCountResultResolvers<ContextType>;
 };
