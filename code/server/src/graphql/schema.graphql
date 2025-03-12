@@ -9,7 +9,12 @@ enum DataItemType {
   message
 }
 
-union NodeItem = Company | Address | Country | Person | Message
+union NodeItem @query(read: false, aggregate: false) =
+  | Company
+  | Address
+  | Country
+  | Person
+  | Message
 
 input NodeIdentification {
   type: DataItemType!
@@ -24,7 +29,11 @@ type RelaionshipProperties @relationshipProperties {
   deleted: Boolean
 }
 
-type Company @node {
+type Company
+  @node
+  @query(read: true, aggregate: false)
+  @mutation(operations: [])
+  @subscription(events: []) {
   id: ID! @unique
   name: String!
   messages: [Message!]! @relationship(type: "CONTAINS", direction: IN)
@@ -63,7 +72,11 @@ type Company @node {
     )
 }
 
-type Country @node {
+type Country
+  @node
+  @query(read: true, aggregate: false)
+  @mutation(operations: [])
+  @subscription(events: []) {
   id: ID! @unique
   name: String!
   messages: [Message!]! @relationship(type: "CONTAINS", direction: IN)
@@ -102,7 +115,11 @@ type Country @node {
     )
 }
 
-type Address @node {
+type Address
+  @node
+  @query(read: true, aggregate: false)
+  @mutation(operations: [])
+  @subscription(events: []) {
   id: ID! @unique
   name: String!
   messages: [Message!]! @relationship(type: "CONTAINS", direction: IN)
@@ -141,7 +158,11 @@ type Address @node {
     )
 }
 
-type Person @node {
+type Person
+  @node
+  @query(read: true, aggregate: false)
+  @mutation(operations: [])
+  @subscription(events: []) {
   id: ID! @unique
   name: String!
   messages: [Message!]! @relationship(type: "CONTAINS", direction: IN)
@@ -180,7 +201,11 @@ type Person @node {
     )
 }
 
-type Message @node {
+type Message
+  @node
+  @query(read: true, aggregate: false)
+  @mutation(operations: [])
+  @subscription(events: []) {
   id: ID! @unique
   year: Int!
   filename: String!
@@ -208,7 +233,10 @@ type Message @node {
 # Inputs
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-type ImportReport {
+type ImportReport
+  @query(read: false, aggregate: false)
+  @mutation(operations: [])
+  @subscription(events: []) {
   count: Int!
   errors: [String!]
 }
@@ -313,24 +341,36 @@ enum PeopleMetadata {
 
 # RETURN TYPE
 
-type SearchResults {
+type SearchResults
+  @query(read: false, aggregate: false)
+  @mutation(operations: [])
+  @subscription(events: []) {
   total: Int!
   results: [NodeItem]!
   scrollId: String
 }
 
-type TopValue {
+type TopValue
+  @query(read: false, aggregate: false)
+  @mutation(operations: [])
+  @subscription(events: []) {
   id: String!
   label: String!
   count: Int!
 }
 
-type YearCountResult {
+type YearCountResult
+  @query(read: false, aggregate: false)
+  @mutation(operations: [])
+  @subscription(events: []) {
   year: Int
   count: Int
 }
 
-type CountResult {
+type CountResult
+  @query(read: false, aggregate: false)
+  @mutation(operations: [])
+  @subscription(events: []) {
   total: Int!
   byYear: [YearCountResult]
 }
@@ -387,7 +427,6 @@ type Query {
   #
   # Internal methods
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
   _getMessageItems: [Message!]!
     @cypher(
       statement: "UNWIND $ids as id MATCH (n:Message { id: id }) RETURN n AS result"
