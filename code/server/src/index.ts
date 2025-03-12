@@ -1,6 +1,6 @@
+import http, { Server } from 'http';
 import { getLogger } from '@ouestware/node-logger';
 import express, { json, urlencoded } from 'express';
-import http, { Server } from 'http';
 
 import config from './config';
 import { errorFilter } from './error';

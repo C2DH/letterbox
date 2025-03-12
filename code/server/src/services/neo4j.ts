@@ -1,5 +1,5 @@
-import * as neo4j from 'neo4j-driver';
 import { getLogger } from '@ouestware/node-logger';
+import * as neo4j from 'neo4j-driver';
 import Stream from 'ts-stream';
 import { singleton } from 'tsyringe';
 

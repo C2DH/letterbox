@@ -1,6 +1,6 @@
 import * as Boom from '@hapi/boom';
-import * as express from 'express';
 import { getLogger } from '@ouestware/node-logger';
+import * as express from 'express';
 
 // Logger
 const log = getLogger('Error');

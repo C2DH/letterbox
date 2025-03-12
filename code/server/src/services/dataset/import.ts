@@ -1,9 +1,9 @@
+import { basename } from 'path';
 import { getLogger } from '@ouestware/node-logger';
 import { toNumber, toString } from '@ouestware/type-utils';
 import { parse } from 'csv-parse';
 import { isNil } from 'lodash';
 import hash from 'object-hash';
-import { basename } from 'path';
 import { inject, singleton } from 'tsyringe';
 
 import config from '../../config';

@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import * as path from 'path';
 import { estypes } from '@elastic/elasticsearch';
 import { delegateToSchema } from '@graphql-tools/delegate';
@@ -7,15 +8,14 @@ import { Filter } from '@ouestware/facets';
 import { getLogger } from '@ouestware/node-logger';
 import { GraphQLResolveInfo, OperationTypeNode } from 'graphql';
 import { capitalize, head } from 'lodash';
-import { readFileSync } from 'node:fs';
 
 import { Services } from '../services';
 import { DatasetEdition } from '../services/dataset/edition';
 import { DatasetImport } from '../services/dataset/import';
 import { DatasetIndexation } from '../services/dataset/indexation';
 import { Elastic } from '../services/elastic';
-import { EsIndices, type ItemType, Neo4jLabels } from '../types';
-import { type NodeItem, Resolvers } from './generated/types';
+import { EsIndices, Neo4jLabels, type ItemType } from '../types';
+import { Resolvers, type NodeItem } from './generated/types';
 
 export const typeDefs = readFileSync(path.resolve(__dirname, './schema.graphql'), 'utf8');
 

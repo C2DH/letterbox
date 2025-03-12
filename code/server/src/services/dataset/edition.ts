@@ -4,7 +4,7 @@ import type { Transaction } from 'neo4j-driver';
 import { inject, singleton } from 'tsyringe';
 import { v4 as uuid } from 'uuid';
 
-import { type ItemType, Neo4jLabels, type NodeItemDefinition } from '../../types';
+import { Neo4jLabels, type ItemType, type NodeItemDefinition } from '../../types';
 import { Neo4j } from '../neo4j';
 import { DatasetIndexation } from './indexation';
 

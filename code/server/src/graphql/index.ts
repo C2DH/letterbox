@@ -1,3 +1,4 @@
+import { Server } from 'http';
 import { ApolloServer } from '@apollo/server';
 import { expressMiddleware } from '@apollo/server/express4';
 import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
@@ -10,7 +11,6 @@ import { getLogger } from '@ouestware/node-logger';
 import { json } from 'body-parser';
 import cors from 'cors';
 import { Express } from 'express';
-import { Server } from 'http';
 
 import { Services } from '../services';
 import { Neo4j } from '../services/neo4j';

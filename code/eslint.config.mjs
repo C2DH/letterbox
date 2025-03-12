@@ -19,7 +19,7 @@ export default tseslint.config(
       "react-hooks": reactHooks,
       'react-refresh': reactRefresh,
       "@typescript-eslint": tseslint.plugin,
-      prettier: prettier,
+      prettier,
     },
     settings: {
       react: {
@@ -51,7 +51,7 @@ export default tseslint.config(
         "varsIgnorePattern": "^_",
         "ignoreRestSiblings": true
       }],
-      "no-extra-boolean-cast": "off",
+      "no-extra-boolean-cast": "off"
     },
   },
 );
