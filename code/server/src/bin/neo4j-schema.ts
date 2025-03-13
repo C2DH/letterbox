@@ -19,22 +19,21 @@ const queries = [
 async function exec(iteration = 0) {
   try {
     await wait(10000);
+    console.log(`Running iteration ${iteration}`);
     const neo4j = new Neo4j();
     // Test connection
     await neo4j.getFirstResultQuery(`RETURN 1 as result`, {});
 
     // Create constraints (never fails)
-    await Promise.all(
-      queries.map(
-        async (q) =>
-          new Promise((resolve, _reject) =>
-            neo4j
-              .getFirstResultQuery(q, {})
-              .catch((e) => console.error(e))
-              .finally(() => resolve(null)),
-          ),
-      ),
-    );
+    for (const query of queries) {
+      try {
+        console.log('rruning query', query);
+        await neo4j.getFirstResultQuery(query, {});
+      } catch (e) {
+        console.error('Failed to run query', query);
+        throw e;
+      }
+    }
   } catch (e) {
     if (iteration < 5) await exec(iteration + 1);
     else throw e;
