@@ -1,13 +1,21 @@
-import { Fragment, useCallback, useEffect, useState, type ReactNode } from 'react';
+import { Spinner } from '@ouestware/loaders';
+import {
+  Fragment,
+  useCallback,
+  useEffect,
+  useState,
+  type HTMLAttributes,
+  type ReactNode,
+} from 'react';
 
-export interface ListWithLoadMoreProps<T> {
+export type ListWithLoadMoreProps<T> = HTMLAttributes<HTMLElement> & {
   data?: T[];
   fetch: (skip: number, limit: number) => Promise<T[]>;
   renderItem: (item: T) => ReactNode;
-  getItemKey?: (item: T) => string;
   renderLoader?: () => ReactNode;
+  getItemKey?: (item: T) => string;
   total?: number;
-}
+};
 export function ListWithLoadMore<T>({
   data,
   fetch,
@@ -15,6 +23,7 @@ export function ListWithLoadMore<T>({
   renderLoader,
   getItemKey,
   total,
+  ...htmlAttributs
 }: ListWithLoadMoreProps<T>) {
   const [items, setItems] = useState<T[]>(data || []);
   const [loading, setLoading] = useState(false);
@@ -38,12 +47,27 @@ export function ListWithLoadMore<T>({
   }, [total, items]);
 
   return (
-    <div>
-      {items.map((item, index) => (
-        <Fragment key={getItemKey ? getItemKey(item) : index}>{renderItem(item)}</Fragment>
-      ))}
-      {loading && (renderLoader ? renderLoader() : <div>Loading...</div>)}
-      {hasMore && <button onClick={fetchMore}>Load more</button>}
-    </div>
+    <>
+      <div {...htmlAttributs}>
+        {items.map((item, index) => (
+          <Fragment key={getItemKey ? getItemKey(item) : index}>{renderItem(item)}</Fragment>
+        ))}
+      </div>
+
+      {hasMore && (
+        <div className="row mt-3">
+          <div className="d-flex justify-content-center">
+            <button
+              disabled={loading}
+              className="btn btn-primary d-flex align-items-center"
+              onClick={fetchMore}
+            >
+              Load more
+              {loading && <Spinner className="ms-1 fs-4" style={{ width: '1em', height: '1em' }} />}
+            </button>
+          </div>
+        </div>
+      )}
+    </>
   );
 }

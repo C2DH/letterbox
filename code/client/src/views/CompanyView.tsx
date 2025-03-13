@@ -1,7 +1,12 @@
 import { useMemo, type FC } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 import { Breadcrumb } from '../components/Breadcrumb';
+import { Collaspsable } from '../components/Collapsable';
+import { AddressCard } from '../components/itemCard/AddressCard';
+import { CountryCard } from '../components/itemCard/CountryCard';
+import { MessageCard } from '../components/itemCard/MessageCard';
+import { PersonCard } from '../components/itemCard/PersonCard';
 import { ListWithLoadMore, type ListWithLoadMoreProps } from '../components/ListWithLoadMore';
 import { type GetCompanyByIdQuery } from '../core/graphql';
 import { useGetCompanyById } from '../hooks/useCompany';
@@ -28,9 +33,9 @@ export const CompanyView: FC = () => {
           total: company.addressesCount,
           fetch: fetchAddresses,
           getItemKey: (address) => address.id,
-          renderItem: (address) => (
-            <div>
-              <Link to={`/address/${address.id}`}>{address.name}</Link>
+          renderItem: (n) => (
+            <div className="col">
+              <AddressCard data={n} />
             </div>
           ),
         } as RelatedDefinition<GetCompanyByIdQuery['result'][0]['addresses'][0]>,
@@ -41,8 +46,8 @@ export const CompanyView: FC = () => {
           fetch: fetchCountries,
           getItemKey: (country) => country.id,
           renderItem: (country) => (
-            <div>
-              <Link to={`/country/${country.id}`}>{country.name}</Link>
+            <div className="col">
+              <CountryCard data={country} />
             </div>
           ),
         } as RelatedDefinition<GetCompanyByIdQuery['result'][0]['countries'][0]>,
@@ -53,8 +58,8 @@ export const CompanyView: FC = () => {
           fetch: fetchPeople,
           getItemKey: (person) => person.id,
           renderItem: (person) => (
-            <div>
-              <Link to={`/person/${person.id}`}>{person.name}</Link>
+            <div className="col">
+              <PersonCard data={person} />
             </div>
           ),
         } as RelatedDefinition<GetCompanyByIdQuery['result'][0]['people'][0]>,
@@ -65,8 +70,8 @@ export const CompanyView: FC = () => {
           fetch: fetchMessages,
           getItemKey: (msg) => msg.id,
           renderItem: (msg) => (
-            <div>
-              <Link to={`/message/${msg.id}`}>{msg.id}</Link>
+            <div className="col">
+              <MessageCard data={msg} />
             </div>
           ),
         } as RelatedDefinition<GetCompanyByIdQuery['result'][0]['messages'][0]>,
@@ -84,10 +89,11 @@ export const CompanyView: FC = () => {
             <h2>Related items</h2>
             {relatedItems.map((related, index) => (
               <div className="container" key={index}>
-                <h3>{related.title}</h3>
-                <div className="container">
-                  <ListWithLoadMore {...related} />
-                </div>
+                <Collaspsable title={related.title}>
+                  <div className="container">
+                    <ListWithLoadMore className="row row-cols-1 row-cols-md-3 g-2" {...related} />
+                  </div>
+                </Collaspsable>
               </div>
             ))}
           </div>

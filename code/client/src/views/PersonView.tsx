@@ -1,7 +1,12 @@
 import { useMemo, type FC } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 import { Breadcrumb } from '../components/Breadcrumb';
+import { Collaspsable } from '../components/Collapsable';
+import { AddressCard } from '../components/itemCard/AddressCard';
+import { CompanyCard } from '../components/itemCard/CompanyCard';
+import { CountryCard } from '../components/itemCard/CountryCard';
+import { MessageCard } from '../components/itemCard/MessageCard';
 import { ListWithLoadMore, type ListWithLoadMoreProps } from '../components/ListWithLoadMore';
 import { type GetPersonByIdQuery } from '../core/graphql';
 import { useGetPersonById } from '../hooks/usePerson';
@@ -29,8 +34,8 @@ export const PersonView: FC = () => {
           fetch: fetchCompanies,
           getItemKey: (n) => n.id,
           renderItem: (company) => (
-            <div>
-              <Link to={`/company/${company.id}`}>{company.name}</Link>
+            <div className="col">
+              <CompanyCard data={company} />
             </div>
           ),
         } as RelatedDefinition<GetPersonByIdQuery['result'][0]['companies'][0]>,
@@ -41,8 +46,8 @@ export const PersonView: FC = () => {
           fetch: fetchCountries,
           getItemKey: (country) => country.id,
           renderItem: (country) => (
-            <div>
-              <Link to={`/country/${country.id}`}>{country.name}</Link>
+            <div className="col">
+              <CountryCard data={country} />
             </div>
           ),
         } as RelatedDefinition<GetPersonByIdQuery['result'][0]['countries'][0]>,
@@ -53,8 +58,9 @@ export const PersonView: FC = () => {
           fetch: fetchAddresses,
           getItemKey: (n) => n.id,
           renderItem: (n) => (
-            <div>
-              <Link to={`/address/${n.id}`}>{n.name}</Link>
+            <div className="col">
+              {' '}
+              <AddressCard data={n} />
             </div>
           ),
         } as RelatedDefinition<GetPersonByIdQuery['result'][0]['addresses'][0]>,
@@ -65,8 +71,8 @@ export const PersonView: FC = () => {
           fetch: fetchMessages,
           getItemKey: (msg) => msg.id,
           renderItem: (msg) => (
-            <div>
-              <Link to={`/message/${msg.id}`}>{msg.id}</Link>
+            <div className="col">
+              <MessageCard data={msg} />
             </div>
           ),
         } as RelatedDefinition<GetPersonByIdQuery['result'][0]['messages'][0]>,
@@ -84,10 +90,11 @@ export const PersonView: FC = () => {
             <h2>Related items</h2>
             {relatedItems.map((related, index) => (
               <div className="container" key={index}>
-                <h3>{related.title}</h3>
-                <div className="container">
-                  <ListWithLoadMore {...related} />
-                </div>
+                <Collaspsable title={related.title}>
+                  <div className="container">
+                    <ListWithLoadMore className="row row-cols-1 row-cols-md-3 g-2" {...related} />
+                  </div>
+                </Collaspsable>
               </div>
             ))}
           </div>

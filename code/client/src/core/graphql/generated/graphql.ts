@@ -5,19 +5,15 @@ export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
-export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> = {
-  [_ in K]?: never;
-};
-export type Incremental<T> =
-  | T
-  | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
+export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> = { [_ in K]?: never };
+export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
-  ID: { input: string; output: string };
-  String: { input: string; output: string };
-  Boolean: { input: boolean; output: boolean };
-  Int: { input: number; output: number };
-  Float: { input: number; output: number };
+  ID: { input: string; output: string; }
+  String: { input: string; output: string; }
+  Boolean: { input: boolean; output: boolean; }
+  Int: { input: number; output: number; }
+  Float: { input: number; output: number; }
 };
 
 export type Address = {
@@ -34,20 +30,24 @@ export type Address = {
   peopleCount: Scalars['Int']['output'];
 };
 
+
 export type AddressCompaniesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   skip?: InputMaybe<Scalars['Int']['input']>;
 };
+
 
 export type AddressCountriesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   skip?: InputMaybe<Scalars['Int']['input']>;
 };
 
+
 export type AddressMessagesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   skip?: InputMaybe<Scalars['Int']['input']>;
 };
+
 
 export type AddressPeopleArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
@@ -59,12 +59,6 @@ export type AddressEdge = {
   cursor: Scalars['String']['output'];
   node: Address;
 };
-
-export enum AddressMetadata {
-  Company = 'company',
-  Country = 'country',
-  People = 'people',
-}
 
 export type AddressOptions = {
   limit?: InputMaybe<Scalars['Int']['input']>;
@@ -130,6 +124,28 @@ export type AddressesConnection = {
   totalCount: Scalars['Int']['output'];
 };
 
+export type AggregateResults = {
+  __typename?: 'AggregateResults';
+  total: Scalars['Int']['output'];
+  values: Array<AggregateValue>;
+};
+
+export type AggregateValue = {
+  __typename?: 'AggregateValue';
+  count: Scalars['Int']['output'];
+  id: Scalars['String']['output'];
+  label: Scalars['String']['output'];
+};
+
+export enum AggregationFields {
+  Addresses = 'addresses',
+  Companies = 'companies',
+  Countries = 'countries',
+  People = 'people',
+  Year = 'year',
+  Years = 'years'
+}
+
 export type CompaniesConnection = {
   __typename?: 'CompaniesConnection';
   edges: Array<CompanyEdge>;
@@ -151,20 +167,24 @@ export type Company = {
   peopleCount: Scalars['Int']['output'];
 };
 
+
 export type CompanyAddressesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   skip?: InputMaybe<Scalars['Int']['input']>;
 };
+
 
 export type CompanyCountriesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   skip?: InputMaybe<Scalars['Int']['input']>;
 };
 
+
 export type CompanyMessagesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   skip?: InputMaybe<Scalars['Int']['input']>;
 };
+
 
 export type CompanyPeopleArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
@@ -176,12 +196,6 @@ export type CompanyEdge = {
   cursor: Scalars['String']['output'];
   node: Company;
 };
-
-export enum CompanyMetadata {
-  Address = 'address',
-  Country = 'country',
-  People = 'people',
-}
 
 export type CompanyOptions = {
   limit?: InputMaybe<Scalars['Int']['input']>;
@@ -245,12 +259,6 @@ export type ContentFilter = {
   type: FilterTypes;
 };
 
-export type CountResult = {
-  __typename?: 'CountResult';
-  byYear?: Maybe<Array<Maybe<YearCountResult>>>;
-  total: Scalars['Int']['output'];
-};
-
 export type CountriesConnection = {
   __typename?: 'CountriesConnection';
   edges: Array<CountryEdge>;
@@ -272,20 +280,24 @@ export type Country = {
   peopleCount: Scalars['Int']['output'];
 };
 
+
 export type CountryAddressesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   skip?: InputMaybe<Scalars['Int']['input']>;
 };
+
 
 export type CountryCompaniesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   skip?: InputMaybe<Scalars['Int']['input']>;
 };
 
+
 export type CountryMessagesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   skip?: InputMaybe<Scalars['Int']['input']>;
 };
+
 
 export type CountryPeopleArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
@@ -297,12 +309,6 @@ export type CountryEdge = {
   cursor: Scalars['String']['output'];
   node: Country;
 };
-
-export enum CountryMetadata {
-  Address = 'address',
-  Company = 'company',
-  People = 'people',
-}
 
 export type CountryOptions = {
   limit?: InputMaybe<Scalars['Int']['input']>;
@@ -366,7 +372,7 @@ export enum DataItemType {
   Company = 'company',
   Country = 'country',
   Message = 'message',
-  Person = 'person',
+  Person = 'person'
 }
 
 export type DateFilter = {
@@ -377,7 +383,7 @@ export type DateFilter = {
 
 export enum EsSortDirection {
   Asc = 'asc',
-  Desc = 'desc',
+  Desc = 'desc'
 }
 
 export enum FilterTypes {
@@ -386,7 +392,7 @@ export enum FilterTypes {
   Content = 'content',
   Date = 'date',
   Keywords = 'keywords',
-  Number = 'number',
+  Number = 'number'
 }
 
 export type ImportReport = {
@@ -422,20 +428,24 @@ export type Message = {
   year: Scalars['Int']['output'];
 };
 
+
 export type MessageAddressesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   skip?: InputMaybe<Scalars['Int']['input']>;
 };
+
 
 export type MessageCompaniesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   skip?: InputMaybe<Scalars['Int']['input']>;
 };
 
+
 export type MessageCountriesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   skip?: InputMaybe<Scalars['Int']['input']>;
 };
+
 
 export type MessagePeopleArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
@@ -447,13 +457,6 @@ export type MessageEdge = {
   cursor: Scalars['String']['output'];
   node: Message;
 };
-
-export enum MessageMetadata {
-  Address = 'address',
-  Company = 'company',
-  Country = 'country',
-  People = 'people',
-}
 
 export type MessageOptions = {
   limit?: InputMaybe<Scalars['Int']['input']>;
@@ -581,11 +584,13 @@ export type Mutation = {
   splitNode: Array<NodeItem>;
 };
 
+
 export type MutationChangeTypeArgs = {
   id: Scalars['ID']['input'];
   newType: DataItemType;
   type: DataItemType;
 };
+
 
 export type MutationCreateNodeArgs = {
   messageId: Scalars['ID']['input'];
@@ -593,14 +598,17 @@ export type MutationCreateNodeArgs = {
   type: DataItemType;
 };
 
+
 export type MutationDeleteNodeArgs = {
   id: Scalars['ID']['input'];
   type: DataItemType;
 };
 
+
 export type MutationImportArgs = {
   fileNamePattern?: InputMaybe<Scalars['String']['input']>;
 };
+
 
 export type MutationMergeNodesArgs = {
   name: Scalars['String']['input'];
@@ -608,11 +616,13 @@ export type MutationMergeNodesArgs = {
   type: DataItemType;
 };
 
+
 export type MutationRenameNodeArgs = {
   id: Scalars['ID']['input'];
   name: Scalars['String']['input'];
   type: DataItemType;
 };
+
 
 export type MutationSplitNodeArgs = {
   id: Scalars['ID']['input'];
@@ -643,12 +653,6 @@ export type PeopleConnection = {
   totalCount: Scalars['Int']['output'];
 };
 
-export enum PeopleMetadata {
-  Address = 'address',
-  Company = 'company',
-  Country = 'country',
-}
-
 export type Person = {
   __typename?: 'Person';
   addresses: Array<Address>;
@@ -663,20 +667,24 @@ export type Person = {
   name: Scalars['String']['output'];
 };
 
+
 export type PersonAddressesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   skip?: InputMaybe<Scalars['Int']['input']>;
 };
+
 
 export type PersonCompaniesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   skip?: InputMaybe<Scalars['Int']['input']>;
 };
 
+
 export type PersonCountriesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   skip?: InputMaybe<Scalars['Int']['input']>;
 };
+
 
 export type PersonMessagesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
@@ -755,14 +763,9 @@ export type Query = {
   _getPersonItems: Array<Person>;
   addresses: Array<Address>;
   addressesConnection: AddressesConnection;
+  aggregate: AggregateResults;
   companies: Array<Company>;
   companiesConnection: CompaniesConnection;
-  countAddress?: Maybe<CountResult>;
-  countCompany?: Maybe<CountResult>;
-  countCountry?: Maybe<CountResult>;
-  /** Count Items respecting a set of filters, option to add count by year */
-  countMessage?: Maybe<CountResult>;
-  countPeople?: Maybe<CountResult>;
   countries: Array<Country>;
   countriesConnection: CountriesConnection;
   messages: Array<Message>;
@@ -772,13 +775,8 @@ export type Query = {
   scroll?: Maybe<SearchResults>;
   /** Search for Items using a set of filters */
   search?: Maybe<SearchResults>;
-  topAddressMetadata?: Maybe<Array<Maybe<TopValue>>>;
-  topCompanyMetadata?: Maybe<Array<Maybe<TopValue>>>;
-  topCountryMetadata?: Maybe<Array<Maybe<TopValue>>>;
-  /** Retrieve Top metadata values in Items which respect a set of filters */
-  topMessageMetadata?: Maybe<Array<Maybe<TopValue>>>;
-  topPeopleMetadata?: Maybe<Array<Maybe<TopValue>>>;
 };
+
 
 export type QueryAddressesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
@@ -787,12 +785,24 @@ export type QueryAddressesArgs = {
   where?: InputMaybe<AddressWhere>;
 };
 
+
 export type QueryAddressesConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<AddressSort>>;
   where?: InputMaybe<AddressWhere>;
 };
+
+
+export type QueryAggregateArgs = {
+  field: AggregationFields;
+  filters?: InputMaybe<SearchFilters>;
+  includes?: InputMaybe<Scalars['String']['input']>;
+  itemType: DataItemType;
+  query?: InputMaybe<Scalars['String']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
+};
+
 
 export type QueryCompaniesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
@@ -801,6 +811,7 @@ export type QueryCompaniesArgs = {
   where?: InputMaybe<CompanyWhere>;
 };
 
+
 export type QueryCompaniesConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -808,30 +819,6 @@ export type QueryCompaniesConnectionArgs = {
   where?: InputMaybe<CompanyWhere>;
 };
 
-export type QueryCountAddressArgs = {
-  byYear?: InputMaybe<Scalars['Boolean']['input']>;
-  filters: SearchFilters;
-};
-
-export type QueryCountCompanyArgs = {
-  byYear?: InputMaybe<Scalars['Boolean']['input']>;
-  filters: SearchFilters;
-};
-
-export type QueryCountCountryArgs = {
-  byYear?: InputMaybe<Scalars['Boolean']['input']>;
-  filters: SearchFilters;
-};
-
-export type QueryCountMessageArgs = {
-  byYear?: InputMaybe<Scalars['Boolean']['input']>;
-  filters: SearchFilters;
-};
-
-export type QueryCountPeopleArgs = {
-  byYear?: InputMaybe<Scalars['Boolean']['input']>;
-  filters: SearchFilters;
-};
 
 export type QueryCountriesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
@@ -840,12 +827,14 @@ export type QueryCountriesArgs = {
   where?: InputMaybe<CountryWhere>;
 };
 
+
 export type QueryCountriesConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<CountrySort>>;
   where?: InputMaybe<CountryWhere>;
 };
+
 
 export type QueryMessagesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
@@ -854,12 +843,14 @@ export type QueryMessagesArgs = {
   where?: InputMaybe<MessageWhere>;
 };
 
+
 export type QueryMessagesConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<MessageSort>>;
   where?: InputMaybe<MessageWhere>;
 };
+
 
 export type QueryPeopleArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
@@ -868,6 +859,7 @@ export type QueryPeopleArgs = {
   where?: InputMaybe<PersonWhere>;
 };
 
+
 export type QueryPeopleConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -875,11 +867,13 @@ export type QueryPeopleConnectionArgs = {
   where?: InputMaybe<PersonWhere>;
 };
 
+
 export type QueryScrollArgs = {
   itemType: DataItemType;
   scrollId: Scalars['String']['input'];
   scrollTimeout?: InputMaybe<Scalars['String']['input']>;
 };
+
 
 export type QuerySearchArgs = {
   filters: SearchFilters;
@@ -888,36 +882,6 @@ export type QuerySearchArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   scrollTimeout?: InputMaybe<Scalars['String']['input']>;
   sortBy?: InputMaybe<Array<InputMaybe<SortBy>>>;
-};
-
-export type QueryTopAddressMetadataArgs = {
-  filters: SearchFilters;
-  limit: Scalars['Int']['input'];
-  metadataModel: AddressMetadata;
-};
-
-export type QueryTopCompanyMetadataArgs = {
-  filters: SearchFilters;
-  limit: Scalars['Int']['input'];
-  metadataModel: CompanyMetadata;
-};
-
-export type QueryTopCountryMetadataArgs = {
-  filters: SearchFilters;
-  limit: Scalars['Int']['input'];
-  metadataModel: CountryMetadata;
-};
-
-export type QueryTopMessageMetadataArgs = {
-  filters: SearchFilters;
-  limit: Scalars['Int']['input'];
-  metadataModel: MessageMetadata;
-};
-
-export type QueryTopPeopleMetadataArgs = {
-  filters: SearchFilters;
-  limit: Scalars['Int']['input'];
-  metadataModel: PeopleMetadata;
 };
 
 export type SearchFilters = {
@@ -950,70 +914,25 @@ export enum SortDirection {
   /** Sort by field values in ascending order. */
   Asc = 'ASC',
   /** Sort by field values in descending order. */
-  Desc = 'DESC',
+  Desc = 'DESC'
 }
 
-export type TopValue = {
-  __typename?: 'TopValue';
-  count: Scalars['Int']['output'];
-  id: Scalars['String']['output'];
-  label: Scalars['String']['output'];
-};
+export type AddressInlineFragment = { __typename?: 'Address', id: string, name: string, companiesCount: number, countriesCount: number, messagesCount: number, peopleCount: number };
 
-export type YearCountResult = {
-  __typename?: 'YearCountResult';
-  count?: Maybe<Scalars['Int']['output']>;
-  year?: Maybe<Scalars['Int']['output']>;
-};
+export type CompanyInlineFragment = { __typename?: 'Company', id: string, name: string, addressesCount: number, countriesCount: number, messagesCount: number, peopleCount: number };
 
-export type AddressInlineFragment = { __typename?: 'Address'; id: string; name: string };
+export type CountryInlineFragment = { __typename?: 'Country', id: string, name: string, addressesCount: number, companiesCount: number, messagesCount: number, peopleCount: number };
 
-export type CompanyInlineFragment = { __typename?: 'Company'; id: string; name: string };
+export type MessageInlineFragment = { __typename?: 'Message', id: string, year: number, message: string, addressesCount: number, companiesCount: number, countriesCount: number, peopleCount: number, companies: Array<{ __typename?: 'Company', name: string }> };
 
-export type CountryInlineFragment = { __typename?: 'Country'; id: string; name: string };
-
-export type MessageInlineFragment = {
-  __typename?: 'Message';
-  id: string;
-  year: number;
-  message: string;
-  addressesCount: number;
-  companiesCount: number;
-  countriesCount: number;
-  peopleCount: number;
-};
-
-export type PersonInlineFragment = { __typename?: 'Person'; id: string; name: string };
+export type PersonInlineFragment = { __typename?: 'Person', id: string, name: string, addressesCount: number, companiesCount: number, countriesCount: number, messagesCount: number };
 
 export type GetAddressByIdQueryVariables = Exact<{
   id: Scalars['ID']['input'];
 }>;
 
-export type GetAddressByIdQuery = {
-  __typename?: 'Query';
-  result: Array<{
-    __typename?: 'Address';
-    id: string;
-    name: string;
-    companiesCount: number;
-    countriesCount: number;
-    messagesCount: number;
-    peopleCount: number;
-    companies: Array<{ __typename?: 'Company'; id: string; name: string }>;
-    countries: Array<{ __typename?: 'Country'; id: string; name: string }>;
-    messages: Array<{
-      __typename?: 'Message';
-      id: string;
-      year: number;
-      message: string;
-      addressesCount: number;
-      companiesCount: number;
-      countriesCount: number;
-      peopleCount: number;
-    }>;
-    people: Array<{ __typename?: 'Person'; id: string; name: string }>;
-  }>;
-};
+
+export type GetAddressByIdQuery = { __typename?: 'Query', result: Array<{ __typename?: 'Address', id: string, name: string, companiesCount: number, countriesCount: number, messagesCount: number, peopleCount: number, companies: Array<{ __typename?: 'Company', id: string, name: string, addressesCount: number, countriesCount: number, messagesCount: number, peopleCount: number }>, countries: Array<{ __typename?: 'Country', id: string, name: string, addressesCount: number, companiesCount: number, messagesCount: number, peopleCount: number }>, messages: Array<{ __typename?: 'Message', id: string, year: number, message: string, addressesCount: number, companiesCount: number, countriesCount: number, peopleCount: number, companies: Array<{ __typename?: 'Company', name: string }> }>, people: Array<{ __typename?: 'Person', id: string, name: string, addressesCount: number, companiesCount: number, countriesCount: number, messagesCount: number }> }> };
 
 export type GetAddressCompaniesQueryVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -1021,13 +940,8 @@ export type GetAddressCompaniesQueryVariables = Exact<{
   limit?: InputMaybe<Scalars['Int']['input']>;
 }>;
 
-export type GetAddressCompaniesQuery = {
-  __typename?: 'Query';
-  result: Array<{
-    __typename?: 'Address';
-    companies: Array<{ __typename?: 'Company'; id: string; name: string }>;
-  }>;
-};
+
+export type GetAddressCompaniesQuery = { __typename?: 'Query', result: Array<{ __typename?: 'Address', companies: Array<{ __typename?: 'Company', id: string, name: string }> }> };
 
 export type GetAddressCountriesQueryVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -1035,13 +949,8 @@ export type GetAddressCountriesQueryVariables = Exact<{
   limit?: InputMaybe<Scalars['Int']['input']>;
 }>;
 
-export type GetAddressCountriesQuery = {
-  __typename?: 'Query';
-  result: Array<{
-    __typename?: 'Address';
-    countries: Array<{ __typename?: 'Country'; id: string; name: string }>;
-  }>;
-};
+
+export type GetAddressCountriesQuery = { __typename?: 'Query', result: Array<{ __typename?: 'Address', countries: Array<{ __typename?: 'Country', id: string, name: string, addressesCount: number, companiesCount: number, messagesCount: number, peopleCount: number }> }> };
 
 export type GetAddressMessagesQueryVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -1049,22 +958,8 @@ export type GetAddressMessagesQueryVariables = Exact<{
   limit?: InputMaybe<Scalars['Int']['input']>;
 }>;
 
-export type GetAddressMessagesQuery = {
-  __typename?: 'Query';
-  result: Array<{
-    __typename?: 'Address';
-    messages: Array<{
-      __typename?: 'Message';
-      id: string;
-      year: number;
-      message: string;
-      addressesCount: number;
-      companiesCount: number;
-      countriesCount: number;
-      peopleCount: number;
-    }>;
-  }>;
-};
+
+export type GetAddressMessagesQuery = { __typename?: 'Query', result: Array<{ __typename?: 'Address', messages: Array<{ __typename?: 'Message', id: string, year: number, message: string, addressesCount: number, companiesCount: number, countriesCount: number, peopleCount: number, companies: Array<{ __typename?: 'Company', name: string }> }> }> };
 
 export type GetAddressPeopleQueryVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -1072,43 +967,15 @@ export type GetAddressPeopleQueryVariables = Exact<{
   limit?: InputMaybe<Scalars['Int']['input']>;
 }>;
 
-export type GetAddressPeopleQuery = {
-  __typename?: 'Query';
-  result: Array<{
-    __typename?: 'Address';
-    people: Array<{ __typename?: 'Person'; id: string; name: string }>;
-  }>;
-};
+
+export type GetAddressPeopleQuery = { __typename?: 'Query', result: Array<{ __typename?: 'Address', people: Array<{ __typename?: 'Person', id: string, name: string, addressesCount: number, companiesCount: number, countriesCount: number, messagesCount: number }> }> };
 
 export type GetCompanyByIdQueryVariables = Exact<{
   id: Scalars['ID']['input'];
 }>;
 
-export type GetCompanyByIdQuery = {
-  __typename?: 'Query';
-  result: Array<{
-    __typename?: 'Company';
-    id: string;
-    name: string;
-    addressesCount: number;
-    countriesCount: number;
-    messagesCount: number;
-    peopleCount: number;
-    addresses: Array<{ __typename?: 'Address'; id: string; name: string }>;
-    countries: Array<{ __typename?: 'Country'; id: string; name: string }>;
-    messages: Array<{
-      __typename?: 'Message';
-      id: string;
-      year: number;
-      message: string;
-      addressesCount: number;
-      companiesCount: number;
-      countriesCount: number;
-      peopleCount: number;
-    }>;
-    people: Array<{ __typename?: 'Person'; id: string; name: string }>;
-  }>;
-};
+
+export type GetCompanyByIdQuery = { __typename?: 'Query', result: Array<{ __typename?: 'Company', id: string, name: string, addressesCount: number, countriesCount: number, messagesCount: number, peopleCount: number, addresses: Array<{ __typename?: 'Address', id: string, name: string, companiesCount: number, countriesCount: number, messagesCount: number, peopleCount: number }>, countries: Array<{ __typename?: 'Country', id: string, name: string, addressesCount: number, companiesCount: number, messagesCount: number, peopleCount: number }>, messages: Array<{ __typename?: 'Message', id: string, year: number, message: string, addressesCount: number, companiesCount: number, countriesCount: number, peopleCount: number, companies: Array<{ __typename?: 'Company', name: string }> }>, people: Array<{ __typename?: 'Person', id: string, name: string, addressesCount: number, companiesCount: number, countriesCount: number, messagesCount: number }> }> };
 
 export type GetCompanyAddressesQueryVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -1116,13 +983,8 @@ export type GetCompanyAddressesQueryVariables = Exact<{
   limit?: InputMaybe<Scalars['Int']['input']>;
 }>;
 
-export type GetCompanyAddressesQuery = {
-  __typename?: 'Query';
-  result: Array<{
-    __typename?: 'Company';
-    addresses: Array<{ __typename?: 'Address'; id: string; name: string }>;
-  }>;
-};
+
+export type GetCompanyAddressesQuery = { __typename?: 'Query', result: Array<{ __typename?: 'Company', addresses: Array<{ __typename?: 'Address', id: string, name: string, companiesCount: number, countriesCount: number, messagesCount: number, peopleCount: number }> }> };
 
 export type GetCompanyCountriesQueryVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -1130,13 +992,8 @@ export type GetCompanyCountriesQueryVariables = Exact<{
   limit?: InputMaybe<Scalars['Int']['input']>;
 }>;
 
-export type GetCompanyCountriesQuery = {
-  __typename?: 'Query';
-  result: Array<{
-    __typename?: 'Company';
-    countries: Array<{ __typename?: 'Country'; id: string; name: string }>;
-  }>;
-};
+
+export type GetCompanyCountriesQuery = { __typename?: 'Query', result: Array<{ __typename?: 'Company', countries: Array<{ __typename?: 'Country', id: string, name: string, addressesCount: number, companiesCount: number, messagesCount: number, peopleCount: number }> }> };
 
 export type GetCompanyMessagesQueryVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -1144,22 +1001,8 @@ export type GetCompanyMessagesQueryVariables = Exact<{
   limit?: InputMaybe<Scalars['Int']['input']>;
 }>;
 
-export type GetCompanyMessagesQuery = {
-  __typename?: 'Query';
-  result: Array<{
-    __typename?: 'Company';
-    messages: Array<{
-      __typename?: 'Message';
-      id: string;
-      year: number;
-      message: string;
-      addressesCount: number;
-      companiesCount: number;
-      countriesCount: number;
-      peopleCount: number;
-    }>;
-  }>;
-};
+
+export type GetCompanyMessagesQuery = { __typename?: 'Query', result: Array<{ __typename?: 'Company', messages: Array<{ __typename?: 'Message', id: string, year: number, message: string, addressesCount: number, companiesCount: number, countriesCount: number, peopleCount: number, companies: Array<{ __typename?: 'Company', name: string }> }> }> };
 
 export type GetCompanyPeopleQueryVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -1167,43 +1010,15 @@ export type GetCompanyPeopleQueryVariables = Exact<{
   limit?: InputMaybe<Scalars['Int']['input']>;
 }>;
 
-export type GetCompanyPeopleQuery = {
-  __typename?: 'Query';
-  result: Array<{
-    __typename?: 'Company';
-    people: Array<{ __typename?: 'Person'; id: string; name: string }>;
-  }>;
-};
+
+export type GetCompanyPeopleQuery = { __typename?: 'Query', result: Array<{ __typename?: 'Company', people: Array<{ __typename?: 'Person', id: string, name: string, addressesCount: number, companiesCount: number, countriesCount: number, messagesCount: number }> }> };
 
 export type GetCountryByIdQueryVariables = Exact<{
   id: Scalars['ID']['input'];
 }>;
 
-export type GetCountryByIdQuery = {
-  __typename?: 'Query';
-  result: Array<{
-    __typename?: 'Country';
-    id: string;
-    name: string;
-    addressesCount: number;
-    companiesCount: number;
-    messagesCount: number;
-    peopleCount: number;
-    addresses: Array<{ __typename?: 'Address'; id: string; name: string }>;
-    companies: Array<{ __typename?: 'Company'; id: string; name: string }>;
-    messages: Array<{
-      __typename?: 'Message';
-      id: string;
-      year: number;
-      message: string;
-      addressesCount: number;
-      companiesCount: number;
-      countriesCount: number;
-      peopleCount: number;
-    }>;
-    people: Array<{ __typename?: 'Person'; id: string; name: string }>;
-  }>;
-};
+
+export type GetCountryByIdQuery = { __typename?: 'Query', result: Array<{ __typename?: 'Country', id: string, name: string, addressesCount: number, companiesCount: number, messagesCount: number, peopleCount: number, addresses: Array<{ __typename?: 'Address', id: string, name: string, companiesCount: number, countriesCount: number, messagesCount: number, peopleCount: number }>, companies: Array<{ __typename?: 'Company', id: string, name: string, addressesCount: number, countriesCount: number, messagesCount: number, peopleCount: number }>, messages: Array<{ __typename?: 'Message', id: string, year: number, message: string, addressesCount: number, companiesCount: number, countriesCount: number, peopleCount: number, companies: Array<{ __typename?: 'Company', name: string }> }>, people: Array<{ __typename?: 'Person', id: string, name: string, addressesCount: number, companiesCount: number, countriesCount: number, messagesCount: number }> }> };
 
 export type GetCountryCompaniesQueryVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -1211,13 +1026,8 @@ export type GetCountryCompaniesQueryVariables = Exact<{
   limit?: InputMaybe<Scalars['Int']['input']>;
 }>;
 
-export type GetCountryCompaniesQuery = {
-  __typename?: 'Query';
-  result: Array<{
-    __typename?: 'Country';
-    companies: Array<{ __typename?: 'Company'; id: string; name: string }>;
-  }>;
-};
+
+export type GetCountryCompaniesQuery = { __typename?: 'Query', result: Array<{ __typename?: 'Country', companies: Array<{ __typename?: 'Company', id: string, name: string, addressesCount: number, countriesCount: number, messagesCount: number, peopleCount: number }> }> };
 
 export type GetCountryCountriesQueryVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -1225,13 +1035,8 @@ export type GetCountryCountriesQueryVariables = Exact<{
   limit?: InputMaybe<Scalars['Int']['input']>;
 }>;
 
-export type GetCountryCountriesQuery = {
-  __typename?: 'Query';
-  result: Array<{
-    __typename?: 'Country';
-    addresses: Array<{ __typename?: 'Address'; id: string; name: string }>;
-  }>;
-};
+
+export type GetCountryCountriesQuery = { __typename?: 'Query', result: Array<{ __typename?: 'Country', addresses: Array<{ __typename?: 'Address', id: string, name: string, companiesCount: number, countriesCount: number, messagesCount: number, peopleCount: number }> }> };
 
 export type GetCountryMessagesQueryVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -1239,22 +1044,8 @@ export type GetCountryMessagesQueryVariables = Exact<{
   limit?: InputMaybe<Scalars['Int']['input']>;
 }>;
 
-export type GetCountryMessagesQuery = {
-  __typename?: 'Query';
-  result: Array<{
-    __typename?: 'Country';
-    messages: Array<{
-      __typename?: 'Message';
-      id: string;
-      year: number;
-      message: string;
-      addressesCount: number;
-      companiesCount: number;
-      countriesCount: number;
-      peopleCount: number;
-    }>;
-  }>;
-};
+
+export type GetCountryMessagesQuery = { __typename?: 'Query', result: Array<{ __typename?: 'Country', messages: Array<{ __typename?: 'Message', id: string, year: number, message: string, addressesCount: number, companiesCount: number, countriesCount: number, peopleCount: number, companies: Array<{ __typename?: 'Company', name: string }> }> }> };
 
 export type GetCountryPeopleQueryVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -1262,35 +1053,15 @@ export type GetCountryPeopleQueryVariables = Exact<{
   limit?: InputMaybe<Scalars['Int']['input']>;
 }>;
 
-export type GetCountryPeopleQuery = {
-  __typename?: 'Query';
-  result: Array<{
-    __typename?: 'Country';
-    people: Array<{ __typename?: 'Person'; id: string; name: string }>;
-  }>;
-};
+
+export type GetCountryPeopleQuery = { __typename?: 'Query', result: Array<{ __typename?: 'Country', people: Array<{ __typename?: 'Person', id: string, name: string, addressesCount: number, companiesCount: number, countriesCount: number, messagesCount: number }> }> };
 
 export type GetMessageByIdQueryVariables = Exact<{
   id: Scalars['ID']['input'];
 }>;
 
-export type GetMessageByIdQuery = {
-  __typename?: 'Query';
-  result: Array<{
-    __typename?: 'Message';
-    id: string;
-    year: number;
-    message: string;
-    addressesCount: number;
-    companiesCount: number;
-    countriesCount: number;
-    peopleCount: number;
-    addresses: Array<{ __typename?: 'Address'; id: string; name: string }>;
-    companies: Array<{ __typename?: 'Company'; id: string; name: string }>;
-    countries: Array<{ __typename?: 'Country'; id: string; name: string }>;
-    people: Array<{ __typename?: 'Person'; id: string; name: string }>;
-  }>;
-};
+
+export type GetMessageByIdQuery = { __typename?: 'Query', result: Array<{ __typename?: 'Message', id: string, year: number, message: string, addressesCount: number, companiesCount: number, countriesCount: number, peopleCount: number, addresses: Array<{ __typename?: 'Address', id: string, name: string, companiesCount: number, countriesCount: number, messagesCount: number, peopleCount: number }>, companies: Array<{ __typename?: 'Company', id: string, name: string, addressesCount: number, countriesCount: number, messagesCount: number, peopleCount: number }>, countries: Array<{ __typename?: 'Country', id: string, name: string, addressesCount: number, companiesCount: number, messagesCount: number, peopleCount: number }>, people: Array<{ __typename?: 'Person', id: string, name: string, addressesCount: number, companiesCount: number, countriesCount: number, messagesCount: number }> }> };
 
 export type GetMessageCompaniesQueryVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -1298,13 +1069,8 @@ export type GetMessageCompaniesQueryVariables = Exact<{
   limit?: InputMaybe<Scalars['Int']['input']>;
 }>;
 
-export type GetMessageCompaniesQuery = {
-  __typename?: 'Query';
-  result: Array<{
-    __typename?: 'Message';
-    companies: Array<{ __typename?: 'Company'; id: string; name: string }>;
-  }>;
-};
+
+export type GetMessageCompaniesQuery = { __typename?: 'Query', result: Array<{ __typename?: 'Message', companies: Array<{ __typename?: 'Company', id: string, name: string, addressesCount: number, countriesCount: number, messagesCount: number, peopleCount: number }> }> };
 
 export type GetMessageCountriesQueryVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -1312,13 +1078,8 @@ export type GetMessageCountriesQueryVariables = Exact<{
   limit?: InputMaybe<Scalars['Int']['input']>;
 }>;
 
-export type GetMessageCountriesQuery = {
-  __typename?: 'Query';
-  result: Array<{
-    __typename?: 'Message';
-    addresses: Array<{ __typename?: 'Address'; id: string; name: string }>;
-  }>;
-};
+
+export type GetMessageCountriesQuery = { __typename?: 'Query', result: Array<{ __typename?: 'Message', addresses: Array<{ __typename?: 'Address', id: string, name: string, companiesCount: number, countriesCount: number, messagesCount: number, peopleCount: number }> }> };
 
 export type GetMessageMessagesQueryVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -1326,13 +1087,8 @@ export type GetMessageMessagesQueryVariables = Exact<{
   limit?: InputMaybe<Scalars['Int']['input']>;
 }>;
 
-export type GetMessageMessagesQuery = {
-  __typename?: 'Query';
-  result: Array<{
-    __typename?: 'Message';
-    people: Array<{ __typename?: 'Person'; id: string; name: string }>;
-  }>;
-};
+
+export type GetMessageMessagesQuery = { __typename?: 'Query', result: Array<{ __typename?: 'Message', people: Array<{ __typename?: 'Person', id: string, name: string, addressesCount: number, companiesCount: number, countriesCount: number, messagesCount: number }> }> };
 
 export type GetMessagePeopleQueryVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -1340,43 +1096,15 @@ export type GetMessagePeopleQueryVariables = Exact<{
   limit?: InputMaybe<Scalars['Int']['input']>;
 }>;
 
-export type GetMessagePeopleQuery = {
-  __typename?: 'Query';
-  result: Array<{
-    __typename?: 'Message';
-    countries: Array<{ __typename?: 'Country'; id: string; name: string }>;
-  }>;
-};
+
+export type GetMessagePeopleQuery = { __typename?: 'Query', result: Array<{ __typename?: 'Message', countries: Array<{ __typename?: 'Country', id: string, name: string, addressesCount: number, companiesCount: number, messagesCount: number, peopleCount: number }> }> };
 
 export type GetPersonByIdQueryVariables = Exact<{
   id: Scalars['ID']['input'];
 }>;
 
-export type GetPersonByIdQuery = {
-  __typename?: 'Query';
-  result: Array<{
-    __typename?: 'Person';
-    id: string;
-    name: string;
-    addressesCount: number;
-    companiesCount: number;
-    countriesCount: number;
-    messagesCount: number;
-    addresses: Array<{ __typename?: 'Address'; id: string; name: string }>;
-    companies: Array<{ __typename?: 'Company'; id: string; name: string }>;
-    countries: Array<{ __typename?: 'Country'; id: string; name: string }>;
-    messages: Array<{
-      __typename?: 'Message';
-      id: string;
-      year: number;
-      message: string;
-      addressesCount: number;
-      companiesCount: number;
-      countriesCount: number;
-      peopleCount: number;
-    }>;
-  }>;
-};
+
+export type GetPersonByIdQuery = { __typename?: 'Query', result: Array<{ __typename?: 'Person', id: string, name: string, addressesCount: number, companiesCount: number, countriesCount: number, messagesCount: number, addresses: Array<{ __typename?: 'Address', id: string, name: string, companiesCount: number, countriesCount: number, messagesCount: number, peopleCount: number }>, companies: Array<{ __typename?: 'Company', id: string, name: string, addressesCount: number, countriesCount: number, messagesCount: number, peopleCount: number }>, countries: Array<{ __typename?: 'Country', id: string, name: string, addressesCount: number, companiesCount: number, messagesCount: number, peopleCount: number }>, messages: Array<{ __typename?: 'Message', id: string, year: number, message: string, addressesCount: number, companiesCount: number, countriesCount: number, peopleCount: number, companies: Array<{ __typename?: 'Company', name: string }> }> }> };
 
 export type GetPersonCompaniesQueryVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -1384,13 +1112,8 @@ export type GetPersonCompaniesQueryVariables = Exact<{
   limit?: InputMaybe<Scalars['Int']['input']>;
 }>;
 
-export type GetPersonCompaniesQuery = {
-  __typename?: 'Query';
-  result: Array<{
-    __typename?: 'Person';
-    companies: Array<{ __typename?: 'Company'; id: string; name: string }>;
-  }>;
-};
+
+export type GetPersonCompaniesQuery = { __typename?: 'Query', result: Array<{ __typename?: 'Person', companies: Array<{ __typename?: 'Company', id: string, name: string, addressesCount: number, countriesCount: number, messagesCount: number, peopleCount: number }> }> };
 
 export type GetPersonCountriesQueryVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -1398,13 +1121,8 @@ export type GetPersonCountriesQueryVariables = Exact<{
   limit?: InputMaybe<Scalars['Int']['input']>;
 }>;
 
-export type GetPersonCountriesQuery = {
-  __typename?: 'Query';
-  result: Array<{
-    __typename?: 'Person';
-    addresses: Array<{ __typename?: 'Address'; id: string; name: string }>;
-  }>;
-};
+
+export type GetPersonCountriesQuery = { __typename?: 'Query', result: Array<{ __typename?: 'Person', addresses: Array<{ __typename?: 'Address', id: string, name: string, companiesCount: number, countriesCount: number, messagesCount: number, peopleCount: number }> }> };
 
 export type GetPersonMessagesQueryVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -1412,22 +1130,8 @@ export type GetPersonMessagesQueryVariables = Exact<{
   limit?: InputMaybe<Scalars['Int']['input']>;
 }>;
 
-export type GetPersonMessagesQuery = {
-  __typename?: 'Query';
-  result: Array<{
-    __typename?: 'Person';
-    messages: Array<{
-      __typename?: 'Message';
-      id: string;
-      year: number;
-      message: string;
-      addressesCount: number;
-      companiesCount: number;
-      countriesCount: number;
-      peopleCount: number;
-    }>;
-  }>;
-};
+
+export type GetPersonMessagesQuery = { __typename?: 'Query', result: Array<{ __typename?: 'Person', messages: Array<{ __typename?: 'Message', id: string, year: number, message: string, addressesCount: number, companiesCount: number, countriesCount: number, peopleCount: number, companies: Array<{ __typename?: 'Company', name: string }> }> }> };
 
 export type GetPersonPeopleQueryVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -1435,2958 +1139,46 @@ export type GetPersonPeopleQueryVariables = Exact<{
   limit?: InputMaybe<Scalars['Int']['input']>;
 }>;
 
-export type GetPersonPeopleQuery = {
-  __typename?: 'Query';
-  result: Array<{
-    __typename?: 'Person';
-    countries: Array<{ __typename?: 'Country'; id: string; name: string }>;
-  }>;
-};
 
-export const AddressInlineFragmentDoc = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'AddressInline' },
-      typeCondition: { kind: 'NamedType', name: { kind: 'Name', value: 'Address' } },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<AddressInlineFragment, unknown>;
-export const CompanyInlineFragmentDoc = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'CompanyInline' },
-      typeCondition: { kind: 'NamedType', name: { kind: 'Name', value: 'Company' } },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<CompanyInlineFragment, unknown>;
-export const CountryInlineFragmentDoc = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'CountryInline' },
-      typeCondition: { kind: 'NamedType', name: { kind: 'Name', value: 'Country' } },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<CountryInlineFragment, unknown>;
-export const MessageInlineFragmentDoc = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'MessageInline' },
-      typeCondition: { kind: 'NamedType', name: { kind: 'Name', value: 'Message' } },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'year' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'message' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'addressesCount' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'companiesCount' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'countriesCount' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'peopleCount' } },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<MessageInlineFragment, unknown>;
-export const PersonInlineFragmentDoc = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'PersonInline' },
-      typeCondition: { kind: 'NamedType', name: { kind: 'Name', value: 'Person' } },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<PersonInlineFragment, unknown>;
-export const GetAddressByIdDocument = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'OperationDefinition',
-      operation: 'query',
-      name: { kind: 'Name', value: 'GetAddressById' },
-      variableDefinitions: [
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
-          type: {
-            kind: 'NonNullType',
-            type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
-          },
-        },
-      ],
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'Field',
-            alias: { kind: 'Name', value: 'result' },
-            name: { kind: 'Name', value: 'addresses' },
-            arguments: [
-              {
-                kind: 'Argument',
-                name: { kind: 'Name', value: 'where' },
-                value: {
-                  kind: 'ObjectValue',
-                  fields: [
-                    {
-                      kind: 'ObjectField',
-                      name: { kind: 'Name', value: 'id_EQ' },
-                      value: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
-                    },
-                  ],
-                },
-              },
-            ],
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'companiesCount' } },
-                {
-                  kind: 'Field',
-                  name: { kind: 'Name', value: 'companies' },
-                  arguments: [
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'skip' },
-                      value: { kind: 'IntValue', value: '0' },
-                    },
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'limit' },
-                      value: { kind: 'IntValue', value: '20' },
-                    },
-                  ],
-                  selectionSet: {
-                    kind: 'SelectionSet',
-                    selections: [
-                      { kind: 'FragmentSpread', name: { kind: 'Name', value: 'CompanyInline' } },
-                    ],
-                  },
-                },
-                { kind: 'Field', name: { kind: 'Name', value: 'countriesCount' } },
-                {
-                  kind: 'Field',
-                  name: { kind: 'Name', value: 'countries' },
-                  arguments: [
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'skip' },
-                      value: { kind: 'IntValue', value: '0' },
-                    },
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'limit' },
-                      value: { kind: 'IntValue', value: '20' },
-                    },
-                  ],
-                  selectionSet: {
-                    kind: 'SelectionSet',
-                    selections: [
-                      { kind: 'FragmentSpread', name: { kind: 'Name', value: 'CountryInline' } },
-                    ],
-                  },
-                },
-                { kind: 'Field', name: { kind: 'Name', value: 'messagesCount' } },
-                {
-                  kind: 'Field',
-                  name: { kind: 'Name', value: 'messages' },
-                  selectionSet: {
-                    kind: 'SelectionSet',
-                    selections: [
-                      { kind: 'FragmentSpread', name: { kind: 'Name', value: 'MessageInline' } },
-                    ],
-                  },
-                },
-                { kind: 'Field', name: { kind: 'Name', value: 'peopleCount' } },
-                {
-                  kind: 'Field',
-                  name: { kind: 'Name', value: 'people' },
-                  arguments: [
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'skip' },
-                      value: { kind: 'IntValue', value: '0' },
-                    },
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'limit' },
-                      value: { kind: 'IntValue', value: '20' },
-                    },
-                  ],
-                  selectionSet: {
-                    kind: 'SelectionSet',
-                    selections: [
-                      { kind: 'FragmentSpread', name: { kind: 'Name', value: 'PersonInline' } },
-                    ],
-                  },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'CompanyInline' },
-      typeCondition: { kind: 'NamedType', name: { kind: 'Name', value: 'Company' } },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-        ],
-      },
-    },
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'CountryInline' },
-      typeCondition: { kind: 'NamedType', name: { kind: 'Name', value: 'Country' } },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-        ],
-      },
-    },
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'MessageInline' },
-      typeCondition: { kind: 'NamedType', name: { kind: 'Name', value: 'Message' } },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'year' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'message' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'addressesCount' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'companiesCount' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'countriesCount' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'peopleCount' } },
-        ],
-      },
-    },
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'PersonInline' },
-      typeCondition: { kind: 'NamedType', name: { kind: 'Name', value: 'Person' } },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<GetAddressByIdQuery, GetAddressByIdQueryVariables>;
-export const GetAddressCompaniesDocument = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'OperationDefinition',
-      operation: 'query',
-      name: { kind: 'Name', value: 'GetAddressCompanies' },
-      variableDefinitions: [
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
-          type: {
-            kind: 'NonNullType',
-            type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
-          },
-        },
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'skip' } },
-          type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
-        },
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'limit' } },
-          type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
-        },
-      ],
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'Field',
-            alias: { kind: 'Name', value: 'result' },
-            name: { kind: 'Name', value: 'addresses' },
-            arguments: [
-              {
-                kind: 'Argument',
-                name: { kind: 'Name', value: 'where' },
-                value: {
-                  kind: 'ObjectValue',
-                  fields: [
-                    {
-                      kind: 'ObjectField',
-                      name: { kind: 'Name', value: 'id_EQ' },
-                      value: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
-                    },
-                  ],
-                },
-              },
-            ],
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                {
-                  kind: 'Field',
-                  name: { kind: 'Name', value: 'companies' },
-                  arguments: [
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'skip' },
-                      value: { kind: 'Variable', name: { kind: 'Name', value: 'skip' } },
-                    },
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'limit' },
-                      value: { kind: 'Variable', name: { kind: 'Name', value: 'limit' } },
-                    },
-                  ],
-                  selectionSet: {
-                    kind: 'SelectionSet',
-                    selections: [
-                      { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-                      { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-                    ],
-                  },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<GetAddressCompaniesQuery, GetAddressCompaniesQueryVariables>;
-export const GetAddressCountriesDocument = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'OperationDefinition',
-      operation: 'query',
-      name: { kind: 'Name', value: 'GetAddressCountries' },
-      variableDefinitions: [
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
-          type: {
-            kind: 'NonNullType',
-            type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
-          },
-        },
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'skip' } },
-          type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
-        },
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'limit' } },
-          type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
-        },
-      ],
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'Field',
-            alias: { kind: 'Name', value: 'result' },
-            name: { kind: 'Name', value: 'addresses' },
-            arguments: [
-              {
-                kind: 'Argument',
-                name: { kind: 'Name', value: 'where' },
-                value: {
-                  kind: 'ObjectValue',
-                  fields: [
-                    {
-                      kind: 'ObjectField',
-                      name: { kind: 'Name', value: 'id_EQ' },
-                      value: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
-                    },
-                  ],
-                },
-              },
-            ],
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                {
-                  kind: 'Field',
-                  name: { kind: 'Name', value: 'countries' },
-                  arguments: [
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'skip' },
-                      value: { kind: 'Variable', name: { kind: 'Name', value: 'skip' } },
-                    },
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'limit' },
-                      value: { kind: 'Variable', name: { kind: 'Name', value: 'limit' } },
-                    },
-                  ],
-                  selectionSet: {
-                    kind: 'SelectionSet',
-                    selections: [
-                      { kind: 'FragmentSpread', name: { kind: 'Name', value: 'CountryInline' } },
-                    ],
-                  },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'CountryInline' },
-      typeCondition: { kind: 'NamedType', name: { kind: 'Name', value: 'Country' } },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<GetAddressCountriesQuery, GetAddressCountriesQueryVariables>;
-export const GetAddressMessagesDocument = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'OperationDefinition',
-      operation: 'query',
-      name: { kind: 'Name', value: 'GetAddressMessages' },
-      variableDefinitions: [
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
-          type: {
-            kind: 'NonNullType',
-            type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
-          },
-        },
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'skip' } },
-          type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
-        },
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'limit' } },
-          type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
-        },
-      ],
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'Field',
-            alias: { kind: 'Name', value: 'result' },
-            name: { kind: 'Name', value: 'addresses' },
-            arguments: [
-              {
-                kind: 'Argument',
-                name: { kind: 'Name', value: 'where' },
-                value: {
-                  kind: 'ObjectValue',
-                  fields: [
-                    {
-                      kind: 'ObjectField',
-                      name: { kind: 'Name', value: 'id_EQ' },
-                      value: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
-                    },
-                  ],
-                },
-              },
-            ],
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                {
-                  kind: 'Field',
-                  name: { kind: 'Name', value: 'messages' },
-                  arguments: [
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'skip' },
-                      value: { kind: 'Variable', name: { kind: 'Name', value: 'skip' } },
-                    },
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'limit' },
-                      value: { kind: 'Variable', name: { kind: 'Name', value: 'limit' } },
-                    },
-                  ],
-                  selectionSet: {
-                    kind: 'SelectionSet',
-                    selections: [
-                      { kind: 'FragmentSpread', name: { kind: 'Name', value: 'MessageInline' } },
-                    ],
-                  },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'MessageInline' },
-      typeCondition: { kind: 'NamedType', name: { kind: 'Name', value: 'Message' } },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'year' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'message' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'addressesCount' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'companiesCount' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'countriesCount' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'peopleCount' } },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<GetAddressMessagesQuery, GetAddressMessagesQueryVariables>;
-export const GetAddressPeopleDocument = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'OperationDefinition',
-      operation: 'query',
-      name: { kind: 'Name', value: 'GetAddressPeople' },
-      variableDefinitions: [
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
-          type: {
-            kind: 'NonNullType',
-            type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
-          },
-        },
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'skip' } },
-          type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
-        },
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'limit' } },
-          type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
-        },
-      ],
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'Field',
-            alias: { kind: 'Name', value: 'result' },
-            name: { kind: 'Name', value: 'addresses' },
-            arguments: [
-              {
-                kind: 'Argument',
-                name: { kind: 'Name', value: 'where' },
-                value: {
-                  kind: 'ObjectValue',
-                  fields: [
-                    {
-                      kind: 'ObjectField',
-                      name: { kind: 'Name', value: 'id_EQ' },
-                      value: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
-                    },
-                  ],
-                },
-              },
-            ],
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                {
-                  kind: 'Field',
-                  name: { kind: 'Name', value: 'people' },
-                  arguments: [
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'skip' },
-                      value: { kind: 'Variable', name: { kind: 'Name', value: 'skip' } },
-                    },
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'limit' },
-                      value: { kind: 'Variable', name: { kind: 'Name', value: 'limit' } },
-                    },
-                  ],
-                  selectionSet: {
-                    kind: 'SelectionSet',
-                    selections: [
-                      { kind: 'FragmentSpread', name: { kind: 'Name', value: 'PersonInline' } },
-                    ],
-                  },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'PersonInline' },
-      typeCondition: { kind: 'NamedType', name: { kind: 'Name', value: 'Person' } },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<GetAddressPeopleQuery, GetAddressPeopleQueryVariables>;
-export const GetCompanyByIdDocument = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'OperationDefinition',
-      operation: 'query',
-      name: { kind: 'Name', value: 'GetCompanyById' },
-      variableDefinitions: [
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
-          type: {
-            kind: 'NonNullType',
-            type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
-          },
-        },
-      ],
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'Field',
-            alias: { kind: 'Name', value: 'result' },
-            name: { kind: 'Name', value: 'companies' },
-            arguments: [
-              {
-                kind: 'Argument',
-                name: { kind: 'Name', value: 'where' },
-                value: {
-                  kind: 'ObjectValue',
-                  fields: [
-                    {
-                      kind: 'ObjectField',
-                      name: { kind: 'Name', value: 'id_EQ' },
-                      value: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
-                    },
-                  ],
-                },
-              },
-            ],
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'addressesCount' } },
-                {
-                  kind: 'Field',
-                  name: { kind: 'Name', value: 'addresses' },
-                  arguments: [
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'skip' },
-                      value: { kind: 'IntValue', value: '0' },
-                    },
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'limit' },
-                      value: { kind: 'IntValue', value: '20' },
-                    },
-                  ],
-                  selectionSet: {
-                    kind: 'SelectionSet',
-                    selections: [
-                      { kind: 'FragmentSpread', name: { kind: 'Name', value: 'AddressInline' } },
-                    ],
-                  },
-                },
-                { kind: 'Field', name: { kind: 'Name', value: 'countriesCount' } },
-                {
-                  kind: 'Field',
-                  name: { kind: 'Name', value: 'countries' },
-                  arguments: [
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'skip' },
-                      value: { kind: 'IntValue', value: '0' },
-                    },
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'limit' },
-                      value: { kind: 'IntValue', value: '20' },
-                    },
-                  ],
-                  selectionSet: {
-                    kind: 'SelectionSet',
-                    selections: [
-                      { kind: 'FragmentSpread', name: { kind: 'Name', value: 'CountryInline' } },
-                    ],
-                  },
-                },
-                { kind: 'Field', name: { kind: 'Name', value: 'messagesCount' } },
-                {
-                  kind: 'Field',
-                  name: { kind: 'Name', value: 'messages' },
-                  selectionSet: {
-                    kind: 'SelectionSet',
-                    selections: [
-                      { kind: 'FragmentSpread', name: { kind: 'Name', value: 'MessageInline' } },
-                    ],
-                  },
-                },
-                { kind: 'Field', name: { kind: 'Name', value: 'peopleCount' } },
-                {
-                  kind: 'Field',
-                  name: { kind: 'Name', value: 'people' },
-                  arguments: [
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'skip' },
-                      value: { kind: 'IntValue', value: '0' },
-                    },
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'limit' },
-                      value: { kind: 'IntValue', value: '20' },
-                    },
-                  ],
-                  selectionSet: {
-                    kind: 'SelectionSet',
-                    selections: [
-                      { kind: 'FragmentSpread', name: { kind: 'Name', value: 'PersonInline' } },
-                    ],
-                  },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'AddressInline' },
-      typeCondition: { kind: 'NamedType', name: { kind: 'Name', value: 'Address' } },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-        ],
-      },
-    },
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'CountryInline' },
-      typeCondition: { kind: 'NamedType', name: { kind: 'Name', value: 'Country' } },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-        ],
-      },
-    },
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'MessageInline' },
-      typeCondition: { kind: 'NamedType', name: { kind: 'Name', value: 'Message' } },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'year' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'message' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'addressesCount' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'companiesCount' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'countriesCount' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'peopleCount' } },
-        ],
-      },
-    },
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'PersonInline' },
-      typeCondition: { kind: 'NamedType', name: { kind: 'Name', value: 'Person' } },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<GetCompanyByIdQuery, GetCompanyByIdQueryVariables>;
-export const GetCompanyAddressesDocument = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'OperationDefinition',
-      operation: 'query',
-      name: { kind: 'Name', value: 'GetCompanyAddresses' },
-      variableDefinitions: [
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
-          type: {
-            kind: 'NonNullType',
-            type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
-          },
-        },
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'skip' } },
-          type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
-        },
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'limit' } },
-          type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
-        },
-      ],
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'Field',
-            alias: { kind: 'Name', value: 'result' },
-            name: { kind: 'Name', value: 'companies' },
-            arguments: [
-              {
-                kind: 'Argument',
-                name: { kind: 'Name', value: 'where' },
-                value: {
-                  kind: 'ObjectValue',
-                  fields: [
-                    {
-                      kind: 'ObjectField',
-                      name: { kind: 'Name', value: 'id_EQ' },
-                      value: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
-                    },
-                  ],
-                },
-              },
-            ],
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                {
-                  kind: 'Field',
-                  name: { kind: 'Name', value: 'addresses' },
-                  arguments: [
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'skip' },
-                      value: { kind: 'Variable', name: { kind: 'Name', value: 'skip' } },
-                    },
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'limit' },
-                      value: { kind: 'Variable', name: { kind: 'Name', value: 'limit' } },
-                    },
-                  ],
-                  selectionSet: {
-                    kind: 'SelectionSet',
-                    selections: [
-                      { kind: 'FragmentSpread', name: { kind: 'Name', value: 'AddressInline' } },
-                    ],
-                  },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'AddressInline' },
-      typeCondition: { kind: 'NamedType', name: { kind: 'Name', value: 'Address' } },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<GetCompanyAddressesQuery, GetCompanyAddressesQueryVariables>;
-export const GetCompanyCountriesDocument = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'OperationDefinition',
-      operation: 'query',
-      name: { kind: 'Name', value: 'GetCompanyCountries' },
-      variableDefinitions: [
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
-          type: {
-            kind: 'NonNullType',
-            type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
-          },
-        },
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'skip' } },
-          type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
-        },
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'limit' } },
-          type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
-        },
-      ],
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'Field',
-            alias: { kind: 'Name', value: 'result' },
-            name: { kind: 'Name', value: 'companies' },
-            arguments: [
-              {
-                kind: 'Argument',
-                name: { kind: 'Name', value: 'where' },
-                value: {
-                  kind: 'ObjectValue',
-                  fields: [
-                    {
-                      kind: 'ObjectField',
-                      name: { kind: 'Name', value: 'id_EQ' },
-                      value: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
-                    },
-                  ],
-                },
-              },
-            ],
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                {
-                  kind: 'Field',
-                  name: { kind: 'Name', value: 'countries' },
-                  arguments: [
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'skip' },
-                      value: { kind: 'Variable', name: { kind: 'Name', value: 'skip' } },
-                    },
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'limit' },
-                      value: { kind: 'Variable', name: { kind: 'Name', value: 'limit' } },
-                    },
-                  ],
-                  selectionSet: {
-                    kind: 'SelectionSet',
-                    selections: [
-                      { kind: 'FragmentSpread', name: { kind: 'Name', value: 'CountryInline' } },
-                    ],
-                  },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'CountryInline' },
-      typeCondition: { kind: 'NamedType', name: { kind: 'Name', value: 'Country' } },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<GetCompanyCountriesQuery, GetCompanyCountriesQueryVariables>;
-export const GetCompanyMessagesDocument = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'OperationDefinition',
-      operation: 'query',
-      name: { kind: 'Name', value: 'GetCompanyMessages' },
-      variableDefinitions: [
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
-          type: {
-            kind: 'NonNullType',
-            type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
-          },
-        },
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'skip' } },
-          type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
-        },
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'limit' } },
-          type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
-        },
-      ],
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'Field',
-            alias: { kind: 'Name', value: 'result' },
-            name: { kind: 'Name', value: 'companies' },
-            arguments: [
-              {
-                kind: 'Argument',
-                name: { kind: 'Name', value: 'where' },
-                value: {
-                  kind: 'ObjectValue',
-                  fields: [
-                    {
-                      kind: 'ObjectField',
-                      name: { kind: 'Name', value: 'id_EQ' },
-                      value: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
-                    },
-                  ],
-                },
-              },
-            ],
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                {
-                  kind: 'Field',
-                  name: { kind: 'Name', value: 'messages' },
-                  arguments: [
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'skip' },
-                      value: { kind: 'Variable', name: { kind: 'Name', value: 'skip' } },
-                    },
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'limit' },
-                      value: { kind: 'Variable', name: { kind: 'Name', value: 'limit' } },
-                    },
-                  ],
-                  selectionSet: {
-                    kind: 'SelectionSet',
-                    selections: [
-                      { kind: 'FragmentSpread', name: { kind: 'Name', value: 'MessageInline' } },
-                    ],
-                  },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'MessageInline' },
-      typeCondition: { kind: 'NamedType', name: { kind: 'Name', value: 'Message' } },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'year' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'message' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'addressesCount' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'companiesCount' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'countriesCount' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'peopleCount' } },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<GetCompanyMessagesQuery, GetCompanyMessagesQueryVariables>;
-export const GetCompanyPeopleDocument = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'OperationDefinition',
-      operation: 'query',
-      name: { kind: 'Name', value: 'GetCompanyPeople' },
-      variableDefinitions: [
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
-          type: {
-            kind: 'NonNullType',
-            type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
-          },
-        },
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'skip' } },
-          type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
-        },
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'limit' } },
-          type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
-        },
-      ],
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'Field',
-            alias: { kind: 'Name', value: 'result' },
-            name: { kind: 'Name', value: 'companies' },
-            arguments: [
-              {
-                kind: 'Argument',
-                name: { kind: 'Name', value: 'where' },
-                value: {
-                  kind: 'ObjectValue',
-                  fields: [
-                    {
-                      kind: 'ObjectField',
-                      name: { kind: 'Name', value: 'id_EQ' },
-                      value: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
-                    },
-                  ],
-                },
-              },
-            ],
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                {
-                  kind: 'Field',
-                  name: { kind: 'Name', value: 'people' },
-                  arguments: [
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'skip' },
-                      value: { kind: 'Variable', name: { kind: 'Name', value: 'skip' } },
-                    },
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'limit' },
-                      value: { kind: 'Variable', name: { kind: 'Name', value: 'limit' } },
-                    },
-                  ],
-                  selectionSet: {
-                    kind: 'SelectionSet',
-                    selections: [
-                      { kind: 'FragmentSpread', name: { kind: 'Name', value: 'PersonInline' } },
-                    ],
-                  },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'PersonInline' },
-      typeCondition: { kind: 'NamedType', name: { kind: 'Name', value: 'Person' } },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<GetCompanyPeopleQuery, GetCompanyPeopleQueryVariables>;
-export const GetCountryByIdDocument = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'OperationDefinition',
-      operation: 'query',
-      name: { kind: 'Name', value: 'GetCountryById' },
-      variableDefinitions: [
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
-          type: {
-            kind: 'NonNullType',
-            type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
-          },
-        },
-      ],
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'Field',
-            alias: { kind: 'Name', value: 'result' },
-            name: { kind: 'Name', value: 'countries' },
-            arguments: [
-              {
-                kind: 'Argument',
-                name: { kind: 'Name', value: 'where' },
-                value: {
-                  kind: 'ObjectValue',
-                  fields: [
-                    {
-                      kind: 'ObjectField',
-                      name: { kind: 'Name', value: 'id_EQ' },
-                      value: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
-                    },
-                  ],
-                },
-              },
-            ],
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'addressesCount' } },
-                {
-                  kind: 'Field',
-                  name: { kind: 'Name', value: 'addresses' },
-                  arguments: [
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'skip' },
-                      value: { kind: 'IntValue', value: '0' },
-                    },
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'limit' },
-                      value: { kind: 'IntValue', value: '20' },
-                    },
-                  ],
-                  selectionSet: {
-                    kind: 'SelectionSet',
-                    selections: [
-                      { kind: 'FragmentSpread', name: { kind: 'Name', value: 'AddressInline' } },
-                    ],
-                  },
-                },
-                { kind: 'Field', name: { kind: 'Name', value: 'companiesCount' } },
-                {
-                  kind: 'Field',
-                  name: { kind: 'Name', value: 'companies' },
-                  arguments: [
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'skip' },
-                      value: { kind: 'IntValue', value: '0' },
-                    },
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'limit' },
-                      value: { kind: 'IntValue', value: '20' },
-                    },
-                  ],
-                  selectionSet: {
-                    kind: 'SelectionSet',
-                    selections: [
-                      { kind: 'FragmentSpread', name: { kind: 'Name', value: 'CompanyInline' } },
-                    ],
-                  },
-                },
-                { kind: 'Field', name: { kind: 'Name', value: 'messagesCount' } },
-                {
-                  kind: 'Field',
-                  name: { kind: 'Name', value: 'messages' },
-                  selectionSet: {
-                    kind: 'SelectionSet',
-                    selections: [
-                      { kind: 'FragmentSpread', name: { kind: 'Name', value: 'MessageInline' } },
-                    ],
-                  },
-                },
-                { kind: 'Field', name: { kind: 'Name', value: 'peopleCount' } },
-                {
-                  kind: 'Field',
-                  name: { kind: 'Name', value: 'people' },
-                  arguments: [
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'skip' },
-                      value: { kind: 'IntValue', value: '0' },
-                    },
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'limit' },
-                      value: { kind: 'IntValue', value: '20' },
-                    },
-                  ],
-                  selectionSet: {
-                    kind: 'SelectionSet',
-                    selections: [
-                      { kind: 'FragmentSpread', name: { kind: 'Name', value: 'PersonInline' } },
-                    ],
-                  },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'AddressInline' },
-      typeCondition: { kind: 'NamedType', name: { kind: 'Name', value: 'Address' } },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-        ],
-      },
-    },
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'CompanyInline' },
-      typeCondition: { kind: 'NamedType', name: { kind: 'Name', value: 'Company' } },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-        ],
-      },
-    },
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'MessageInline' },
-      typeCondition: { kind: 'NamedType', name: { kind: 'Name', value: 'Message' } },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'year' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'message' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'addressesCount' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'companiesCount' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'countriesCount' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'peopleCount' } },
-        ],
-      },
-    },
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'PersonInline' },
-      typeCondition: { kind: 'NamedType', name: { kind: 'Name', value: 'Person' } },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<GetCountryByIdQuery, GetCountryByIdQueryVariables>;
-export const GetCountryCompaniesDocument = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'OperationDefinition',
-      operation: 'query',
-      name: { kind: 'Name', value: 'GetCountryCompanies' },
-      variableDefinitions: [
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
-          type: {
-            kind: 'NonNullType',
-            type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
-          },
-        },
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'skip' } },
-          type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
-        },
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'limit' } },
-          type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
-        },
-      ],
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'Field',
-            alias: { kind: 'Name', value: 'result' },
-            name: { kind: 'Name', value: 'countries' },
-            arguments: [
-              {
-                kind: 'Argument',
-                name: { kind: 'Name', value: 'where' },
-                value: {
-                  kind: 'ObjectValue',
-                  fields: [
-                    {
-                      kind: 'ObjectField',
-                      name: { kind: 'Name', value: 'id_EQ' },
-                      value: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
-                    },
-                  ],
-                },
-              },
-            ],
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                {
-                  kind: 'Field',
-                  name: { kind: 'Name', value: 'companies' },
-                  arguments: [
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'skip' },
-                      value: { kind: 'Variable', name: { kind: 'Name', value: 'skip' } },
-                    },
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'limit' },
-                      value: { kind: 'Variable', name: { kind: 'Name', value: 'limit' } },
-                    },
-                  ],
-                  selectionSet: {
-                    kind: 'SelectionSet',
-                    selections: [
-                      { kind: 'FragmentSpread', name: { kind: 'Name', value: 'CompanyInline' } },
-                    ],
-                  },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'CompanyInline' },
-      typeCondition: { kind: 'NamedType', name: { kind: 'Name', value: 'Company' } },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<GetCountryCompaniesQuery, GetCountryCompaniesQueryVariables>;
-export const GetCountryCountriesDocument = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'OperationDefinition',
-      operation: 'query',
-      name: { kind: 'Name', value: 'GetCountryCountries' },
-      variableDefinitions: [
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
-          type: {
-            kind: 'NonNullType',
-            type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
-          },
-        },
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'skip' } },
-          type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
-        },
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'limit' } },
-          type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
-        },
-      ],
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'Field',
-            alias: { kind: 'Name', value: 'result' },
-            name: { kind: 'Name', value: 'countries' },
-            arguments: [
-              {
-                kind: 'Argument',
-                name: { kind: 'Name', value: 'where' },
-                value: {
-                  kind: 'ObjectValue',
-                  fields: [
-                    {
-                      kind: 'ObjectField',
-                      name: { kind: 'Name', value: 'id_EQ' },
-                      value: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
-                    },
-                  ],
-                },
-              },
-            ],
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                {
-                  kind: 'Field',
-                  name: { kind: 'Name', value: 'addresses' },
-                  arguments: [
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'skip' },
-                      value: { kind: 'Variable', name: { kind: 'Name', value: 'skip' } },
-                    },
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'limit' },
-                      value: { kind: 'Variable', name: { kind: 'Name', value: 'limit' } },
-                    },
-                  ],
-                  selectionSet: {
-                    kind: 'SelectionSet',
-                    selections: [
-                      { kind: 'FragmentSpread', name: { kind: 'Name', value: 'AddressInline' } },
-                    ],
-                  },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'AddressInline' },
-      typeCondition: { kind: 'NamedType', name: { kind: 'Name', value: 'Address' } },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<GetCountryCountriesQuery, GetCountryCountriesQueryVariables>;
-export const GetCountryMessagesDocument = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'OperationDefinition',
-      operation: 'query',
-      name: { kind: 'Name', value: 'GetCountryMessages' },
-      variableDefinitions: [
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
-          type: {
-            kind: 'NonNullType',
-            type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
-          },
-        },
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'skip' } },
-          type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
-        },
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'limit' } },
-          type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
-        },
-      ],
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'Field',
-            alias: { kind: 'Name', value: 'result' },
-            name: { kind: 'Name', value: 'countries' },
-            arguments: [
-              {
-                kind: 'Argument',
-                name: { kind: 'Name', value: 'where' },
-                value: {
-                  kind: 'ObjectValue',
-                  fields: [
-                    {
-                      kind: 'ObjectField',
-                      name: { kind: 'Name', value: 'id_EQ' },
-                      value: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
-                    },
-                  ],
-                },
-              },
-            ],
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                {
-                  kind: 'Field',
-                  name: { kind: 'Name', value: 'messages' },
-                  arguments: [
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'skip' },
-                      value: { kind: 'Variable', name: { kind: 'Name', value: 'skip' } },
-                    },
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'limit' },
-                      value: { kind: 'Variable', name: { kind: 'Name', value: 'limit' } },
-                    },
-                  ],
-                  selectionSet: {
-                    kind: 'SelectionSet',
-                    selections: [
-                      { kind: 'FragmentSpread', name: { kind: 'Name', value: 'MessageInline' } },
-                    ],
-                  },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'MessageInline' },
-      typeCondition: { kind: 'NamedType', name: { kind: 'Name', value: 'Message' } },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'year' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'message' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'addressesCount' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'companiesCount' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'countriesCount' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'peopleCount' } },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<GetCountryMessagesQuery, GetCountryMessagesQueryVariables>;
-export const GetCountryPeopleDocument = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'OperationDefinition',
-      operation: 'query',
-      name: { kind: 'Name', value: 'GetCountryPeople' },
-      variableDefinitions: [
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
-          type: {
-            kind: 'NonNullType',
-            type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
-          },
-        },
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'skip' } },
-          type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
-        },
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'limit' } },
-          type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
-        },
-      ],
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'Field',
-            alias: { kind: 'Name', value: 'result' },
-            name: { kind: 'Name', value: 'countries' },
-            arguments: [
-              {
-                kind: 'Argument',
-                name: { kind: 'Name', value: 'where' },
-                value: {
-                  kind: 'ObjectValue',
-                  fields: [
-                    {
-                      kind: 'ObjectField',
-                      name: { kind: 'Name', value: 'id_EQ' },
-                      value: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
-                    },
-                  ],
-                },
-              },
-            ],
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                {
-                  kind: 'Field',
-                  name: { kind: 'Name', value: 'people' },
-                  arguments: [
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'skip' },
-                      value: { kind: 'Variable', name: { kind: 'Name', value: 'skip' } },
-                    },
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'limit' },
-                      value: { kind: 'Variable', name: { kind: 'Name', value: 'limit' } },
-                    },
-                  ],
-                  selectionSet: {
-                    kind: 'SelectionSet',
-                    selections: [
-                      { kind: 'FragmentSpread', name: { kind: 'Name', value: 'PersonInline' } },
-                    ],
-                  },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'PersonInline' },
-      typeCondition: { kind: 'NamedType', name: { kind: 'Name', value: 'Person' } },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<GetCountryPeopleQuery, GetCountryPeopleQueryVariables>;
-export const GetMessageByIdDocument = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'OperationDefinition',
-      operation: 'query',
-      name: { kind: 'Name', value: 'GetMessageById' },
-      variableDefinitions: [
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
-          type: {
-            kind: 'NonNullType',
-            type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
-          },
-        },
-      ],
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'Field',
-            alias: { kind: 'Name', value: 'result' },
-            name: { kind: 'Name', value: 'messages' },
-            arguments: [
-              {
-                kind: 'Argument',
-                name: { kind: 'Name', value: 'where' },
-                value: {
-                  kind: 'ObjectValue',
-                  fields: [
-                    {
-                      kind: 'ObjectField',
-                      name: { kind: 'Name', value: 'id_EQ' },
-                      value: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
-                    },
-                  ],
-                },
-              },
-            ],
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'year' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'message' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'addressesCount' } },
-                {
-                  kind: 'Field',
-                  name: { kind: 'Name', value: 'addresses' },
-                  arguments: [
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'skip' },
-                      value: { kind: 'IntValue', value: '0' },
-                    },
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'limit' },
-                      value: { kind: 'IntValue', value: '20' },
-                    },
-                  ],
-                  selectionSet: {
-                    kind: 'SelectionSet',
-                    selections: [
-                      { kind: 'FragmentSpread', name: { kind: 'Name', value: 'AddressInline' } },
-                    ],
-                  },
-                },
-                { kind: 'Field', name: { kind: 'Name', value: 'companiesCount' } },
-                {
-                  kind: 'Field',
-                  name: { kind: 'Name', value: 'companies' },
-                  arguments: [
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'skip' },
-                      value: { kind: 'IntValue', value: '0' },
-                    },
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'limit' },
-                      value: { kind: 'IntValue', value: '20' },
-                    },
-                  ],
-                  selectionSet: {
-                    kind: 'SelectionSet',
-                    selections: [
-                      { kind: 'FragmentSpread', name: { kind: 'Name', value: 'CompanyInline' } },
-                    ],
-                  },
-                },
-                { kind: 'Field', name: { kind: 'Name', value: 'countriesCount' } },
-                {
-                  kind: 'Field',
-                  name: { kind: 'Name', value: 'countries' },
-                  arguments: [
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'skip' },
-                      value: { kind: 'IntValue', value: '0' },
-                    },
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'limit' },
-                      value: { kind: 'IntValue', value: '20' },
-                    },
-                  ],
-                  selectionSet: {
-                    kind: 'SelectionSet',
-                    selections: [
-                      { kind: 'FragmentSpread', name: { kind: 'Name', value: 'CountryInline' } },
-                    ],
-                  },
-                },
-                { kind: 'Field', name: { kind: 'Name', value: 'peopleCount' } },
-                {
-                  kind: 'Field',
-                  name: { kind: 'Name', value: 'people' },
-                  arguments: [
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'skip' },
-                      value: { kind: 'IntValue', value: '0' },
-                    },
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'limit' },
-                      value: { kind: 'IntValue', value: '20' },
-                    },
-                  ],
-                  selectionSet: {
-                    kind: 'SelectionSet',
-                    selections: [
-                      { kind: 'FragmentSpread', name: { kind: 'Name', value: 'PersonInline' } },
-                    ],
-                  },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'AddressInline' },
-      typeCondition: { kind: 'NamedType', name: { kind: 'Name', value: 'Address' } },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-        ],
-      },
-    },
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'CompanyInline' },
-      typeCondition: { kind: 'NamedType', name: { kind: 'Name', value: 'Company' } },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-        ],
-      },
-    },
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'CountryInline' },
-      typeCondition: { kind: 'NamedType', name: { kind: 'Name', value: 'Country' } },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-        ],
-      },
-    },
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'PersonInline' },
-      typeCondition: { kind: 'NamedType', name: { kind: 'Name', value: 'Person' } },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<GetMessageByIdQuery, GetMessageByIdQueryVariables>;
-export const GetMessageCompaniesDocument = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'OperationDefinition',
-      operation: 'query',
-      name: { kind: 'Name', value: 'GetMessageCompanies' },
-      variableDefinitions: [
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
-          type: {
-            kind: 'NonNullType',
-            type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
-          },
-        },
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'skip' } },
-          type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
-        },
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'limit' } },
-          type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
-        },
-      ],
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'Field',
-            alias: { kind: 'Name', value: 'result' },
-            name: { kind: 'Name', value: 'messages' },
-            arguments: [
-              {
-                kind: 'Argument',
-                name: { kind: 'Name', value: 'where' },
-                value: {
-                  kind: 'ObjectValue',
-                  fields: [
-                    {
-                      kind: 'ObjectField',
-                      name: { kind: 'Name', value: 'id_EQ' },
-                      value: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
-                    },
-                  ],
-                },
-              },
-            ],
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                {
-                  kind: 'Field',
-                  name: { kind: 'Name', value: 'companies' },
-                  arguments: [
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'skip' },
-                      value: { kind: 'Variable', name: { kind: 'Name', value: 'skip' } },
-                    },
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'limit' },
-                      value: { kind: 'Variable', name: { kind: 'Name', value: 'limit' } },
-                    },
-                  ],
-                  selectionSet: {
-                    kind: 'SelectionSet',
-                    selections: [
-                      { kind: 'FragmentSpread', name: { kind: 'Name', value: 'CompanyInline' } },
-                    ],
-                  },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'CompanyInline' },
-      typeCondition: { kind: 'NamedType', name: { kind: 'Name', value: 'Company' } },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<GetMessageCompaniesQuery, GetMessageCompaniesQueryVariables>;
-export const GetMessageCountriesDocument = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'OperationDefinition',
-      operation: 'query',
-      name: { kind: 'Name', value: 'GetMessageCountries' },
-      variableDefinitions: [
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
-          type: {
-            kind: 'NonNullType',
-            type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
-          },
-        },
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'skip' } },
-          type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
-        },
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'limit' } },
-          type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
-        },
-      ],
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'Field',
-            alias: { kind: 'Name', value: 'result' },
-            name: { kind: 'Name', value: 'messages' },
-            arguments: [
-              {
-                kind: 'Argument',
-                name: { kind: 'Name', value: 'where' },
-                value: {
-                  kind: 'ObjectValue',
-                  fields: [
-                    {
-                      kind: 'ObjectField',
-                      name: { kind: 'Name', value: 'id_EQ' },
-                      value: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
-                    },
-                  ],
-                },
-              },
-            ],
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                {
-                  kind: 'Field',
-                  name: { kind: 'Name', value: 'addresses' },
-                  arguments: [
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'skip' },
-                      value: { kind: 'Variable', name: { kind: 'Name', value: 'skip' } },
-                    },
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'limit' },
-                      value: { kind: 'Variable', name: { kind: 'Name', value: 'limit' } },
-                    },
-                  ],
-                  selectionSet: {
-                    kind: 'SelectionSet',
-                    selections: [
-                      { kind: 'FragmentSpread', name: { kind: 'Name', value: 'AddressInline' } },
-                    ],
-                  },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'AddressInline' },
-      typeCondition: { kind: 'NamedType', name: { kind: 'Name', value: 'Address' } },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<GetMessageCountriesQuery, GetMessageCountriesQueryVariables>;
-export const GetMessageMessagesDocument = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'OperationDefinition',
-      operation: 'query',
-      name: { kind: 'Name', value: 'GetMessageMessages' },
-      variableDefinitions: [
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
-          type: {
-            kind: 'NonNullType',
-            type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
-          },
-        },
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'skip' } },
-          type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
-        },
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'limit' } },
-          type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
-        },
-      ],
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'Field',
-            alias: { kind: 'Name', value: 'result' },
-            name: { kind: 'Name', value: 'messages' },
-            arguments: [
-              {
-                kind: 'Argument',
-                name: { kind: 'Name', value: 'where' },
-                value: {
-                  kind: 'ObjectValue',
-                  fields: [
-                    {
-                      kind: 'ObjectField',
-                      name: { kind: 'Name', value: 'id_EQ' },
-                      value: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
-                    },
-                  ],
-                },
-              },
-            ],
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                {
-                  kind: 'Field',
-                  name: { kind: 'Name', value: 'people' },
-                  arguments: [
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'skip' },
-                      value: { kind: 'Variable', name: { kind: 'Name', value: 'skip' } },
-                    },
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'limit' },
-                      value: { kind: 'Variable', name: { kind: 'Name', value: 'limit' } },
-                    },
-                  ],
-                  selectionSet: {
-                    kind: 'SelectionSet',
-                    selections: [
-                      { kind: 'FragmentSpread', name: { kind: 'Name', value: 'PersonInline' } },
-                    ],
-                  },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'PersonInline' },
-      typeCondition: { kind: 'NamedType', name: { kind: 'Name', value: 'Person' } },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<GetMessageMessagesQuery, GetMessageMessagesQueryVariables>;
-export const GetMessagePeopleDocument = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'OperationDefinition',
-      operation: 'query',
-      name: { kind: 'Name', value: 'GetMessagePeople' },
-      variableDefinitions: [
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
-          type: {
-            kind: 'NonNullType',
-            type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
-          },
-        },
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'skip' } },
-          type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
-        },
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'limit' } },
-          type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
-        },
-      ],
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'Field',
-            alias: { kind: 'Name', value: 'result' },
-            name: { kind: 'Name', value: 'messages' },
-            arguments: [
-              {
-                kind: 'Argument',
-                name: { kind: 'Name', value: 'where' },
-                value: {
-                  kind: 'ObjectValue',
-                  fields: [
-                    {
-                      kind: 'ObjectField',
-                      name: { kind: 'Name', value: 'id_EQ' },
-                      value: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
-                    },
-                  ],
-                },
-              },
-            ],
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                {
-                  kind: 'Field',
-                  name: { kind: 'Name', value: 'countries' },
-                  arguments: [
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'skip' },
-                      value: { kind: 'Variable', name: { kind: 'Name', value: 'skip' } },
-                    },
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'limit' },
-                      value: { kind: 'Variable', name: { kind: 'Name', value: 'limit' } },
-                    },
-                  ],
-                  selectionSet: {
-                    kind: 'SelectionSet',
-                    selections: [
-                      { kind: 'FragmentSpread', name: { kind: 'Name', value: 'CountryInline' } },
-                    ],
-                  },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'CountryInline' },
-      typeCondition: { kind: 'NamedType', name: { kind: 'Name', value: 'Country' } },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<GetMessagePeopleQuery, GetMessagePeopleQueryVariables>;
-export const GetPersonByIdDocument = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'OperationDefinition',
-      operation: 'query',
-      name: { kind: 'Name', value: 'GetPersonById' },
-      variableDefinitions: [
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
-          type: {
-            kind: 'NonNullType',
-            type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
-          },
-        },
-      ],
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'Field',
-            alias: { kind: 'Name', value: 'result' },
-            name: { kind: 'Name', value: 'people' },
-            arguments: [
-              {
-                kind: 'Argument',
-                name: { kind: 'Name', value: 'where' },
-                value: {
-                  kind: 'ObjectValue',
-                  fields: [
-                    {
-                      kind: 'ObjectField',
-                      name: { kind: 'Name', value: 'id_EQ' },
-                      value: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
-                    },
-                  ],
-                },
-              },
-            ],
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'addressesCount' } },
-                {
-                  kind: 'Field',
-                  name: { kind: 'Name', value: 'addresses' },
-                  arguments: [
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'skip' },
-                      value: { kind: 'IntValue', value: '0' },
-                    },
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'limit' },
-                      value: { kind: 'IntValue', value: '20' },
-                    },
-                  ],
-                  selectionSet: {
-                    kind: 'SelectionSet',
-                    selections: [
-                      { kind: 'FragmentSpread', name: { kind: 'Name', value: 'AddressInline' } },
-                    ],
-                  },
-                },
-                { kind: 'Field', name: { kind: 'Name', value: 'companiesCount' } },
-                {
-                  kind: 'Field',
-                  name: { kind: 'Name', value: 'companies' },
-                  arguments: [
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'skip' },
-                      value: { kind: 'IntValue', value: '0' },
-                    },
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'limit' },
-                      value: { kind: 'IntValue', value: '20' },
-                    },
-                  ],
-                  selectionSet: {
-                    kind: 'SelectionSet',
-                    selections: [
-                      { kind: 'FragmentSpread', name: { kind: 'Name', value: 'CompanyInline' } },
-                    ],
-                  },
-                },
-                { kind: 'Field', name: { kind: 'Name', value: 'countriesCount' } },
-                {
-                  kind: 'Field',
-                  name: { kind: 'Name', value: 'countries' },
-                  arguments: [
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'skip' },
-                      value: { kind: 'IntValue', value: '0' },
-                    },
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'limit' },
-                      value: { kind: 'IntValue', value: '20' },
-                    },
-                  ],
-                  selectionSet: {
-                    kind: 'SelectionSet',
-                    selections: [
-                      { kind: 'FragmentSpread', name: { kind: 'Name', value: 'CountryInline' } },
-                    ],
-                  },
-                },
-                { kind: 'Field', name: { kind: 'Name', value: 'messagesCount' } },
-                {
-                  kind: 'Field',
-                  name: { kind: 'Name', value: 'messages' },
-                  selectionSet: {
-                    kind: 'SelectionSet',
-                    selections: [
-                      { kind: 'FragmentSpread', name: { kind: 'Name', value: 'MessageInline' } },
-                    ],
-                  },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'AddressInline' },
-      typeCondition: { kind: 'NamedType', name: { kind: 'Name', value: 'Address' } },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-        ],
-      },
-    },
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'CompanyInline' },
-      typeCondition: { kind: 'NamedType', name: { kind: 'Name', value: 'Company' } },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-        ],
-      },
-    },
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'CountryInline' },
-      typeCondition: { kind: 'NamedType', name: { kind: 'Name', value: 'Country' } },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-        ],
-      },
-    },
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'MessageInline' },
-      typeCondition: { kind: 'NamedType', name: { kind: 'Name', value: 'Message' } },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'year' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'message' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'addressesCount' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'companiesCount' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'countriesCount' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'peopleCount' } },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<GetPersonByIdQuery, GetPersonByIdQueryVariables>;
-export const GetPersonCompaniesDocument = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'OperationDefinition',
-      operation: 'query',
-      name: { kind: 'Name', value: 'GetPersonCompanies' },
-      variableDefinitions: [
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
-          type: {
-            kind: 'NonNullType',
-            type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
-          },
-        },
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'skip' } },
-          type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
-        },
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'limit' } },
-          type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
-        },
-      ],
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'Field',
-            alias: { kind: 'Name', value: 'result' },
-            name: { kind: 'Name', value: 'people' },
-            arguments: [
-              {
-                kind: 'Argument',
-                name: { kind: 'Name', value: 'where' },
-                value: {
-                  kind: 'ObjectValue',
-                  fields: [
-                    {
-                      kind: 'ObjectField',
-                      name: { kind: 'Name', value: 'id_EQ' },
-                      value: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
-                    },
-                  ],
-                },
-              },
-            ],
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                {
-                  kind: 'Field',
-                  name: { kind: 'Name', value: 'companies' },
-                  arguments: [
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'skip' },
-                      value: { kind: 'Variable', name: { kind: 'Name', value: 'skip' } },
-                    },
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'limit' },
-                      value: { kind: 'Variable', name: { kind: 'Name', value: 'limit' } },
-                    },
-                  ],
-                  selectionSet: {
-                    kind: 'SelectionSet',
-                    selections: [
-                      { kind: 'FragmentSpread', name: { kind: 'Name', value: 'CompanyInline' } },
-                    ],
-                  },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'CompanyInline' },
-      typeCondition: { kind: 'NamedType', name: { kind: 'Name', value: 'Company' } },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<GetPersonCompaniesQuery, GetPersonCompaniesQueryVariables>;
-export const GetPersonCountriesDocument = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'OperationDefinition',
-      operation: 'query',
-      name: { kind: 'Name', value: 'GetPersonCountries' },
-      variableDefinitions: [
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
-          type: {
-            kind: 'NonNullType',
-            type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
-          },
-        },
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'skip' } },
-          type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
-        },
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'limit' } },
-          type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
-        },
-      ],
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'Field',
-            alias: { kind: 'Name', value: 'result' },
-            name: { kind: 'Name', value: 'people' },
-            arguments: [
-              {
-                kind: 'Argument',
-                name: { kind: 'Name', value: 'where' },
-                value: {
-                  kind: 'ObjectValue',
-                  fields: [
-                    {
-                      kind: 'ObjectField',
-                      name: { kind: 'Name', value: 'id_EQ' },
-                      value: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
-                    },
-                  ],
-                },
-              },
-            ],
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                {
-                  kind: 'Field',
-                  name: { kind: 'Name', value: 'addresses' },
-                  arguments: [
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'skip' },
-                      value: { kind: 'Variable', name: { kind: 'Name', value: 'skip' } },
-                    },
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'limit' },
-                      value: { kind: 'Variable', name: { kind: 'Name', value: 'limit' } },
-                    },
-                  ],
-                  selectionSet: {
-                    kind: 'SelectionSet',
-                    selections: [
-                      { kind: 'FragmentSpread', name: { kind: 'Name', value: 'AddressInline' } },
-                    ],
-                  },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'AddressInline' },
-      typeCondition: { kind: 'NamedType', name: { kind: 'Name', value: 'Address' } },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<GetPersonCountriesQuery, GetPersonCountriesQueryVariables>;
-export const GetPersonMessagesDocument = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'OperationDefinition',
-      operation: 'query',
-      name: { kind: 'Name', value: 'GetPersonMessages' },
-      variableDefinitions: [
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
-          type: {
-            kind: 'NonNullType',
-            type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
-          },
-        },
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'skip' } },
-          type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
-        },
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'limit' } },
-          type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
-        },
-      ],
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'Field',
-            alias: { kind: 'Name', value: 'result' },
-            name: { kind: 'Name', value: 'people' },
-            arguments: [
-              {
-                kind: 'Argument',
-                name: { kind: 'Name', value: 'where' },
-                value: {
-                  kind: 'ObjectValue',
-                  fields: [
-                    {
-                      kind: 'ObjectField',
-                      name: { kind: 'Name', value: 'id_EQ' },
-                      value: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
-                    },
-                  ],
-                },
-              },
-            ],
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                {
-                  kind: 'Field',
-                  name: { kind: 'Name', value: 'messages' },
-                  arguments: [
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'skip' },
-                      value: { kind: 'Variable', name: { kind: 'Name', value: 'skip' } },
-                    },
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'limit' },
-                      value: { kind: 'Variable', name: { kind: 'Name', value: 'limit' } },
-                    },
-                  ],
-                  selectionSet: {
-                    kind: 'SelectionSet',
-                    selections: [
-                      { kind: 'FragmentSpread', name: { kind: 'Name', value: 'MessageInline' } },
-                    ],
-                  },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'MessageInline' },
-      typeCondition: { kind: 'NamedType', name: { kind: 'Name', value: 'Message' } },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'year' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'message' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'addressesCount' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'companiesCount' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'countriesCount' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'peopleCount' } },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<GetPersonMessagesQuery, GetPersonMessagesQueryVariables>;
-export const GetPersonPeopleDocument = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'OperationDefinition',
-      operation: 'query',
-      name: { kind: 'Name', value: 'GetPersonPeople' },
-      variableDefinitions: [
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
-          type: {
-            kind: 'NonNullType',
-            type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
-          },
-        },
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'skip' } },
-          type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
-        },
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'limit' } },
-          type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
-        },
-      ],
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'Field',
-            alias: { kind: 'Name', value: 'result' },
-            name: { kind: 'Name', value: 'people' },
-            arguments: [
-              {
-                kind: 'Argument',
-                name: { kind: 'Name', value: 'where' },
-                value: {
-                  kind: 'ObjectValue',
-                  fields: [
-                    {
-                      kind: 'ObjectField',
-                      name: { kind: 'Name', value: 'id_EQ' },
-                      value: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
-                    },
-                  ],
-                },
-              },
-            ],
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                {
-                  kind: 'Field',
-                  name: { kind: 'Name', value: 'countries' },
-                  arguments: [
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'skip' },
-                      value: { kind: 'Variable', name: { kind: 'Name', value: 'skip' } },
-                    },
-                    {
-                      kind: 'Argument',
-                      name: { kind: 'Name', value: 'limit' },
-                      value: { kind: 'Variable', name: { kind: 'Name', value: 'limit' } },
-                    },
-                  ],
-                  selectionSet: {
-                    kind: 'SelectionSet',
-                    selections: [
-                      { kind: 'FragmentSpread', name: { kind: 'Name', value: 'CountryInline' } },
-                    ],
-                  },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-    {
-      kind: 'FragmentDefinition',
-      name: { kind: 'Name', value: 'CountryInline' },
-      typeCondition: { kind: 'NamedType', name: { kind: 'Name', value: 'Country' } },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<GetPersonPeopleQuery, GetPersonPeopleQueryVariables>;
+export type GetPersonPeopleQuery = { __typename?: 'Query', result: Array<{ __typename?: 'Person', countries: Array<{ __typename?: 'Country', id: string, name: string, addressesCount: number, companiesCount: number, messagesCount: number, peopleCount: number }> }> };
+
+export const AddressInlineFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"AddressInline"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Address"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"companiesCount"}},{"kind":"Field","name":{"kind":"Name","value":"countriesCount"}},{"kind":"Field","name":{"kind":"Name","value":"messagesCount"}},{"kind":"Field","name":{"kind":"Name","value":"peopleCount"}}]}}]} as unknown as DocumentNode<AddressInlineFragment, unknown>;
+export const CompanyInlineFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"CompanyInline"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Company"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"addressesCount"}},{"kind":"Field","name":{"kind":"Name","value":"countriesCount"}},{"kind":"Field","name":{"kind":"Name","value":"messagesCount"}},{"kind":"Field","name":{"kind":"Name","value":"peopleCount"}}]}}]} as unknown as DocumentNode<CompanyInlineFragment, unknown>;
+export const CountryInlineFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"CountryInline"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Country"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"addressesCount"}},{"kind":"Field","name":{"kind":"Name","value":"companiesCount"}},{"kind":"Field","name":{"kind":"Name","value":"messagesCount"}},{"kind":"Field","name":{"kind":"Name","value":"peopleCount"}}]}}]} as unknown as DocumentNode<CountryInlineFragment, unknown>;
+export const MessageInlineFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"MessageInline"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Message"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"year"}},{"kind":"Field","name":{"kind":"Name","value":"message"}},{"kind":"Field","name":{"kind":"Name","value":"addressesCount"}},{"kind":"Field","name":{"kind":"Name","value":"companiesCount"}},{"kind":"Field","name":{"kind":"Name","value":"companies"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"IntValue","value":"3"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"countriesCount"}},{"kind":"Field","name":{"kind":"Name","value":"peopleCount"}}]}}]} as unknown as DocumentNode<MessageInlineFragment, unknown>;
+export const PersonInlineFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"PersonInline"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Person"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"addressesCount"}},{"kind":"Field","name":{"kind":"Name","value":"companiesCount"}},{"kind":"Field","name":{"kind":"Name","value":"countriesCount"}},{"kind":"Field","name":{"kind":"Name","value":"messagesCount"}}]}}]} as unknown as DocumentNode<PersonInlineFragment, unknown>;
+export const GetAddressByIdDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetAddressById"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","alias":{"kind":"Name","value":"result"},"name":{"kind":"Name","value":"addresses"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"id_EQ"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"companiesCount"}},{"kind":"Field","name":{"kind":"Name","value":"companies"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"IntValue","value":"0"}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"IntValue","value":"20"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"CompanyInline"}}]}},{"kind":"Field","name":{"kind":"Name","value":"countriesCount"}},{"kind":"Field","name":{"kind":"Name","value":"countries"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"IntValue","value":"0"}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"IntValue","value":"20"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"CountryInline"}}]}},{"kind":"Field","name":{"kind":"Name","value":"messagesCount"}},{"kind":"Field","name":{"kind":"Name","value":"messages"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"MessageInline"}}]}},{"kind":"Field","name":{"kind":"Name","value":"peopleCount"}},{"kind":"Field","name":{"kind":"Name","value":"people"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"IntValue","value":"0"}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"IntValue","value":"20"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"PersonInline"}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"CompanyInline"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Company"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"addressesCount"}},{"kind":"Field","name":{"kind":"Name","value":"countriesCount"}},{"kind":"Field","name":{"kind":"Name","value":"messagesCount"}},{"kind":"Field","name":{"kind":"Name","value":"peopleCount"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"CountryInline"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Country"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"addressesCount"}},{"kind":"Field","name":{"kind":"Name","value":"companiesCount"}},{"kind":"Field","name":{"kind":"Name","value":"messagesCount"}},{"kind":"Field","name":{"kind":"Name","value":"peopleCount"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"MessageInline"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Message"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"year"}},{"kind":"Field","name":{"kind":"Name","value":"message"}},{"kind":"Field","name":{"kind":"Name","value":"addressesCount"}},{"kind":"Field","name":{"kind":"Name","value":"companiesCount"}},{"kind":"Field","name":{"kind":"Name","value":"companies"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"IntValue","value":"3"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"countriesCount"}},{"kind":"Field","name":{"kind":"Name","value":"peopleCount"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"PersonInline"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Person"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"addressesCount"}},{"kind":"Field","name":{"kind":"Name","value":"companiesCount"}},{"kind":"Field","name":{"kind":"Name","value":"countriesCount"}},{"kind":"Field","name":{"kind":"Name","value":"messagesCount"}}]}}]} as unknown as DocumentNode<GetAddressByIdQuery, GetAddressByIdQueryVariables>;
+export const GetAddressCompaniesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetAddressCompanies"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"limit"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","alias":{"kind":"Name","value":"result"},"name":{"kind":"Name","value":"addresses"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"id_EQ"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"companies"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"Variable","name":{"kind":"Name","value":"limit"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]}}]} as unknown as DocumentNode<GetAddressCompaniesQuery, GetAddressCompaniesQueryVariables>;
+export const GetAddressCountriesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetAddressCountries"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"limit"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","alias":{"kind":"Name","value":"result"},"name":{"kind":"Name","value":"addresses"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"id_EQ"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"countries"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"Variable","name":{"kind":"Name","value":"limit"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"CountryInline"}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"CountryInline"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Country"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"addressesCount"}},{"kind":"Field","name":{"kind":"Name","value":"companiesCount"}},{"kind":"Field","name":{"kind":"Name","value":"messagesCount"}},{"kind":"Field","name":{"kind":"Name","value":"peopleCount"}}]}}]} as unknown as DocumentNode<GetAddressCountriesQuery, GetAddressCountriesQueryVariables>;
+export const GetAddressMessagesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetAddressMessages"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"limit"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","alias":{"kind":"Name","value":"result"},"name":{"kind":"Name","value":"addresses"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"id_EQ"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"messages"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"Variable","name":{"kind":"Name","value":"limit"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"MessageInline"}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"MessageInline"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Message"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"year"}},{"kind":"Field","name":{"kind":"Name","value":"message"}},{"kind":"Field","name":{"kind":"Name","value":"addressesCount"}},{"kind":"Field","name":{"kind":"Name","value":"companiesCount"}},{"kind":"Field","name":{"kind":"Name","value":"companies"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"IntValue","value":"3"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"countriesCount"}},{"kind":"Field","name":{"kind":"Name","value":"peopleCount"}}]}}]} as unknown as DocumentNode<GetAddressMessagesQuery, GetAddressMessagesQueryVariables>;
+export const GetAddressPeopleDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetAddressPeople"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"limit"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","alias":{"kind":"Name","value":"result"},"name":{"kind":"Name","value":"addresses"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"id_EQ"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"people"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"Variable","name":{"kind":"Name","value":"limit"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"PersonInline"}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"PersonInline"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Person"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"addressesCount"}},{"kind":"Field","name":{"kind":"Name","value":"companiesCount"}},{"kind":"Field","name":{"kind":"Name","value":"countriesCount"}},{"kind":"Field","name":{"kind":"Name","value":"messagesCount"}}]}}]} as unknown as DocumentNode<GetAddressPeopleQuery, GetAddressPeopleQueryVariables>;
+export const GetCompanyByIdDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetCompanyById"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","alias":{"kind":"Name","value":"result"},"name":{"kind":"Name","value":"companies"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"id_EQ"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"addressesCount"}},{"kind":"Field","name":{"kind":"Name","value":"addresses"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"IntValue","value":"0"}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"IntValue","value":"20"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"AddressInline"}}]}},{"kind":"Field","name":{"kind":"Name","value":"countriesCount"}},{"kind":"Field","name":{"kind":"Name","value":"countries"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"IntValue","value":"0"}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"IntValue","value":"20"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"CountryInline"}}]}},{"kind":"Field","name":{"kind":"Name","value":"messagesCount"}},{"kind":"Field","name":{"kind":"Name","value":"messages"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"MessageInline"}}]}},{"kind":"Field","name":{"kind":"Name","value":"peopleCount"}},{"kind":"Field","name":{"kind":"Name","value":"people"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"IntValue","value":"0"}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"IntValue","value":"20"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"PersonInline"}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"AddressInline"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Address"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"companiesCount"}},{"kind":"Field","name":{"kind":"Name","value":"countriesCount"}},{"kind":"Field","name":{"kind":"Name","value":"messagesCount"}},{"kind":"Field","name":{"kind":"Name","value":"peopleCount"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"CountryInline"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Country"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"addressesCount"}},{"kind":"Field","name":{"kind":"Name","value":"companiesCount"}},{"kind":"Field","name":{"kind":"Name","value":"messagesCount"}},{"kind":"Field","name":{"kind":"Name","value":"peopleCount"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"MessageInline"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Message"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"year"}},{"kind":"Field","name":{"kind":"Name","value":"message"}},{"kind":"Field","name":{"kind":"Name","value":"addressesCount"}},{"kind":"Field","name":{"kind":"Name","value":"companiesCount"}},{"kind":"Field","name":{"kind":"Name","value":"companies"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"IntValue","value":"3"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"countriesCount"}},{"kind":"Field","name":{"kind":"Name","value":"peopleCount"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"PersonInline"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Person"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"addressesCount"}},{"kind":"Field","name":{"kind":"Name","value":"companiesCount"}},{"kind":"Field","name":{"kind":"Name","value":"countriesCount"}},{"kind":"Field","name":{"kind":"Name","value":"messagesCount"}}]}}]} as unknown as DocumentNode<GetCompanyByIdQuery, GetCompanyByIdQueryVariables>;
+export const GetCompanyAddressesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetCompanyAddresses"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"limit"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","alias":{"kind":"Name","value":"result"},"name":{"kind":"Name","value":"companies"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"id_EQ"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"addresses"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"Variable","name":{"kind":"Name","value":"limit"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"AddressInline"}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"AddressInline"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Address"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"companiesCount"}},{"kind":"Field","name":{"kind":"Name","value":"countriesCount"}},{"kind":"Field","name":{"kind":"Name","value":"messagesCount"}},{"kind":"Field","name":{"kind":"Name","value":"peopleCount"}}]}}]} as unknown as DocumentNode<GetCompanyAddressesQuery, GetCompanyAddressesQueryVariables>;
+export const GetCompanyCountriesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetCompanyCountries"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"limit"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","alias":{"kind":"Name","value":"result"},"name":{"kind":"Name","value":"companies"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"id_EQ"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"countries"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"Variable","name":{"kind":"Name","value":"limit"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"CountryInline"}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"CountryInline"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Country"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"addressesCount"}},{"kind":"Field","name":{"kind":"Name","value":"companiesCount"}},{"kind":"Field","name":{"kind":"Name","value":"messagesCount"}},{"kind":"Field","name":{"kind":"Name","value":"peopleCount"}}]}}]} as unknown as DocumentNode<GetCompanyCountriesQuery, GetCompanyCountriesQueryVariables>;
+export const GetCompanyMessagesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetCompanyMessages"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"limit"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","alias":{"kind":"Name","value":"result"},"name":{"kind":"Name","value":"companies"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"id_EQ"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"messages"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"Variable","name":{"kind":"Name","value":"limit"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"MessageInline"}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"MessageInline"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Message"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"year"}},{"kind":"Field","name":{"kind":"Name","value":"message"}},{"kind":"Field","name":{"kind":"Name","value":"addressesCount"}},{"kind":"Field","name":{"kind":"Name","value":"companiesCount"}},{"kind":"Field","name":{"kind":"Name","value":"companies"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"IntValue","value":"3"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"countriesCount"}},{"kind":"Field","name":{"kind":"Name","value":"peopleCount"}}]}}]} as unknown as DocumentNode<GetCompanyMessagesQuery, GetCompanyMessagesQueryVariables>;
+export const GetCompanyPeopleDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetCompanyPeople"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"limit"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","alias":{"kind":"Name","value":"result"},"name":{"kind":"Name","value":"companies"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"id_EQ"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"people"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"Variable","name":{"kind":"Name","value":"limit"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"PersonInline"}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"PersonInline"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Person"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"addressesCount"}},{"kind":"Field","name":{"kind":"Name","value":"companiesCount"}},{"kind":"Field","name":{"kind":"Name","value":"countriesCount"}},{"kind":"Field","name":{"kind":"Name","value":"messagesCount"}}]}}]} as unknown as DocumentNode<GetCompanyPeopleQuery, GetCompanyPeopleQueryVariables>;
+export const GetCountryByIdDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetCountryById"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","alias":{"kind":"Name","value":"result"},"name":{"kind":"Name","value":"countries"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"id_EQ"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"addressesCount"}},{"kind":"Field","name":{"kind":"Name","value":"addresses"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"IntValue","value":"0"}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"IntValue","value":"20"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"AddressInline"}}]}},{"kind":"Field","name":{"kind":"Name","value":"companiesCount"}},{"kind":"Field","name":{"kind":"Name","value":"companies"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"IntValue","value":"0"}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"IntValue","value":"20"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"CompanyInline"}}]}},{"kind":"Field","name":{"kind":"Name","value":"messagesCount"}},{"kind":"Field","name":{"kind":"Name","value":"messages"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"MessageInline"}}]}},{"kind":"Field","name":{"kind":"Name","value":"peopleCount"}},{"kind":"Field","name":{"kind":"Name","value":"people"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"IntValue","value":"0"}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"IntValue","value":"20"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"PersonInline"}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"AddressInline"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Address"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"companiesCount"}},{"kind":"Field","name":{"kind":"Name","value":"countriesCount"}},{"kind":"Field","name":{"kind":"Name","value":"messagesCount"}},{"kind":"Field","name":{"kind":"Name","value":"peopleCount"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"CompanyInline"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Company"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"addressesCount"}},{"kind":"Field","name":{"kind":"Name","value":"countriesCount"}},{"kind":"Field","name":{"kind":"Name","value":"messagesCount"}},{"kind":"Field","name":{"kind":"Name","value":"peopleCount"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"MessageInline"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Message"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"year"}},{"kind":"Field","name":{"kind":"Name","value":"message"}},{"kind":"Field","name":{"kind":"Name","value":"addressesCount"}},{"kind":"Field","name":{"kind":"Name","value":"companiesCount"}},{"kind":"Field","name":{"kind":"Name","value":"companies"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"IntValue","value":"3"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"countriesCount"}},{"kind":"Field","name":{"kind":"Name","value":"peopleCount"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"PersonInline"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Person"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"addressesCount"}},{"kind":"Field","name":{"kind":"Name","value":"companiesCount"}},{"kind":"Field","name":{"kind":"Name","value":"countriesCount"}},{"kind":"Field","name":{"kind":"Name","value":"messagesCount"}}]}}]} as unknown as DocumentNode<GetCountryByIdQuery, GetCountryByIdQueryVariables>;
+export const GetCountryCompaniesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetCountryCompanies"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"limit"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","alias":{"kind":"Name","value":"result"},"name":{"kind":"Name","value":"countries"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"id_EQ"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"companies"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"Variable","name":{"kind":"Name","value":"limit"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"CompanyInline"}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"CompanyInline"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Company"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"addressesCount"}},{"kind":"Field","name":{"kind":"Name","value":"countriesCount"}},{"kind":"Field","name":{"kind":"Name","value":"messagesCount"}},{"kind":"Field","name":{"kind":"Name","value":"peopleCount"}}]}}]} as unknown as DocumentNode<GetCountryCompaniesQuery, GetCountryCompaniesQueryVariables>;
+export const GetCountryCountriesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetCountryCountries"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"limit"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","alias":{"kind":"Name","value":"result"},"name":{"kind":"Name","value":"countries"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"id_EQ"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"addresses"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"Variable","name":{"kind":"Name","value":"limit"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"AddressInline"}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"AddressInline"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Address"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"companiesCount"}},{"kind":"Field","name":{"kind":"Name","value":"countriesCount"}},{"kind":"Field","name":{"kind":"Name","value":"messagesCount"}},{"kind":"Field","name":{"kind":"Name","value":"peopleCount"}}]}}]} as unknown as DocumentNode<GetCountryCountriesQuery, GetCountryCountriesQueryVariables>;
+export const GetCountryMessagesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetCountryMessages"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"limit"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","alias":{"kind":"Name","value":"result"},"name":{"kind":"Name","value":"countries"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"id_EQ"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"messages"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"Variable","name":{"kind":"Name","value":"limit"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"MessageInline"}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"MessageInline"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Message"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"year"}},{"kind":"Field","name":{"kind":"Name","value":"message"}},{"kind":"Field","name":{"kind":"Name","value":"addressesCount"}},{"kind":"Field","name":{"kind":"Name","value":"companiesCount"}},{"kind":"Field","name":{"kind":"Name","value":"companies"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"IntValue","value":"3"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"countriesCount"}},{"kind":"Field","name":{"kind":"Name","value":"peopleCount"}}]}}]} as unknown as DocumentNode<GetCountryMessagesQuery, GetCountryMessagesQueryVariables>;
+export const GetCountryPeopleDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetCountryPeople"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"limit"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","alias":{"kind":"Name","value":"result"},"name":{"kind":"Name","value":"countries"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"id_EQ"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"people"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"Variable","name":{"kind":"Name","value":"limit"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"PersonInline"}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"PersonInline"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Person"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"addressesCount"}},{"kind":"Field","name":{"kind":"Name","value":"companiesCount"}},{"kind":"Field","name":{"kind":"Name","value":"countriesCount"}},{"kind":"Field","name":{"kind":"Name","value":"messagesCount"}}]}}]} as unknown as DocumentNode<GetCountryPeopleQuery, GetCountryPeopleQueryVariables>;
+export const GetMessageByIdDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetMessageById"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","alias":{"kind":"Name","value":"result"},"name":{"kind":"Name","value":"messages"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"id_EQ"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"year"}},{"kind":"Field","name":{"kind":"Name","value":"message"}},{"kind":"Field","name":{"kind":"Name","value":"addressesCount"}},{"kind":"Field","name":{"kind":"Name","value":"addresses"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"IntValue","value":"0"}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"IntValue","value":"20"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"AddressInline"}}]}},{"kind":"Field","name":{"kind":"Name","value":"companiesCount"}},{"kind":"Field","name":{"kind":"Name","value":"companies"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"IntValue","value":"0"}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"IntValue","value":"20"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"CompanyInline"}}]}},{"kind":"Field","name":{"kind":"Name","value":"countriesCount"}},{"kind":"Field","name":{"kind":"Name","value":"countries"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"IntValue","value":"0"}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"IntValue","value":"20"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"CountryInline"}}]}},{"kind":"Field","name":{"kind":"Name","value":"peopleCount"}},{"kind":"Field","name":{"kind":"Name","value":"people"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"IntValue","value":"0"}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"IntValue","value":"20"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"PersonInline"}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"AddressInline"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Address"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"companiesCount"}},{"kind":"Field","name":{"kind":"Name","value":"countriesCount"}},{"kind":"Field","name":{"kind":"Name","value":"messagesCount"}},{"kind":"Field","name":{"kind":"Name","value":"peopleCount"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"CompanyInline"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Company"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"addressesCount"}},{"kind":"Field","name":{"kind":"Name","value":"countriesCount"}},{"kind":"Field","name":{"kind":"Name","value":"messagesCount"}},{"kind":"Field","name":{"kind":"Name","value":"peopleCount"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"CountryInline"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Country"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"addressesCount"}},{"kind":"Field","name":{"kind":"Name","value":"companiesCount"}},{"kind":"Field","name":{"kind":"Name","value":"messagesCount"}},{"kind":"Field","name":{"kind":"Name","value":"peopleCount"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"PersonInline"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Person"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"addressesCount"}},{"kind":"Field","name":{"kind":"Name","value":"companiesCount"}},{"kind":"Field","name":{"kind":"Name","value":"countriesCount"}},{"kind":"Field","name":{"kind":"Name","value":"messagesCount"}}]}}]} as unknown as DocumentNode<GetMessageByIdQuery, GetMessageByIdQueryVariables>;
+export const GetMessageCompaniesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetMessageCompanies"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"limit"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","alias":{"kind":"Name","value":"result"},"name":{"kind":"Name","value":"messages"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"id_EQ"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"companies"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"Variable","name":{"kind":"Name","value":"limit"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"CompanyInline"}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"CompanyInline"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Company"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"addressesCount"}},{"kind":"Field","name":{"kind":"Name","value":"countriesCount"}},{"kind":"Field","name":{"kind":"Name","value":"messagesCount"}},{"kind":"Field","name":{"kind":"Name","value":"peopleCount"}}]}}]} as unknown as DocumentNode<GetMessageCompaniesQuery, GetMessageCompaniesQueryVariables>;
+export const GetMessageCountriesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetMessageCountries"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"limit"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","alias":{"kind":"Name","value":"result"},"name":{"kind":"Name","value":"messages"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"id_EQ"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"addresses"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"Variable","name":{"kind":"Name","value":"limit"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"AddressInline"}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"AddressInline"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Address"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"companiesCount"}},{"kind":"Field","name":{"kind":"Name","value":"countriesCount"}},{"kind":"Field","name":{"kind":"Name","value":"messagesCount"}},{"kind":"Field","name":{"kind":"Name","value":"peopleCount"}}]}}]} as unknown as DocumentNode<GetMessageCountriesQuery, GetMessageCountriesQueryVariables>;
+export const GetMessageMessagesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetMessageMessages"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"limit"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","alias":{"kind":"Name","value":"result"},"name":{"kind":"Name","value":"messages"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"id_EQ"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"people"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"Variable","name":{"kind":"Name","value":"limit"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"PersonInline"}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"PersonInline"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Person"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"addressesCount"}},{"kind":"Field","name":{"kind":"Name","value":"companiesCount"}},{"kind":"Field","name":{"kind":"Name","value":"countriesCount"}},{"kind":"Field","name":{"kind":"Name","value":"messagesCount"}}]}}]} as unknown as DocumentNode<GetMessageMessagesQuery, GetMessageMessagesQueryVariables>;
+export const GetMessagePeopleDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetMessagePeople"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"limit"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","alias":{"kind":"Name","value":"result"},"name":{"kind":"Name","value":"messages"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"id_EQ"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"countries"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"Variable","name":{"kind":"Name","value":"limit"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"CountryInline"}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"CountryInline"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Country"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"addressesCount"}},{"kind":"Field","name":{"kind":"Name","value":"companiesCount"}},{"kind":"Field","name":{"kind":"Name","value":"messagesCount"}},{"kind":"Field","name":{"kind":"Name","value":"peopleCount"}}]}}]} as unknown as DocumentNode<GetMessagePeopleQuery, GetMessagePeopleQueryVariables>;
+export const GetPersonByIdDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetPersonById"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","alias":{"kind":"Name","value":"result"},"name":{"kind":"Name","value":"people"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"id_EQ"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"addressesCount"}},{"kind":"Field","name":{"kind":"Name","value":"addresses"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"IntValue","value":"0"}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"IntValue","value":"20"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"AddressInline"}}]}},{"kind":"Field","name":{"kind":"Name","value":"companiesCount"}},{"kind":"Field","name":{"kind":"Name","value":"companies"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"IntValue","value":"0"}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"IntValue","value":"20"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"CompanyInline"}}]}},{"kind":"Field","name":{"kind":"Name","value":"countriesCount"}},{"kind":"Field","name":{"kind":"Name","value":"countries"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"IntValue","value":"0"}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"IntValue","value":"20"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"CountryInline"}}]}},{"kind":"Field","name":{"kind":"Name","value":"messagesCount"}},{"kind":"Field","name":{"kind":"Name","value":"messages"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"MessageInline"}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"AddressInline"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Address"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"companiesCount"}},{"kind":"Field","name":{"kind":"Name","value":"countriesCount"}},{"kind":"Field","name":{"kind":"Name","value":"messagesCount"}},{"kind":"Field","name":{"kind":"Name","value":"peopleCount"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"CompanyInline"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Company"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"addressesCount"}},{"kind":"Field","name":{"kind":"Name","value":"countriesCount"}},{"kind":"Field","name":{"kind":"Name","value":"messagesCount"}},{"kind":"Field","name":{"kind":"Name","value":"peopleCount"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"CountryInline"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Country"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"addressesCount"}},{"kind":"Field","name":{"kind":"Name","value":"companiesCount"}},{"kind":"Field","name":{"kind":"Name","value":"messagesCount"}},{"kind":"Field","name":{"kind":"Name","value":"peopleCount"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"MessageInline"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Message"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"year"}},{"kind":"Field","name":{"kind":"Name","value":"message"}},{"kind":"Field","name":{"kind":"Name","value":"addressesCount"}},{"kind":"Field","name":{"kind":"Name","value":"companiesCount"}},{"kind":"Field","name":{"kind":"Name","value":"companies"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"IntValue","value":"3"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"countriesCount"}},{"kind":"Field","name":{"kind":"Name","value":"peopleCount"}}]}}]} as unknown as DocumentNode<GetPersonByIdQuery, GetPersonByIdQueryVariables>;
+export const GetPersonCompaniesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetPersonCompanies"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"limit"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","alias":{"kind":"Name","value":"result"},"name":{"kind":"Name","value":"people"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"id_EQ"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"companies"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"Variable","name":{"kind":"Name","value":"limit"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"CompanyInline"}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"CompanyInline"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Company"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"addressesCount"}},{"kind":"Field","name":{"kind":"Name","value":"countriesCount"}},{"kind":"Field","name":{"kind":"Name","value":"messagesCount"}},{"kind":"Field","name":{"kind":"Name","value":"peopleCount"}}]}}]} as unknown as DocumentNode<GetPersonCompaniesQuery, GetPersonCompaniesQueryVariables>;
+export const GetPersonCountriesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetPersonCountries"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"limit"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","alias":{"kind":"Name","value":"result"},"name":{"kind":"Name","value":"people"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"id_EQ"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"addresses"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"Variable","name":{"kind":"Name","value":"limit"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"AddressInline"}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"AddressInline"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Address"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"companiesCount"}},{"kind":"Field","name":{"kind":"Name","value":"countriesCount"}},{"kind":"Field","name":{"kind":"Name","value":"messagesCount"}},{"kind":"Field","name":{"kind":"Name","value":"peopleCount"}}]}}]} as unknown as DocumentNode<GetPersonCountriesQuery, GetPersonCountriesQueryVariables>;
+export const GetPersonMessagesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetPersonMessages"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"limit"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","alias":{"kind":"Name","value":"result"},"name":{"kind":"Name","value":"people"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"id_EQ"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"messages"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"Variable","name":{"kind":"Name","value":"limit"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"MessageInline"}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"MessageInline"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Message"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"year"}},{"kind":"Field","name":{"kind":"Name","value":"message"}},{"kind":"Field","name":{"kind":"Name","value":"addressesCount"}},{"kind":"Field","name":{"kind":"Name","value":"companiesCount"}},{"kind":"Field","name":{"kind":"Name","value":"companies"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"IntValue","value":"3"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"countriesCount"}},{"kind":"Field","name":{"kind":"Name","value":"peopleCount"}}]}}]} as unknown as DocumentNode<GetPersonMessagesQuery, GetPersonMessagesQueryVariables>;
+export const GetPersonPeopleDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetPersonPeople"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"limit"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","alias":{"kind":"Name","value":"result"},"name":{"kind":"Name","value":"people"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"id_EQ"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"countries"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"Variable","name":{"kind":"Name","value":"limit"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"CountryInline"}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"CountryInline"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Country"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"addressesCount"}},{"kind":"Field","name":{"kind":"Name","value":"companiesCount"}},{"kind":"Field","name":{"kind":"Name","value":"messagesCount"}},{"kind":"Field","name":{"kind":"Name","value":"peopleCount"}}]}}]} as unknown as DocumentNode<GetPersonPeopleQuery, GetPersonPeopleQueryVariables>;
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
-  ID: { input: string; output: string };
-  String: { input: string; output: string };
-  Boolean: { input: boolean; output: boolean };
-  Int: { input: number; output: number };
-  Float: { input: number; output: number };
+  ID: { input: string; output: string; }
+  String: { input: string; output: string; }
+  Boolean: { input: boolean; output: boolean; }
+  Int: { input: number; output: number; }
+  Float: { input: number; output: number; }
 };
 
 export type Address = {
@@ -4403,20 +1195,24 @@ export type Address = {
   peopleCount: Scalars['Int']['output'];
 };
 
+
 export type AddressCompaniesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   skip?: InputMaybe<Scalars['Int']['input']>;
 };
+
 
 export type AddressCountriesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   skip?: InputMaybe<Scalars['Int']['input']>;
 };
 
+
 export type AddressMessagesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   skip?: InputMaybe<Scalars['Int']['input']>;
 };
+
 
 export type AddressPeopleArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
@@ -4428,12 +1224,6 @@ export type AddressEdge = {
   cursor: Scalars['String']['output'];
   node: Address;
 };
-
-export enum AddressMetadata {
-  Company = 'company',
-  Country = 'country',
-  People = 'people',
-}
 
 export type AddressOptions = {
   limit?: InputMaybe<Scalars['Int']['input']>;
@@ -4499,6 +1289,28 @@ export type AddressesConnection = {
   totalCount: Scalars['Int']['output'];
 };
 
+export type AggregateResults = {
+  __typename?: 'AggregateResults';
+  total: Scalars['Int']['output'];
+  values: Array<AggregateValue>;
+};
+
+export type AggregateValue = {
+  __typename?: 'AggregateValue';
+  count: Scalars['Int']['output'];
+  id: Scalars['String']['output'];
+  label: Scalars['String']['output'];
+};
+
+export enum AggregationFields {
+  Addresses = 'addresses',
+  Companies = 'companies',
+  Countries = 'countries',
+  People = 'people',
+  Year = 'year',
+  Years = 'years'
+}
+
 export type CompaniesConnection = {
   __typename?: 'CompaniesConnection';
   edges: Array<CompanyEdge>;
@@ -4520,20 +1332,24 @@ export type Company = {
   peopleCount: Scalars['Int']['output'];
 };
 
+
 export type CompanyAddressesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   skip?: InputMaybe<Scalars['Int']['input']>;
 };
+
 
 export type CompanyCountriesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   skip?: InputMaybe<Scalars['Int']['input']>;
 };
 
+
 export type CompanyMessagesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   skip?: InputMaybe<Scalars['Int']['input']>;
 };
+
 
 export type CompanyPeopleArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
@@ -4545,12 +1361,6 @@ export type CompanyEdge = {
   cursor: Scalars['String']['output'];
   node: Company;
 };
-
-export enum CompanyMetadata {
-  Address = 'address',
-  Country = 'country',
-  People = 'people',
-}
 
 export type CompanyOptions = {
   limit?: InputMaybe<Scalars['Int']['input']>;
@@ -4614,12 +1424,6 @@ export type ContentFilter = {
   type: FilterTypes;
 };
 
-export type CountResult = {
-  __typename?: 'CountResult';
-  byYear?: Maybe<Array<Maybe<YearCountResult>>>;
-  total: Scalars['Int']['output'];
-};
-
 export type CountriesConnection = {
   __typename?: 'CountriesConnection';
   edges: Array<CountryEdge>;
@@ -4641,20 +1445,24 @@ export type Country = {
   peopleCount: Scalars['Int']['output'];
 };
 
+
 export type CountryAddressesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   skip?: InputMaybe<Scalars['Int']['input']>;
 };
+
 
 export type CountryCompaniesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   skip?: InputMaybe<Scalars['Int']['input']>;
 };
 
+
 export type CountryMessagesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   skip?: InputMaybe<Scalars['Int']['input']>;
 };
+
 
 export type CountryPeopleArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
@@ -4666,12 +1474,6 @@ export type CountryEdge = {
   cursor: Scalars['String']['output'];
   node: Country;
 };
-
-export enum CountryMetadata {
-  Address = 'address',
-  Company = 'company',
-  People = 'people',
-}
 
 export type CountryOptions = {
   limit?: InputMaybe<Scalars['Int']['input']>;
@@ -4735,7 +1537,7 @@ export enum DataItemType {
   Company = 'company',
   Country = 'country',
   Message = 'message',
-  Person = 'person',
+  Person = 'person'
 }
 
 export type DateFilter = {
@@ -4746,7 +1548,7 @@ export type DateFilter = {
 
 export enum EsSortDirection {
   Asc = 'asc',
-  Desc = 'desc',
+  Desc = 'desc'
 }
 
 export enum FilterTypes {
@@ -4755,7 +1557,7 @@ export enum FilterTypes {
   Content = 'content',
   Date = 'date',
   Keywords = 'keywords',
-  Number = 'number',
+  Number = 'number'
 }
 
 export type ImportReport = {
@@ -4791,20 +1593,24 @@ export type Message = {
   year: Scalars['Int']['output'];
 };
 
+
 export type MessageAddressesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   skip?: InputMaybe<Scalars['Int']['input']>;
 };
+
 
 export type MessageCompaniesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   skip?: InputMaybe<Scalars['Int']['input']>;
 };
 
+
 export type MessageCountriesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   skip?: InputMaybe<Scalars['Int']['input']>;
 };
+
 
 export type MessagePeopleArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
@@ -4816,13 +1622,6 @@ export type MessageEdge = {
   cursor: Scalars['String']['output'];
   node: Message;
 };
-
-export enum MessageMetadata {
-  Address = 'address',
-  Company = 'company',
-  Country = 'country',
-  People = 'people',
-}
 
 export type MessageOptions = {
   limit?: InputMaybe<Scalars['Int']['input']>;
@@ -4950,11 +1749,13 @@ export type Mutation = {
   splitNode: Array<NodeItem>;
 };
 
+
 export type MutationChangeTypeArgs = {
   id: Scalars['ID']['input'];
   newType: DataItemType;
   type: DataItemType;
 };
+
 
 export type MutationCreateNodeArgs = {
   messageId: Scalars['ID']['input'];
@@ -4962,14 +1763,17 @@ export type MutationCreateNodeArgs = {
   type: DataItemType;
 };
 
+
 export type MutationDeleteNodeArgs = {
   id: Scalars['ID']['input'];
   type: DataItemType;
 };
 
+
 export type MutationImportArgs = {
   fileNamePattern?: InputMaybe<Scalars['String']['input']>;
 };
+
 
 export type MutationMergeNodesArgs = {
   name: Scalars['String']['input'];
@@ -4977,11 +1781,13 @@ export type MutationMergeNodesArgs = {
   type: DataItemType;
 };
 
+
 export type MutationRenameNodeArgs = {
   id: Scalars['ID']['input'];
   name: Scalars['String']['input'];
   type: DataItemType;
 };
+
 
 export type MutationSplitNodeArgs = {
   id: Scalars['ID']['input'];
@@ -5012,12 +1818,6 @@ export type PeopleConnection = {
   totalCount: Scalars['Int']['output'];
 };
 
-export enum PeopleMetadata {
-  Address = 'address',
-  Company = 'company',
-  Country = 'country',
-}
-
 export type Person = {
   __typename?: 'Person';
   addresses: Array<Address>;
@@ -5032,20 +1832,24 @@ export type Person = {
   name: Scalars['String']['output'];
 };
 
+
 export type PersonAddressesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   skip?: InputMaybe<Scalars['Int']['input']>;
 };
+
 
 export type PersonCompaniesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   skip?: InputMaybe<Scalars['Int']['input']>;
 };
 
+
 export type PersonCountriesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   skip?: InputMaybe<Scalars['Int']['input']>;
 };
+
 
 export type PersonMessagesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
@@ -5124,14 +1928,9 @@ export type Query = {
   _getPersonItems: Array<Person>;
   addresses: Array<Address>;
   addressesConnection: AddressesConnection;
+  aggregate: AggregateResults;
   companies: Array<Company>;
   companiesConnection: CompaniesConnection;
-  countAddress?: Maybe<CountResult>;
-  countCompany?: Maybe<CountResult>;
-  countCountry?: Maybe<CountResult>;
-  /** Count Items respecting a set of filters, option to add count by year */
-  countMessage?: Maybe<CountResult>;
-  countPeople?: Maybe<CountResult>;
   countries: Array<Country>;
   countriesConnection: CountriesConnection;
   messages: Array<Message>;
@@ -5141,13 +1940,8 @@ export type Query = {
   scroll?: Maybe<SearchResults>;
   /** Search for Items using a set of filters */
   search?: Maybe<SearchResults>;
-  topAddressMetadata?: Maybe<Array<Maybe<TopValue>>>;
-  topCompanyMetadata?: Maybe<Array<Maybe<TopValue>>>;
-  topCountryMetadata?: Maybe<Array<Maybe<TopValue>>>;
-  /** Retrieve Top metadata values in Items which respect a set of filters */
-  topMessageMetadata?: Maybe<Array<Maybe<TopValue>>>;
-  topPeopleMetadata?: Maybe<Array<Maybe<TopValue>>>;
 };
+
 
 export type QueryAddressesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
@@ -5156,12 +1950,24 @@ export type QueryAddressesArgs = {
   where?: InputMaybe<AddressWhere>;
 };
 
+
 export type QueryAddressesConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<AddressSort>>;
   where?: InputMaybe<AddressWhere>;
 };
+
+
+export type QueryAggregateArgs = {
+  field: AggregationFields;
+  filters?: InputMaybe<SearchFilters>;
+  includes?: InputMaybe<Scalars['String']['input']>;
+  itemType: DataItemType;
+  query?: InputMaybe<Scalars['String']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
+};
+
 
 export type QueryCompaniesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
@@ -5170,6 +1976,7 @@ export type QueryCompaniesArgs = {
   where?: InputMaybe<CompanyWhere>;
 };
 
+
 export type QueryCompaniesConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -5177,30 +1984,6 @@ export type QueryCompaniesConnectionArgs = {
   where?: InputMaybe<CompanyWhere>;
 };
 
-export type QueryCountAddressArgs = {
-  byYear?: InputMaybe<Scalars['Boolean']['input']>;
-  filters: SearchFilters;
-};
-
-export type QueryCountCompanyArgs = {
-  byYear?: InputMaybe<Scalars['Boolean']['input']>;
-  filters: SearchFilters;
-};
-
-export type QueryCountCountryArgs = {
-  byYear?: InputMaybe<Scalars['Boolean']['input']>;
-  filters: SearchFilters;
-};
-
-export type QueryCountMessageArgs = {
-  byYear?: InputMaybe<Scalars['Boolean']['input']>;
-  filters: SearchFilters;
-};
-
-export type QueryCountPeopleArgs = {
-  byYear?: InputMaybe<Scalars['Boolean']['input']>;
-  filters: SearchFilters;
-};
 
 export type QueryCountriesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
@@ -5209,12 +1992,14 @@ export type QueryCountriesArgs = {
   where?: InputMaybe<CountryWhere>;
 };
 
+
 export type QueryCountriesConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<CountrySort>>;
   where?: InputMaybe<CountryWhere>;
 };
+
 
 export type QueryMessagesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
@@ -5223,12 +2008,14 @@ export type QueryMessagesArgs = {
   where?: InputMaybe<MessageWhere>;
 };
 
+
 export type QueryMessagesConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<MessageSort>>;
   where?: InputMaybe<MessageWhere>;
 };
+
 
 export type QueryPeopleArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
@@ -5237,6 +2024,7 @@ export type QueryPeopleArgs = {
   where?: InputMaybe<PersonWhere>;
 };
 
+
 export type QueryPeopleConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -5244,11 +2032,13 @@ export type QueryPeopleConnectionArgs = {
   where?: InputMaybe<PersonWhere>;
 };
 
+
 export type QueryScrollArgs = {
   itemType: DataItemType;
   scrollId: Scalars['String']['input'];
   scrollTimeout?: InputMaybe<Scalars['String']['input']>;
 };
+
 
 export type QuerySearchArgs = {
   filters: SearchFilters;
@@ -5257,36 +2047,6 @@ export type QuerySearchArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   scrollTimeout?: InputMaybe<Scalars['String']['input']>;
   sortBy?: InputMaybe<Array<InputMaybe<SortBy>>>;
-};
-
-export type QueryTopAddressMetadataArgs = {
-  filters: SearchFilters;
-  limit: Scalars['Int']['input'];
-  metadataModel: AddressMetadata;
-};
-
-export type QueryTopCompanyMetadataArgs = {
-  filters: SearchFilters;
-  limit: Scalars['Int']['input'];
-  metadataModel: CompanyMetadata;
-};
-
-export type QueryTopCountryMetadataArgs = {
-  filters: SearchFilters;
-  limit: Scalars['Int']['input'];
-  metadataModel: CountryMetadata;
-};
-
-export type QueryTopMessageMetadataArgs = {
-  filters: SearchFilters;
-  limit: Scalars['Int']['input'];
-  metadataModel: MessageMetadata;
-};
-
-export type QueryTopPeopleMetadataArgs = {
-  filters: SearchFilters;
-  limit: Scalars['Int']['input'];
-  metadataModel: PeopleMetadata;
 };
 
 export type SearchFilters = {
@@ -5319,70 +2079,25 @@ export enum SortDirection {
   /** Sort by field values in ascending order. */
   Asc = 'ASC',
   /** Sort by field values in descending order. */
-  Desc = 'DESC',
+  Desc = 'DESC'
 }
 
-export type TopValue = {
-  __typename?: 'TopValue';
-  count: Scalars['Int']['output'];
-  id: Scalars['String']['output'];
-  label: Scalars['String']['output'];
-};
+export type AddressInlineFragment = { __typename?: 'Address', id: string, name: string, companiesCount: number, countriesCount: number, messagesCount: number, peopleCount: number };
 
-export type YearCountResult = {
-  __typename?: 'YearCountResult';
-  count?: Maybe<Scalars['Int']['output']>;
-  year?: Maybe<Scalars['Int']['output']>;
-};
+export type CompanyInlineFragment = { __typename?: 'Company', id: string, name: string, addressesCount: number, countriesCount: number, messagesCount: number, peopleCount: number };
 
-export type AddressInlineFragment = { __typename?: 'Address'; id: string; name: string };
+export type CountryInlineFragment = { __typename?: 'Country', id: string, name: string, addressesCount: number, companiesCount: number, messagesCount: number, peopleCount: number };
 
-export type CompanyInlineFragment = { __typename?: 'Company'; id: string; name: string };
+export type MessageInlineFragment = { __typename?: 'Message', id: string, year: number, message: string, addressesCount: number, companiesCount: number, countriesCount: number, peopleCount: number, companies: Array<{ __typename?: 'Company', name: string }> };
 
-export type CountryInlineFragment = { __typename?: 'Country'; id: string; name: string };
-
-export type MessageInlineFragment = {
-  __typename?: 'Message';
-  id: string;
-  year: number;
-  message: string;
-  addressesCount: number;
-  companiesCount: number;
-  countriesCount: number;
-  peopleCount: number;
-};
-
-export type PersonInlineFragment = { __typename?: 'Person'; id: string; name: string };
+export type PersonInlineFragment = { __typename?: 'Person', id: string, name: string, addressesCount: number, companiesCount: number, countriesCount: number, messagesCount: number };
 
 export type GetAddressByIdQueryVariables = Exact<{
   id: Scalars['ID']['input'];
 }>;
 
-export type GetAddressByIdQuery = {
-  __typename?: 'Query';
-  result: Array<{
-    __typename?: 'Address';
-    id: string;
-    name: string;
-    companiesCount: number;
-    countriesCount: number;
-    messagesCount: number;
-    peopleCount: number;
-    companies: Array<{ __typename?: 'Company'; id: string; name: string }>;
-    countries: Array<{ __typename?: 'Country'; id: string; name: string }>;
-    messages: Array<{
-      __typename?: 'Message';
-      id: string;
-      year: number;
-      message: string;
-      addressesCount: number;
-      companiesCount: number;
-      countriesCount: number;
-      peopleCount: number;
-    }>;
-    people: Array<{ __typename?: 'Person'; id: string; name: string }>;
-  }>;
-};
+
+export type GetAddressByIdQuery = { __typename?: 'Query', result: Array<{ __typename?: 'Address', id: string, name: string, companiesCount: number, countriesCount: number, messagesCount: number, peopleCount: number, companies: Array<{ __typename?: 'Company', id: string, name: string, addressesCount: number, countriesCount: number, messagesCount: number, peopleCount: number }>, countries: Array<{ __typename?: 'Country', id: string, name: string, addressesCount: number, companiesCount: number, messagesCount: number, peopleCount: number }>, messages: Array<{ __typename?: 'Message', id: string, year: number, message: string, addressesCount: number, companiesCount: number, countriesCount: number, peopleCount: number, companies: Array<{ __typename?: 'Company', name: string }> }>, people: Array<{ __typename?: 'Person', id: string, name: string, addressesCount: number, companiesCount: number, countriesCount: number, messagesCount: number }> }> };
 
 export type GetAddressCompaniesQueryVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -5390,13 +2105,8 @@ export type GetAddressCompaniesQueryVariables = Exact<{
   limit?: InputMaybe<Scalars['Int']['input']>;
 }>;
 
-export type GetAddressCompaniesQuery = {
-  __typename?: 'Query';
-  result: Array<{
-    __typename?: 'Address';
-    companies: Array<{ __typename?: 'Company'; id: string; name: string }>;
-  }>;
-};
+
+export type GetAddressCompaniesQuery = { __typename?: 'Query', result: Array<{ __typename?: 'Address', companies: Array<{ __typename?: 'Company', id: string, name: string }> }> };
 
 export type GetAddressCountriesQueryVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -5404,13 +2114,8 @@ export type GetAddressCountriesQueryVariables = Exact<{
   limit?: InputMaybe<Scalars['Int']['input']>;
 }>;
 
-export type GetAddressCountriesQuery = {
-  __typename?: 'Query';
-  result: Array<{
-    __typename?: 'Address';
-    countries: Array<{ __typename?: 'Country'; id: string; name: string }>;
-  }>;
-};
+
+export type GetAddressCountriesQuery = { __typename?: 'Query', result: Array<{ __typename?: 'Address', countries: Array<{ __typename?: 'Country', id: string, name: string, addressesCount: number, companiesCount: number, messagesCount: number, peopleCount: number }> }> };
 
 export type GetAddressMessagesQueryVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -5418,22 +2123,8 @@ export type GetAddressMessagesQueryVariables = Exact<{
   limit?: InputMaybe<Scalars['Int']['input']>;
 }>;
 
-export type GetAddressMessagesQuery = {
-  __typename?: 'Query';
-  result: Array<{
-    __typename?: 'Address';
-    messages: Array<{
-      __typename?: 'Message';
-      id: string;
-      year: number;
-      message: string;
-      addressesCount: number;
-      companiesCount: number;
-      countriesCount: number;
-      peopleCount: number;
-    }>;
-  }>;
-};
+
+export type GetAddressMessagesQuery = { __typename?: 'Query', result: Array<{ __typename?: 'Address', messages: Array<{ __typename?: 'Message', id: string, year: number, message: string, addressesCount: number, companiesCount: number, countriesCount: number, peopleCount: number, companies: Array<{ __typename?: 'Company', name: string }> }> }> };
 
 export type GetAddressPeopleQueryVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -5441,43 +2132,15 @@ export type GetAddressPeopleQueryVariables = Exact<{
   limit?: InputMaybe<Scalars['Int']['input']>;
 }>;
 
-export type GetAddressPeopleQuery = {
-  __typename?: 'Query';
-  result: Array<{
-    __typename?: 'Address';
-    people: Array<{ __typename?: 'Person'; id: string; name: string }>;
-  }>;
-};
+
+export type GetAddressPeopleQuery = { __typename?: 'Query', result: Array<{ __typename?: 'Address', people: Array<{ __typename?: 'Person', id: string, name: string, addressesCount: number, companiesCount: number, countriesCount: number, messagesCount: number }> }> };
 
 export type GetCompanyByIdQueryVariables = Exact<{
   id: Scalars['ID']['input'];
 }>;
 
-export type GetCompanyByIdQuery = {
-  __typename?: 'Query';
-  result: Array<{
-    __typename?: 'Company';
-    id: string;
-    name: string;
-    addressesCount: number;
-    countriesCount: number;
-    messagesCount: number;
-    peopleCount: number;
-    addresses: Array<{ __typename?: 'Address'; id: string; name: string }>;
-    countries: Array<{ __typename?: 'Country'; id: string; name: string }>;
-    messages: Array<{
-      __typename?: 'Message';
-      id: string;
-      year: number;
-      message: string;
-      addressesCount: number;
-      companiesCount: number;
-      countriesCount: number;
-      peopleCount: number;
-    }>;
-    people: Array<{ __typename?: 'Person'; id: string; name: string }>;
-  }>;
-};
+
+export type GetCompanyByIdQuery = { __typename?: 'Query', result: Array<{ __typename?: 'Company', id: string, name: string, addressesCount: number, countriesCount: number, messagesCount: number, peopleCount: number, addresses: Array<{ __typename?: 'Address', id: string, name: string, companiesCount: number, countriesCount: number, messagesCount: number, peopleCount: number }>, countries: Array<{ __typename?: 'Country', id: string, name: string, addressesCount: number, companiesCount: number, messagesCount: number, peopleCount: number }>, messages: Array<{ __typename?: 'Message', id: string, year: number, message: string, addressesCount: number, companiesCount: number, countriesCount: number, peopleCount: number, companies: Array<{ __typename?: 'Company', name: string }> }>, people: Array<{ __typename?: 'Person', id: string, name: string, addressesCount: number, companiesCount: number, countriesCount: number, messagesCount: number }> }> };
 
 export type GetCompanyAddressesQueryVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -5485,13 +2148,8 @@ export type GetCompanyAddressesQueryVariables = Exact<{
   limit?: InputMaybe<Scalars['Int']['input']>;
 }>;
 
-export type GetCompanyAddressesQuery = {
-  __typename?: 'Query';
-  result: Array<{
-    __typename?: 'Company';
-    addresses: Array<{ __typename?: 'Address'; id: string; name: string }>;
-  }>;
-};
+
+export type GetCompanyAddressesQuery = { __typename?: 'Query', result: Array<{ __typename?: 'Company', addresses: Array<{ __typename?: 'Address', id: string, name: string, companiesCount: number, countriesCount: number, messagesCount: number, peopleCount: number }> }> };
 
 export type GetCompanyCountriesQueryVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -5499,13 +2157,8 @@ export type GetCompanyCountriesQueryVariables = Exact<{
   limit?: InputMaybe<Scalars['Int']['input']>;
 }>;
 
-export type GetCompanyCountriesQuery = {
-  __typename?: 'Query';
-  result: Array<{
-    __typename?: 'Company';
-    countries: Array<{ __typename?: 'Country'; id: string; name: string }>;
-  }>;
-};
+
+export type GetCompanyCountriesQuery = { __typename?: 'Query', result: Array<{ __typename?: 'Company', countries: Array<{ __typename?: 'Country', id: string, name: string, addressesCount: number, companiesCount: number, messagesCount: number, peopleCount: number }> }> };
 
 export type GetCompanyMessagesQueryVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -5513,22 +2166,8 @@ export type GetCompanyMessagesQueryVariables = Exact<{
   limit?: InputMaybe<Scalars['Int']['input']>;
 }>;
 
-export type GetCompanyMessagesQuery = {
-  __typename?: 'Query';
-  result: Array<{
-    __typename?: 'Company';
-    messages: Array<{
-      __typename?: 'Message';
-      id: string;
-      year: number;
-      message: string;
-      addressesCount: number;
-      companiesCount: number;
-      countriesCount: number;
-      peopleCount: number;
-    }>;
-  }>;
-};
+
+export type GetCompanyMessagesQuery = { __typename?: 'Query', result: Array<{ __typename?: 'Company', messages: Array<{ __typename?: 'Message', id: string, year: number, message: string, addressesCount: number, companiesCount: number, countriesCount: number, peopleCount: number, companies: Array<{ __typename?: 'Company', name: string }> }> }> };
 
 export type GetCompanyPeopleQueryVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -5536,43 +2175,15 @@ export type GetCompanyPeopleQueryVariables = Exact<{
   limit?: InputMaybe<Scalars['Int']['input']>;
 }>;
 
-export type GetCompanyPeopleQuery = {
-  __typename?: 'Query';
-  result: Array<{
-    __typename?: 'Company';
-    people: Array<{ __typename?: 'Person'; id: string; name: string }>;
-  }>;
-};
+
+export type GetCompanyPeopleQuery = { __typename?: 'Query', result: Array<{ __typename?: 'Company', people: Array<{ __typename?: 'Person', id: string, name: string, addressesCount: number, companiesCount: number, countriesCount: number, messagesCount: number }> }> };
 
 export type GetCountryByIdQueryVariables = Exact<{
   id: Scalars['ID']['input'];
 }>;
 
-export type GetCountryByIdQuery = {
-  __typename?: 'Query';
-  result: Array<{
-    __typename?: 'Country';
-    id: string;
-    name: string;
-    addressesCount: number;
-    companiesCount: number;
-    messagesCount: number;
-    peopleCount: number;
-    addresses: Array<{ __typename?: 'Address'; id: string; name: string }>;
-    companies: Array<{ __typename?: 'Company'; id: string; name: string }>;
-    messages: Array<{
-      __typename?: 'Message';
-      id: string;
-      year: number;
-      message: string;
-      addressesCount: number;
-      companiesCount: number;
-      countriesCount: number;
-      peopleCount: number;
-    }>;
-    people: Array<{ __typename?: 'Person'; id: string; name: string }>;
-  }>;
-};
+
+export type GetCountryByIdQuery = { __typename?: 'Query', result: Array<{ __typename?: 'Country', id: string, name: string, addressesCount: number, companiesCount: number, messagesCount: number, peopleCount: number, addresses: Array<{ __typename?: 'Address', id: string, name: string, companiesCount: number, countriesCount: number, messagesCount: number, peopleCount: number }>, companies: Array<{ __typename?: 'Company', id: string, name: string, addressesCount: number, countriesCount: number, messagesCount: number, peopleCount: number }>, messages: Array<{ __typename?: 'Message', id: string, year: number, message: string, addressesCount: number, companiesCount: number, countriesCount: number, peopleCount: number, companies: Array<{ __typename?: 'Company', name: string }> }>, people: Array<{ __typename?: 'Person', id: string, name: string, addressesCount: number, companiesCount: number, countriesCount: number, messagesCount: number }> }> };
 
 export type GetCountryCompaniesQueryVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -5580,13 +2191,8 @@ export type GetCountryCompaniesQueryVariables = Exact<{
   limit?: InputMaybe<Scalars['Int']['input']>;
 }>;
 
-export type GetCountryCompaniesQuery = {
-  __typename?: 'Query';
-  result: Array<{
-    __typename?: 'Country';
-    companies: Array<{ __typename?: 'Company'; id: string; name: string }>;
-  }>;
-};
+
+export type GetCountryCompaniesQuery = { __typename?: 'Query', result: Array<{ __typename?: 'Country', companies: Array<{ __typename?: 'Company', id: string, name: string, addressesCount: number, countriesCount: number, messagesCount: number, peopleCount: number }> }> };
 
 export type GetCountryCountriesQueryVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -5594,13 +2200,8 @@ export type GetCountryCountriesQueryVariables = Exact<{
   limit?: InputMaybe<Scalars['Int']['input']>;
 }>;
 
-export type GetCountryCountriesQuery = {
-  __typename?: 'Query';
-  result: Array<{
-    __typename?: 'Country';
-    addresses: Array<{ __typename?: 'Address'; id: string; name: string }>;
-  }>;
-};
+
+export type GetCountryCountriesQuery = { __typename?: 'Query', result: Array<{ __typename?: 'Country', addresses: Array<{ __typename?: 'Address', id: string, name: string, companiesCount: number, countriesCount: number, messagesCount: number, peopleCount: number }> }> };
 
 export type GetCountryMessagesQueryVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -5608,22 +2209,8 @@ export type GetCountryMessagesQueryVariables = Exact<{
   limit?: InputMaybe<Scalars['Int']['input']>;
 }>;
 
-export type GetCountryMessagesQuery = {
-  __typename?: 'Query';
-  result: Array<{
-    __typename?: 'Country';
-    messages: Array<{
-      __typename?: 'Message';
-      id: string;
-      year: number;
-      message: string;
-      addressesCount: number;
-      companiesCount: number;
-      countriesCount: number;
-      peopleCount: number;
-    }>;
-  }>;
-};
+
+export type GetCountryMessagesQuery = { __typename?: 'Query', result: Array<{ __typename?: 'Country', messages: Array<{ __typename?: 'Message', id: string, year: number, message: string, addressesCount: number, companiesCount: number, countriesCount: number, peopleCount: number, companies: Array<{ __typename?: 'Company', name: string }> }> }> };
 
 export type GetCountryPeopleQueryVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -5631,35 +2218,15 @@ export type GetCountryPeopleQueryVariables = Exact<{
   limit?: InputMaybe<Scalars['Int']['input']>;
 }>;
 
-export type GetCountryPeopleQuery = {
-  __typename?: 'Query';
-  result: Array<{
-    __typename?: 'Country';
-    people: Array<{ __typename?: 'Person'; id: string; name: string }>;
-  }>;
-};
+
+export type GetCountryPeopleQuery = { __typename?: 'Query', result: Array<{ __typename?: 'Country', people: Array<{ __typename?: 'Person', id: string, name: string, addressesCount: number, companiesCount: number, countriesCount: number, messagesCount: number }> }> };
 
 export type GetMessageByIdQueryVariables = Exact<{
   id: Scalars['ID']['input'];
 }>;
 
-export type GetMessageByIdQuery = {
-  __typename?: 'Query';
-  result: Array<{
-    __typename?: 'Message';
-    id: string;
-    year: number;
-    message: string;
-    addressesCount: number;
-    companiesCount: number;
-    countriesCount: number;
-    peopleCount: number;
-    addresses: Array<{ __typename?: 'Address'; id: string; name: string }>;
-    companies: Array<{ __typename?: 'Company'; id: string; name: string }>;
-    countries: Array<{ __typename?: 'Country'; id: string; name: string }>;
-    people: Array<{ __typename?: 'Person'; id: string; name: string }>;
-  }>;
-};
+
+export type GetMessageByIdQuery = { __typename?: 'Query', result: Array<{ __typename?: 'Message', id: string, year: number, message: string, addressesCount: number, companiesCount: number, countriesCount: number, peopleCount: number, addresses: Array<{ __typename?: 'Address', id: string, name: string, companiesCount: number, countriesCount: number, messagesCount: number, peopleCount: number }>, companies: Array<{ __typename?: 'Company', id: string, name: string, addressesCount: number, countriesCount: number, messagesCount: number, peopleCount: number }>, countries: Array<{ __typename?: 'Country', id: string, name: string, addressesCount: number, companiesCount: number, messagesCount: number, peopleCount: number }>, people: Array<{ __typename?: 'Person', id: string, name: string, addressesCount: number, companiesCount: number, countriesCount: number, messagesCount: number }> }> };
 
 export type GetMessageCompaniesQueryVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -5667,13 +2234,8 @@ export type GetMessageCompaniesQueryVariables = Exact<{
   limit?: InputMaybe<Scalars['Int']['input']>;
 }>;
 
-export type GetMessageCompaniesQuery = {
-  __typename?: 'Query';
-  result: Array<{
-    __typename?: 'Message';
-    companies: Array<{ __typename?: 'Company'; id: string; name: string }>;
-  }>;
-};
+
+export type GetMessageCompaniesQuery = { __typename?: 'Query', result: Array<{ __typename?: 'Message', companies: Array<{ __typename?: 'Company', id: string, name: string, addressesCount: number, countriesCount: number, messagesCount: number, peopleCount: number }> }> };
 
 export type GetMessageCountriesQueryVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -5681,13 +2243,8 @@ export type GetMessageCountriesQueryVariables = Exact<{
   limit?: InputMaybe<Scalars['Int']['input']>;
 }>;
 
-export type GetMessageCountriesQuery = {
-  __typename?: 'Query';
-  result: Array<{
-    __typename?: 'Message';
-    addresses: Array<{ __typename?: 'Address'; id: string; name: string }>;
-  }>;
-};
+
+export type GetMessageCountriesQuery = { __typename?: 'Query', result: Array<{ __typename?: 'Message', addresses: Array<{ __typename?: 'Address', id: string, name: string, companiesCount: number, countriesCount: number, messagesCount: number, peopleCount: number }> }> };
 
 export type GetMessageMessagesQueryVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -5695,13 +2252,8 @@ export type GetMessageMessagesQueryVariables = Exact<{
   limit?: InputMaybe<Scalars['Int']['input']>;
 }>;
 
-export type GetMessageMessagesQuery = {
-  __typename?: 'Query';
-  result: Array<{
-    __typename?: 'Message';
-    people: Array<{ __typename?: 'Person'; id: string; name: string }>;
-  }>;
-};
+
+export type GetMessageMessagesQuery = { __typename?: 'Query', result: Array<{ __typename?: 'Message', people: Array<{ __typename?: 'Person', id: string, name: string, addressesCount: number, companiesCount: number, countriesCount: number, messagesCount: number }> }> };
 
 export type GetMessagePeopleQueryVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -5709,43 +2261,15 @@ export type GetMessagePeopleQueryVariables = Exact<{
   limit?: InputMaybe<Scalars['Int']['input']>;
 }>;
 
-export type GetMessagePeopleQuery = {
-  __typename?: 'Query';
-  result: Array<{
-    __typename?: 'Message';
-    countries: Array<{ __typename?: 'Country'; id: string; name: string }>;
-  }>;
-};
+
+export type GetMessagePeopleQuery = { __typename?: 'Query', result: Array<{ __typename?: 'Message', countries: Array<{ __typename?: 'Country', id: string, name: string, addressesCount: number, companiesCount: number, messagesCount: number, peopleCount: number }> }> };
 
 export type GetPersonByIdQueryVariables = Exact<{
   id: Scalars['ID']['input'];
 }>;
 
-export type GetPersonByIdQuery = {
-  __typename?: 'Query';
-  result: Array<{
-    __typename?: 'Person';
-    id: string;
-    name: string;
-    addressesCount: number;
-    companiesCount: number;
-    countriesCount: number;
-    messagesCount: number;
-    addresses: Array<{ __typename?: 'Address'; id: string; name: string }>;
-    companies: Array<{ __typename?: 'Company'; id: string; name: string }>;
-    countries: Array<{ __typename?: 'Country'; id: string; name: string }>;
-    messages: Array<{
-      __typename?: 'Message';
-      id: string;
-      year: number;
-      message: string;
-      addressesCount: number;
-      companiesCount: number;
-      countriesCount: number;
-      peopleCount: number;
-    }>;
-  }>;
-};
+
+export type GetPersonByIdQuery = { __typename?: 'Query', result: Array<{ __typename?: 'Person', id: string, name: string, addressesCount: number, companiesCount: number, countriesCount: number, messagesCount: number, addresses: Array<{ __typename?: 'Address', id: string, name: string, companiesCount: number, countriesCount: number, messagesCount: number, peopleCount: number }>, companies: Array<{ __typename?: 'Company', id: string, name: string, addressesCount: number, countriesCount: number, messagesCount: number, peopleCount: number }>, countries: Array<{ __typename?: 'Country', id: string, name: string, addressesCount: number, companiesCount: number, messagesCount: number, peopleCount: number }>, messages: Array<{ __typename?: 'Message', id: string, year: number, message: string, addressesCount: number, companiesCount: number, countriesCount: number, peopleCount: number, companies: Array<{ __typename?: 'Company', name: string }> }> }> };
 
 export type GetPersonCompaniesQueryVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -5753,13 +2277,8 @@ export type GetPersonCompaniesQueryVariables = Exact<{
   limit?: InputMaybe<Scalars['Int']['input']>;
 }>;
 
-export type GetPersonCompaniesQuery = {
-  __typename?: 'Query';
-  result: Array<{
-    __typename?: 'Person';
-    companies: Array<{ __typename?: 'Company'; id: string; name: string }>;
-  }>;
-};
+
+export type GetPersonCompaniesQuery = { __typename?: 'Query', result: Array<{ __typename?: 'Person', companies: Array<{ __typename?: 'Company', id: string, name: string, addressesCount: number, countriesCount: number, messagesCount: number, peopleCount: number }> }> };
 
 export type GetPersonCountriesQueryVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -5767,13 +2286,8 @@ export type GetPersonCountriesQueryVariables = Exact<{
   limit?: InputMaybe<Scalars['Int']['input']>;
 }>;
 
-export type GetPersonCountriesQuery = {
-  __typename?: 'Query';
-  result: Array<{
-    __typename?: 'Person';
-    addresses: Array<{ __typename?: 'Address'; id: string; name: string }>;
-  }>;
-};
+
+export type GetPersonCountriesQuery = { __typename?: 'Query', result: Array<{ __typename?: 'Person', addresses: Array<{ __typename?: 'Address', id: string, name: string, companiesCount: number, countriesCount: number, messagesCount: number, peopleCount: number }> }> };
 
 export type GetPersonMessagesQueryVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -5781,22 +2295,8 @@ export type GetPersonMessagesQueryVariables = Exact<{
   limit?: InputMaybe<Scalars['Int']['input']>;
 }>;
 
-export type GetPersonMessagesQuery = {
-  __typename?: 'Query';
-  result: Array<{
-    __typename?: 'Person';
-    messages: Array<{
-      __typename?: 'Message';
-      id: string;
-      year: number;
-      message: string;
-      addressesCount: number;
-      companiesCount: number;
-      countriesCount: number;
-      peopleCount: number;
-    }>;
-  }>;
-};
+
+export type GetPersonMessagesQuery = { __typename?: 'Query', result: Array<{ __typename?: 'Person', messages: Array<{ __typename?: 'Message', id: string, year: number, message: string, addressesCount: number, companiesCount: number, countriesCount: number, peopleCount: number, companies: Array<{ __typename?: 'Company', name: string }> }> }> };
 
 export type GetPersonPeopleQueryVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -5804,10 +2304,5 @@ export type GetPersonPeopleQueryVariables = Exact<{
   limit?: InputMaybe<Scalars['Int']['input']>;
 }>;
 
-export type GetPersonPeopleQuery = {
-  __typename?: 'Query';
-  result: Array<{
-    __typename?: 'Person';
-    countries: Array<{ __typename?: 'Country'; id: string; name: string }>;
-  }>;
-};
+
+export type GetPersonPeopleQuery = { __typename?: 'Query', result: Array<{ __typename?: 'Person', countries: Array<{ __typename?: 'Country', id: string, name: string, addressesCount: number, companiesCount: number, messagesCount: number, peopleCount: number }> }> };

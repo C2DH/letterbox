@@ -1,5 +1,6 @@
 export * from './client';
 export * from './generated';
+export * from './generated/graphql';
 export * from './queries/addresses';
 export * from './queries/companies';
 export * from './queries/countries';
