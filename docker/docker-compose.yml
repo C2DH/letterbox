@@ -45,7 +45,7 @@ services:
         neo4j: 
           condition: service_healthy
       environment:
-      - MODE=${MODE}
+      - MODE=dev
       volumes:
       - ${PROJECT_PATH}/docker/project/entrypoint.sh:/entrypoint.sh
       - ${PROJECT_PATH}/code:/code
