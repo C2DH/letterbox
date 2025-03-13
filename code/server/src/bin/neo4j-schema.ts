@@ -2,6 +2,8 @@ import { wait } from '@ouestware/async';
 
 import 'reflect-metadata';
 
+import { Neo4jError } from 'neo4j-driver';
+
 import { Neo4j } from '../services/neo4j';
 
 const queries = [
@@ -27,11 +29,18 @@ async function exec(iteration = 0) {
     // Create constraints (never fails)
     for (const query of queries) {
       try {
-        console.log('rruning query', query);
+        console.log('runing query', query);
         await neo4j.getFirstResultQuery(query, {});
       } catch (e) {
-        console.error('Failed to run query', query);
-        throw e;
+        if (e) console.error('Failed to run query', query);
+        if (
+          !(
+            e instanceof Neo4jError &&
+            e.code === 'Neo.ClientError.Schema.IndexWithNameAlreadyExists'
+          )
+        ) {
+          throw e;
+        }
       }
     }
   } catch (e) {
