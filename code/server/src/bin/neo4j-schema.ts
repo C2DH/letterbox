@@ -1,4 +1,5 @@
 import { wait } from '@ouestware/async';
+
 import 'reflect-metadata';
 
 import { Neo4j } from '../services/neo4j';
@@ -19,7 +20,21 @@ async function exec(iteration = 0) {
   try {
     await wait(10000);
     const neo4j = new Neo4j();
-    await Promise.all(queries.map(async (q) => await neo4j.getFirstResultQuery(q, {})));
+    // Test connection
+    await neo4j.getFirstResultQuery(`RETURN 1 as result`, {});
+
+    // Create constraints (never fails)
+    await Promise.all(
+      queries.map(
+        async (q) =>
+          new Promise((resolve) =>
+            neo4j
+              .getFirstResultQuery(q, {})
+              .catch((e) => console.error(e))
+              .finally(() => resolve(void)),
+          ),
+      ),
+    );
   } catch (e) {
     if (iteration < 5) await exec(iteration + 1);
     else throw e;
