@@ -27,11 +27,11 @@ async function exec(iteration = 0) {
     await Promise.all(
       queries.map(
         async (q) =>
-          new Promise((resolve) =>
+          new Promise((resolve, _reject) =>
             neo4j
               .getFirstResultQuery(q, {})
               .catch((e) => console.error(e))
-              .finally(() => resolve(void)),
+              .finally(() => resolve(null)),
           ),
       ),
     );
