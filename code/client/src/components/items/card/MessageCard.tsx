@@ -11,13 +11,6 @@ export const MessageCard: FC<MessageCardProps> = ({ data }) => {
   const name = `${data.year}, ${data.companies.map((company) => company.name).join(', ')}`;
   return (
     <div className="card">
-      {/* Action menu */}
-      <ItemActionMenu
-        type={DataItemType.Message}
-        id={data.id}
-        name={name}
-        className="position-absolute top-0 end-0"
-      />
       <div className="card-body">
         {/* Title */}
         <h5 className="card-title">
