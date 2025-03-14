@@ -29,8 +29,7 @@ export const getAddressCompanies = graphql(`
   query GetAddressCompanies($id: ID!, $skip: Int, $limit: Int) {
     result: addresses(where: { id_EQ: $id }) {
       companies(skip: $skip, limit: $limit) {
-        id
-        name
+        ...CompanyInline
       }
     }
   }

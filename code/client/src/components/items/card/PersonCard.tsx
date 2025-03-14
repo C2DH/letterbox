@@ -2,13 +2,21 @@ import { type FC } from 'react';
 import { BsPerson } from 'react-icons/bs';
 import { Link } from 'react-router-dom';
 
-import type { PersonInlineFragment } from '../../core/graphql';
-import { ItemCounts } from './ItemCount';
+import { DataItemType, type PersonInlineFragment } from '../../../core/graphql';
+import { ItemActionMenu } from '../actions/ItemActions';
+import { ItemCounts } from '../ItemCount';
 
 type PersonCardProps = { data: PersonInlineFragment };
 export const PersonCard: FC<PersonCardProps> = ({ data }) => {
   return (
     <div className="card">
+      {/* Action menu */}
+      <ItemActionMenu
+        type={DataItemType.Person}
+        id={data.id}
+        name={data.name}
+        className="position-absolute top-0 end-0"
+      />
       <div className="card-body">
         {/* Title */}
         <BsPerson />

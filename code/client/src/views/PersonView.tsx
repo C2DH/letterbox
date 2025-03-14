@@ -3,10 +3,10 @@ import { useParams } from 'react-router-dom';
 
 import { Breadcrumb } from '../components/Breadcrumb';
 import { Collaspsable } from '../components/Collapsable';
-import { AddressCard } from '../components/itemCard/AddressCard';
-import { CompanyCard } from '../components/itemCard/CompanyCard';
-import { CountryCard } from '../components/itemCard/CountryCard';
-import { MessageCard } from '../components/itemCard/MessageCard';
+import { AddressCard } from '../components/items/card/AddressCard';
+import { CompanyCard } from '../components/items/card/CompanyCard';
+import { CountryCard } from '../components/items/card/CountryCard';
+import { MessageCard } from '../components/items/card/MessageCard';
 import { ListWithLoadMore, type ListWithLoadMoreProps } from '../components/ListWithLoadMore';
 import { type GetPersonByIdQuery } from '../core/graphql';
 import { useGetPersonById } from '../hooks/usePerson';
