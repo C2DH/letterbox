@@ -54,6 +54,7 @@ export const ChangeTypeModal: FC<ChangeTypeModalProps> = ({ type, id, name, onSu
             New type
           </label>
           <select
+            id="type"
             className="form-select form-select-lg mb-3"
             onChange={(e) => SetNewType(e.target.value as DataItemType)}
           >

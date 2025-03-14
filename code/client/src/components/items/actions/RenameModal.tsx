@@ -43,7 +43,7 @@ export const RenameModal: FC<RenameModalProps> = ({ type, id, name, onSuccess })
         }}
       >
         <div className="mb-3">
-          <label htmlFor="type" className="form-label">
+          <label htmlFor="name" className="form-label">
             Name
           </label>
           <input

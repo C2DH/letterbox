@@ -1,4 +1,5 @@
 import { type FC } from 'react';
+import { BsJournalText } from 'react-icons/bs';
 import { Link } from 'react-router-dom';
 
 import { type MessageInlineFragment } from '../../../core/graphql';
@@ -11,6 +12,7 @@ export const MessageCard: FC<MessageCardProps> = ({ data }) => {
   return (
     <div className="card">
       <div className="card-body">
+        <BsJournalText />
         {/* Title */}
         <h5 className="card-title">
           <Link title={`Link to message page '${name}`} to={`/message/${data.id}`}>
