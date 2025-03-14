@@ -1,9 +1,8 @@
 import { type FC } from 'react';
 import { Link } from 'react-router-dom';
 
-import { DataItemType, type MessageInlineFragment } from '../../../core/graphql';
+import { type MessageInlineFragment } from '../../../core/graphql';
 import { Collaspsable } from '../../Collapsable';
-import { ItemActionMenu } from '../actions/ItemActions';
 import { ItemCounts } from '../ItemCount';
 
 type MessageCardProps = { data: MessageInlineFragment };
