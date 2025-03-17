@@ -52,6 +52,7 @@ type Address
       MATCH (this)<-[r]-(n:Message)
       WHERE NOT coalesce(r.deleted, false)
       RETURN DISTINCT n AS result
+      ORDER BY result.year ASC
       SKIP $skip
       LIMIT $limit
       """
@@ -76,6 +77,7 @@ type Address
       MATCH (this)<-[r1]-(:Message)-[r2]->(n:Company)
       WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false) AND NOT coalesce(n.deleted, false)
       RETURN DISTINCT n AS result
+      ORDER BY result.name ASC
       SKIP $skip
       LIMIT $limit
       """
@@ -100,6 +102,7 @@ type Address
       MATCH (this)<-[r1]-(:Message)-[r2]->(n:Country)
       WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false) AND NOT coalesce(n.deleted, false)
       RETURN DISTINCT n AS result
+      ORDER BY result.name ASC
       SKIP $skip
       LIMIT $limit
       """
@@ -124,6 +127,7 @@ type Address
       MATCH (this)<-[r1]-(:Message)-[r2]->(n:Person)
       WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false) AND NOT coalesce(n.deleted, false)
       RETURN DISTINCT n AS result
+      ORDER BY result.name ASC
       SKIP $skip
       LIMIT $limit
       """
@@ -161,6 +165,7 @@ type Company
       MATCH (this)<-[r]-(n:Message)
       WHERE NOT coalesce(r.deleted, false)
       RETURN DISTINCT n AS result
+      ORDER BY result.year ASC
       SKIP $skip
       LIMIT $limit
       """
@@ -185,6 +190,7 @@ type Company
       MATCH (this)<-[r1]-(:Message)-[r2]->(n:Address)
       WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false)
       RETURN DISTINCT n AS result
+      ORDER BY result.name ASC
       SKIP $skip
       LIMIT $limit
       """
@@ -209,6 +215,7 @@ type Company
       MATCH (this)<-[r1]-(:Message)-[r2]->(n:Country)
       WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false) AND NOT coalesce(n.deleted, false)
       RETURN DISTINCT n AS result
+      ORDER BY result.name ASC
       SKIP $skip
       LIMIT $limit
       """
@@ -233,6 +240,7 @@ type Company
       MATCH (this)<-[r1]-(:Message)-[r2]->(n:Person)
       WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false) AND NOT coalesce(n.deleted, false)
       RETURN DISTINCT n AS result
+      ORDER BY result.name ASC
       SKIP $skip
       LIMIT $limit
       """
@@ -270,6 +278,7 @@ type Country
       MATCH (this)<-[r]-(n:Message)
       WHERE NOT coalesce(r.deleted, false)
       RETURN DISTINCT n AS result
+      ORDER BY result.year ASC
       SKIP $skip
       LIMIT $limit
       """
@@ -294,6 +303,7 @@ type Country
       MATCH (this)<-[r1]-(:Message)-[r2]->(n:Address)
       WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false)
       RETURN DISTINCT n AS result
+      ORDER BY result.name ASC
       SKIP $skip
       LIMIT $limit
       """
@@ -318,6 +328,7 @@ type Country
       MATCH (this)<-[r1]-(:Message)-[r2]->(n:Company)
       WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false) AND NOT coalesce(n.deleted, false)
       RETURN DISTINCT n AS result
+      ORDER BY result.name ASC
       SKIP $skip
       LIMIT $limit
       """
@@ -342,6 +353,7 @@ type Country
       MATCH (this)<-[r1]-(:Message)-[r2]->(n:Person)
       WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false) AND NOT coalesce(n.deleted, false)
       RETURN DISTINCT n AS result
+      ORDER BY result.name ASC
       SKIP $skip
       LIMIT $limit
       """
@@ -389,6 +401,7 @@ type Message
       MATCH (this)-[r]->(n:Address)
       WHERE NOT coalesce(r.deleted, false) AND NOT coalesce(n.deleted, false)
       RETURN DISTINCT n AS result
+      ORDER BY n.result ASC
       SKIP $skip
       LIMIT $limit
       """
@@ -413,6 +426,7 @@ type Message
       MATCH (this)-[r]->(n:Company)
       WHERE NOT coalesce(r.deleted, false) AND NOT coalesce(n.deleted, false)
       RETURN DISTINCT n AS result
+      ORDER BY n.result ASC
       SKIP $skip
       LIMIT $limit
       """
@@ -437,6 +451,7 @@ type Message
       MATCH (this)-[r]->(n:Country)
       WHERE NOT coalesce(r.deleted, false) AND NOT coalesce(n.deleted, false)
       RETURN DISTINCT n AS result
+      ORDER BY n.result ASC
       SKIP $skip
       LIMIT $limit
       """
@@ -461,6 +476,7 @@ type Message
       MATCH (this)-[r]->(n:Person)
       WHERE NOT coalesce(r.deleted, false) AND NOT coalesce(n.deleted, false)
       RETURN DISTINCT n AS result
+      ORDER BY result.name ASC
       SKIP $skip
       LIMIT $limit
       """
@@ -498,6 +514,7 @@ type Person
       MATCH (this)<-[r]-(n:Message)
       WHERE NOT coalesce(r.deleted, false)
       RETURN DISTINCT n AS result
+      ORDER BY result.year ASC
       SKIP $skip
       LIMIT $limit
       """
@@ -522,6 +539,7 @@ type Person
       MATCH (this)<-[r1]-(:Message)-[r2]->(n:Address)
       WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false) AND NOT coalesce(n.deleted, false)
       RETURN DISTINCT n AS result
+      ORDER BY result.name ASC
       SKIP $skip
       LIMIT $limit
       """
@@ -546,6 +564,7 @@ type Person
       MATCH (this)<-[r1]-(:Message)-[r2]->(n:Company)
       WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false) AND NOT coalesce(n.deleted, false)
       RETURN DISTINCT n AS result
+      ORDER BY result.name ASC
       SKIP $skip
       LIMIT $limit
       """
@@ -570,6 +589,7 @@ type Person
       MATCH (this)<-[r1]-(:Message)-[r2]->(n:Country)
       WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false) AND NOT coalesce(n.deleted, false)
       RETURN DISTINCT n AS result
+      ORDER BY result.name ASC
       SKIP $skip
       LIMIT $limit
       """
