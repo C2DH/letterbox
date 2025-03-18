@@ -181,7 +181,7 @@ export async function checkMessage(
 export async function checkMessageIndexation(id: string) {
   await es.client.indices.flush({ index: EsIndices['message'] });
   await es.client.indices.flush({ index: EsIndices['company'] });
-  await es.client.indices.flush({ index: EsIndices['people'] });
+  await es.client.indices.flush({ index: EsIndices['person'] });
   await es.client.indices.flush({ index: EsIndices['country'] });
   await es.client.indices.flush({ index: EsIndices['address'] });
 

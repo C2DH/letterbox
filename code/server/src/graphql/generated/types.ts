@@ -209,6 +209,11 @@ export type ImportReport = {
   errors?: Maybe<Array<Scalars['String']['output']>>;
 };
 
+export type IndexingPendingModification = {
+  __typename?: 'IndexingPendingModification';
+  startTime: Scalars['String']['output'];
+};
+
 export type KeywordsFilter = {
   type: FilterTypes;
   values: Array<Scalars['String']['input']>;
@@ -272,6 +277,8 @@ export type Mutation = {
   import?: Maybe<ImportReport>;
   /** Index the graph in the search engine */
   index?: Maybe<ImportReport>;
+  /** Index Pending modifications */
+  indexPendingModifications: Scalars['Int']['output'];
   /** Merge nodes */
   mergeNodes: NodeItem;
   /** Rename a node value */
@@ -384,7 +391,10 @@ export type Query = {
   _getCountryItems: Array<Country>;
   _getMessageItems: Array<Message>;
   _getPersonItems: Array<Person>;
+  /** Aggregate results into top values aggregations */
   aggregate: AggregateResults;
+  countPendingModifications: Scalars['Int']['output'];
+  /** Scroll results */
   scroll?: Maybe<SearchResults>;
   /** Search for Items using a set of filters */
   search?: Maybe<SearchResults>;
@@ -541,6 +551,7 @@ export type ResolversTypes = {
   Float: ResolverTypeWrapper<Scalars['Float']['output']>;
   ID: ResolverTypeWrapper<Scalars['ID']['output']>;
   ImportReport: ResolverTypeWrapper<ImportReport>;
+  IndexingPendingModification: ResolverTypeWrapper<IndexingPendingModification>;
   Int: ResolverTypeWrapper<Scalars['Int']['output']>;
   KeywordsFilter: KeywordsFilter;
   Message: ResolverTypeWrapper<Message>;
@@ -573,6 +584,7 @@ export type ResolversParentTypes = {
   Float: Scalars['Float']['output'];
   ID: Scalars['ID']['output'];
   ImportReport: ImportReport;
+  IndexingPendingModification: IndexingPendingModification;
   Int: Scalars['Int']['output'];
   KeywordsFilter: KeywordsFilter;
   Message: Message;
@@ -656,6 +668,11 @@ export type ImportReportResolvers<ContextType = any, ParentType extends Resolver
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type IndexingPendingModificationResolvers<ContextType = any, ParentType extends ResolversParentTypes['IndexingPendingModification'] = ResolversParentTypes['IndexingPendingModification']> = {
+  startTime?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type MessageResolvers<ContextType = any, ParentType extends ResolversParentTypes['Message'] = ResolversParentTypes['Message']> = {
   addresses?: Resolver<Array<ResolversTypes['Address']>, ParentType, ContextType, RequireFields<MessageAddressesArgs, 'limit' | 'skip'>>;
   addressesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
@@ -684,6 +701,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   deleteNode?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationDeleteNodeArgs, 'id' | 'type'>>;
   import?: Resolver<Maybe<ResolversTypes['ImportReport']>, ParentType, ContextType, Partial<MutationImportArgs>>;
   index?: Resolver<Maybe<ResolversTypes['ImportReport']>, ParentType, ContextType>;
+  indexPendingModifications?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   mergeNodes?: Resolver<ResolversTypes['NodeItem'], ParentType, ContextType, RequireFields<MutationMergeNodesArgs, 'name' | 'nodes' | 'type'>>;
   renameNode?: Resolver<ResolversTypes['NodeItem'], ParentType, ContextType, RequireFields<MutationRenameNodeArgs, 'id' | 'name' | 'type'>>;
   splitNode?: Resolver<Array<ResolversTypes['NodeItem']>, ParentType, ContextType, RequireFields<MutationSplitNodeArgs, 'id' | 'type' | 'values'>>;
@@ -714,6 +732,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   _getMessageItems?: Resolver<Array<ResolversTypes['Message']>, ParentType, ContextType>;
   _getPersonItems?: Resolver<Array<ResolversTypes['Person']>, ParentType, ContextType>;
   aggregate?: Resolver<ResolversTypes['AggregateResults'], ParentType, ContextType, RequireFields<QueryAggregateArgs, 'field' | 'itemType'>>;
+  countPendingModifications?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   scroll?: Resolver<Maybe<ResolversTypes['SearchResults']>, ParentType, ContextType, RequireFields<QueryScrollArgs, 'itemType' | 'scrollId'>>;
   search?: Resolver<Maybe<ResolversTypes['SearchResults']>, ParentType, ContextType, RequireFields<QuerySearchArgs, 'filters' | 'itemType'>>;
 };
@@ -739,6 +758,7 @@ export type Resolvers<ContextType = any> = {
   CountResult?: CountResultResolvers<ContextType>;
   Country?: CountryResolvers<ContextType>;
   ImportReport?: ImportReportResolvers<ContextType>;
+  IndexingPendingModification?: IndexingPendingModificationResolvers<ContextType>;
   Message?: MessageResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   NodeItem?: NodeItemResolvers<ContextType>;

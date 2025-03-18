@@ -595,6 +595,17 @@ type Person
       """
     )
 }
+#
+# Lock Node IndexingPendingModification
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+type IndexingPendingModification
+  @node
+  @query(read: true, aggregate: false)
+  @mutation(operations: [])
+  @subscription(events: []) {
+  startTime: String!
+}
 
 #
 # Inputs
@@ -739,6 +750,10 @@ type CountResult
 # QUERIES
 
 type Query {
+  #
+  # SEARCH QUERIES
+  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
   "Search for Items using a set of filters"
   search(
     itemType: DataItemType!
@@ -749,7 +764,10 @@ type Query {
     scrollTimeout: String
   ): SearchResults
 
+  "Scroll results"
   scroll(itemType: DataItemType!, scrollId: String!, scrollTimeout: String): SearchResults
+
+  "Aggregate results into top values aggregations"
   aggregate(
     itemType: DataItemType!
     field: AggregationFields!
@@ -758,6 +776,12 @@ type Query {
     filters: SearchFilters
     size: Int
   ): AggregateResults!
+
+  #
+  # Pending modifications
+  # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  countPendingModifications: Int!
 
   #
   # Internal methods
@@ -829,4 +853,9 @@ type Mutation {
   Merge nodes
   """
   mergeNodes(nodes: [NodeIdentification!]!, type: DataItemType!, name: String!): NodeItem!
+
+  """
+  Index Pending modifications
+  """
+  indexPendingModifications: Int!
 }

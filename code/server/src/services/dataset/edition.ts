@@ -1,10 +1,17 @@
 import Boom from '@hapi/boom';
 import { getLogger } from '@ouestware/node-logger';
+import { chunk } from 'lodash';
 import type { Transaction } from 'neo4j-driver';
 import { inject, singleton } from 'tsyringe';
 import { v4 as uuid } from 'uuid';
 
-import { Neo4jLabels, type ItemType, type NodeItemDefinition } from '../../types';
+import config from '../../config';
+import {
+  Neo4jLabels,
+  Neo4jLabelsPendingModificationsLabels,
+  type ItemType,
+  type NodeItemDefinition,
+} from '../../types';
 import { Neo4j } from '../neo4j';
 import { DatasetIndexation } from './indexation';
 
@@ -36,17 +43,14 @@ export class DatasetEdition {
 
     // Create the node
     const nodeId = uuid();
-    const result = await this.neo4j.getFirstResultQuery<string[]>(
-      ` MATCH (m:Message {id: $messageId}) 
+    await this.neo4j.getFirstResultQuery<string[]>(
+      /* cypher*/ ` MATCH (m:Message {id: $messageId}) 
         CREATE (n:${Neo4jLabels[type]} { id: $id, name: $name, created: datetime(), updated: datetime() }) 
         CREATE (m)-[:CONTAINS { created: datetime(), updated: datetime() }]->(n)
-        RETURN  collect { MATCH (n)<-[r:CONTAINS]-(msg:Message) WHERE NOT coalesce(r.deleted, false) RETURN msg.id } AS result`,
+        SET m:${Neo4jLabelsPendingModificationsLabels.ToReIndexFlag}
+        RETURN 1 as result`,
       { messageId, id: nodeId, name },
     );
-
-    // Do the re-indexation
-    await this.indexation.indexMessagesInCascade(result ?? []);
-
     return { type, id: nodeId };
   }
 
@@ -61,19 +65,17 @@ export class DatasetEdition {
     await this.checkItemExists(type, id);
 
     // Link nodes
-    const result = await this.neo4j.getFirstResultQuery<string[]>(
-      ` MATCH (m:Message {id: $messageId}) 
+    await this.neo4j.getFirstResultQuery<string[]>(
+      /* cypher*/ ` MATCH (m:Message {id: $messageId}) 
         MATCH (n:${Neo4jLabels[type]} {id: $id}) 
         MERGE (m)-[r:CONTAINS]->(n)
           ON CREATE SET 
             r.created = datetime(), 
             r.updated = datetime()
-        RETURN  collect { MATCH (n)<-[r:CONTAINS]-(msg:Message) WHERE NOT coalesce(r.deleted, false) RETURN msg.id } AS result`,
+        SET m:${Neo4jLabelsPendingModificationsLabels.ToReIndexFlag}
+        RETURN 1 as result`,
       { messageId, id },
     );
-
-    // Do the re-indexation
-    await this.indexation.indexMessagesInCascade(result ?? []);
   }
 
   /**
@@ -85,16 +87,16 @@ export class DatasetEdition {
     await this.checkItemExists(type, id);
 
     // Rename the node
-    const result = await this.neo4j.getFirstResultQuery<string[]>(
-      ` MATCH (n:${Neo4jLabels[type]} { id: $id })
+    await this.neo4j.getFirstResultQuery<string[]>(
+      /* cypher*/ `MATCH (n:${Neo4jLabels[type]} { id: $id })
         SET n.name = $name,
             n.updated = datetime()
-        RETURN  collect { MATCH (n)<-[r:CONTAINS]-(msg:Message) WHERE NOT coalesce(r.deleted, false) RETURN msg.id } AS result`,
+        WITH n
+          MATCH (n)<-[r:CONTAINS]-(msg:Message) WHERE NOT coalesce(r.deleted, false) 
+          SET msg:${Neo4jLabelsPendingModificationsLabels.ToReIndexFlag}
+          RETURN 1 as result`,
       { id, name },
     );
-
-    // Do the re-indexation
-    await this.indexation.indexMessagesInCascade(result ?? []);
   }
 
   /**
@@ -107,17 +109,17 @@ export class DatasetEdition {
     await this.checkItemExists(type, id);
 
     // Change the type
-    const result = await this.neo4j.getFirstResultQuery<string[]>(
-      ` MATCH (n:${Neo4jLabels[type]} { id: $id })
+    await this.neo4j.getFirstResultQuery<string[]>(
+      /*cypher */ ` MATCH (n:${Neo4jLabels[type]} { id: $id })
         REMOVE n:${Neo4jLabels[type]}
         SET n:${Neo4jLabels[newType]}
         SET n.updated = datetime()
-        RETURN  collect { MATCH (n)<-[r:CONTAINS]-(msg:Message) WHERE NOT coalesce(r.deleted, false) RETURN msg.id } AS result`,
+        WITH n
+          MATCH (n)<-[r:CONTAINS]-(msg:Message) WHERE NOT coalesce(r.deleted, false)
+          SET msg:${Neo4jLabelsPendingModificationsLabels.ToReIndexFlag}
+          RETURN 1 as result`,
       { id },
     );
-
-    // Do the re-indexation
-    await this.indexation.indexMessagesInCascade(result ?? []);
 
     return { type, id };
   }
@@ -131,19 +133,19 @@ export class DatasetEdition {
     await this.checkItemExists(type, id);
 
     // Delete the node
-    const query = `
+    const query = /* cypher */ `
       MATCH (n:${Neo4jLabels[type]} { id: $id }) 
       SET n.deleted = true,
           n.updated = datetime()
       WITH n
+        OPTIONAL MATCH (n)<-[r:CONTAINS]-(msg:Message) WHERE NOT coalesce(r.deleted, false) 
+        SET msg:${Neo4jLabelsPendingModificationsLabels.ToReIndexFlag}
+      WITH n
         OPTIONAL MATCH (n)-[r]-() SET r.deleted = true, r.updated = datetime()
-        RETURN  collect { MATCH (n)<-[r:CONTAINS]-(msg:Message) WHERE NOT coalesce(r.deleted, false) RETURN msg.id } AS result`;
-    const result = await (tx
+        RETURN 1 AS result`;
+    await (tx
       ? this.neo4j.getTxFirstResultQuery<string[]>(tx, query, { id })
       : this.neo4j.getFirstResultQuery<string[]>(query, { id }));
-
-    // Do the re-indexation
-    await this.indexation.indexMessagesInCascade(result ?? []);
   }
 
   /**
@@ -166,7 +168,7 @@ export class DatasetEdition {
         nodes.map(async (nodeDef) => {
           // Check that the node exists and get its graph fingerprint
           const data = await this.getItemGraphFingerprint(tx, nodeDef.type, nodeDef.id);
-          // delete the node
+          // delete the node: this action will flag all impacted message
           await this.deleteNode(nodeDef.type, nodeDef.id, tx);
           return data;
         }),
@@ -176,14 +178,14 @@ export class DatasetEdition {
       const targetId = uuid();
       const targetElementId = await this.neo4j.getTxFirstResultQuery<string>(
         tx,
-        `CREATE (n:${Neo4jLabels[targetType]} { id: $id, name: $name, created: datetime(), updated: datetime() }) RETURN elementId(n) AS result`,
+        /*cypher*/ `CREATE (n:${Neo4jLabels[targetType]} { id: $id, name: $name, created: datetime(), updated: datetime() }) RETURN elementId(n) AS result`,
         { id: targetId, name: targetName },
       );
 
       // Merge the nodes into the target one
       await this.neo4j.getTxFirstResultQuery<string[]>(
         tx,
-        ` MATCH (n) WHERE elementId(n) = $targetElementId
+        /*cypher*/ ` MATCH (n) WHERE elementId(n) = $targetElementId
           UNWIND $mergeData AS data
             WITH n, data
               CALL(n, data) {
@@ -201,10 +203,6 @@ export class DatasetEdition {
       );
 
       await tx.commit();
-
-      // Do the re-indexation
-      const message = new Set<string>(mergeData.flatMap((n) => n.impactedMessages));
-      await this.indexation.indexMessagesInCascade(Array.from(message));
 
       // Returned the created merged node
       return { type: targetType, id: targetId };
@@ -236,7 +234,7 @@ export class DatasetEdition {
       const newNodes = newNames.map((name) => ({ id: uuid(), name }));
       await this.neo4j.getTxFirstResultQuery(
         tx,
-        ` UNWIND $newNodes AS newNode
+        /* cypher */ ` UNWIND $newNodes AS newNode
             CREATE (n:${Neo4jLabels[type]} { id: newNode.id, name: newNode.name, created: datetime(), updated: datetime() })
             WITH n 
               CALL(n) {
@@ -253,14 +251,11 @@ export class DatasetEdition {
         { ...data, newNodes },
       );
 
-      // Delete the current node
+      // Delete the current node: this action will flag all impacted messages
       await this.deleteNode(type, id, tx);
 
       // Commit
       await tx.commit();
-
-      // Do the re-indexation
-      await this.indexation.indexMessagesInCascade(data.impactedMessages);
 
       // return the list of node created
       return { nodes: newNodes.map((n) => ({ type, id: n.id })) };
@@ -277,6 +272,70 @@ export class DatasetEdition {
    */
   async resetNodes(_nodes: Array<{ type: ItemType; id: string }>): Promise<void> {
     throw Boom.notImplemented('Not implemented');
+  }
+
+  /**
+   * Apply pending changes to ElasticSearch
+   * returns number of indexed messages
+   * */
+  async indexPendingModifications(): Promise<number> {
+    // Check lock node existence
+    const lockNode = await this.getIndexingPendingModificationLockNode();
+    if (lockNode !== null) {
+      console.log(lockNode);
+      throw new Error(
+        `Can't index pending modification, an existing process is already running since ${lockNode}`,
+      );
+    }
+
+    // create a indexation status node
+    await this.neo4j.getFirstResultQuery(
+      /* cypher */ `CREATE (n:${Neo4jLabelsPendingModificationsLabels.IndexingPendingModification}) SET n.startTime = $startTime RETURN 1 as result`,
+      { startTime: new Date().toISOString() },
+    );
+    const messagesIds = await this.getMessageIdsWithPendingModifications();
+    try {
+      if (messagesIds && messagesIds.length > 0) {
+        for (const messagesIdsBatch of chunk(messagesIds, config.elastic.updateBatchSize)) {
+          await this.indexation.indexMessagesInCascade(messagesIdsBatch);
+          // remove ToReIndex labels
+          await this.neo4j.getFirstResultQuery<string[]>(
+            /* cypher */ `UNWIND $messagesIds AS msgId
+          MATCH (msg {id:msgId}) 
+          REMOVE msg:${Neo4jLabelsPendingModificationsLabels.ToReIndexFlag}
+          RETURN collect(msg.id) as result
+        `,
+            { messagesIds: messagesIdsBatch },
+          );
+        }
+      }
+    } finally {
+      // make sure to delete lock node
+      await this.neo4j.getFirstResultQuery(
+        `MATCH (n:${Neo4jLabelsPendingModificationsLabels.IndexingPendingModification}) DELETE n RETURN count(n) AS result`,
+        {},
+      );
+    }
+
+    // return number of impacted messages
+    return messagesIds?.length || 0;
+  }
+
+  async getMessageIdsWithPendingModifications(): Promise<string[]> {
+    const messagesIds = await this.neo4j.getFirstResultQuery<string[]>(
+      /* cypher */ `
+        MATCH (msg:Message:${Neo4jLabelsPendingModificationsLabels.ToReIndexFlag}) RETURN collect(msg.id) as result
+      `,
+      {},
+    );
+    return messagesIds || [];
+  }
+
+  getIndexingPendingModificationLockNode() {
+    return this.neo4j.getFirstResultQuery<{ startTime: string }>(
+      `MATCH (n:${Neo4jLabelsPendingModificationsLabels.IndexingPendingModification}) return n as result`,
+      {},
+    );
   }
 
   /**
@@ -302,7 +361,7 @@ export class DatasetEdition {
       impactedMessages: string[];
     }>(
       tx,
-      ` MATCH (n:${Neo4jLabels[type]} { id: $id }) 
+      /* cypher */ ` MATCH (n:${Neo4jLabels[type]} { id: $id }) 
         RETURN {
           elementId: elementId(n),
           inEdges: [(n)<-[r]-(m) WHERE NOT coalesce(r.deleted, false) | { elementId: elementId(m), type: type(r) }],

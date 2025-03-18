@@ -170,6 +170,11 @@ export const resolvers: Resolvers<unknown> = {
 
       return elasticSearch.formatAggregationResults(field, results);
     },
+
+    // Pending modifications
+    countPendingModifications: async () => {
+      return (await datasetEdition.getMessageIdsWithPendingModifications()).length;
+    },
   },
   Mutation: {
     import: async (_root, { fileNamePattern }, _context, _info) => {

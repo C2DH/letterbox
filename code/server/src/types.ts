@@ -42,3 +42,8 @@ export const Neo4jLabels: Record<ItemType, string> = {
   address: `Address`,
   country: `Country`,
 };
+
+export const Neo4jLabelsPendingModificationsLabels = {
+  ToReIndexFlag: 'ToReIndexFlag',
+  IndexingPendingModification: 'IndexingPendingModification',
+};

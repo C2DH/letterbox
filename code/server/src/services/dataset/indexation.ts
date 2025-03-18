@@ -66,7 +66,7 @@ export class DatasetIndexation {
 
       this.neo4j
         .streamReadQuery<{ id: string }>(this.getIndexMessagesQuery(ids), { ids })
-        .transform(batcher(batchSize || config.elastic.batchSize))
+        .transform(batcher(batchSize || config.elastic.importBatchSize))
         .forEach(
           async (batch) => {
             batchNumber++;
@@ -132,7 +132,7 @@ export class DatasetIndexation {
         .map((doc) => {
           return { ...doc, fingerprint: fingerprint(doc.name) };
         })
-        .transform(batcher(config.elastic.batchSize))
+        .transform(batcher(config.elastic.importBatchSize))
         .forEach(
           async (batch) => {
             batchNumber++;
@@ -165,7 +165,7 @@ export class DatasetIndexation {
         .map((doc) => {
           return { ...doc, fingerprint: fingerprint(doc.name) };
         })
-        .transform(batcher(config.elastic.batchSize))
+        .transform(batcher(config.elastic.importBatchSize))
         .forEach(
           async (batch) => {
             batchNumber++;
@@ -198,7 +198,7 @@ export class DatasetIndexation {
         .map((doc) => {
           return { ...doc, fingerprint: fingerprint(doc.name) };
         })
-        .transform(batcher(config.elastic.batchSize))
+        .transform(batcher(config.elastic.importBatchSize))
         .forEach(
           async (batch) => {
             batchNumber++;
@@ -228,7 +228,7 @@ export class DatasetIndexation {
 
       this.neo4j
         .streamReadQuery<{ id: string }>(this.getIndexCountriesQuery(ids), {})
-        .transform(batcher(config.elastic.batchSize))
+        .transform(batcher(config.elastic.importBatchSize))
         .forEach(
           async (batch) => {
             batchNumber++;

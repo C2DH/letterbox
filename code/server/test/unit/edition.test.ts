@@ -106,6 +106,8 @@ describe('Dataset edition', () => {
       const nodeValue = await getItemData('person', node.id);
       expect(nodeValue).not.toBeNull();
       expect(nodeValue!.name).toBe(name);
+      // apply modifications in ElasticSearch
+      await edition.indexPendingModifications();
       // Check the shape of the message
       await checkMessage(message.id, {
         ...message,
@@ -140,6 +142,8 @@ describe('Dataset edition', () => {
       // ~~~~~~~~~~~~~~~~~~~~~~
       const deletedNode = await getItemData('company', message.raw_company.id, true);
       expect(deletedNode!.deleted).toBe(true);
+      // apply modifications in ElasticSearch
+      await edition.indexPendingModifications();
       // Check the shape of the message
       await checkMessage(message.id, {
         ...message,
@@ -175,6 +179,9 @@ describe('Dataset edition', () => {
         'person',
         nodeName,
       );
+      // check Pending Modifications labels works
+      const nbImpactedMessages = (await edition.getMessageIdsWithPendingModifications()).length;
+      expect(nbImpactedMessages).toBeGreaterThan(0);
 
       // Checks
       // ~~~~~~~~~~~~~~~~~~~~~~
@@ -185,6 +192,14 @@ describe('Dataset edition', () => {
       for (const person of people) {
         await expect(getItemData('person', person.id)).resolves.toBeNull();
       }
+      // apply modifications in ElasticSearch
+      const nb = await edition.indexPendingModifications();
+      expect(nb).toEqual(nbImpactedMessages);
+      // check Pending Modifications labels works
+      const nbPendingModifications = (await edition.getMessageIdsWithPendingModifications()).length;
+      expect(nbPendingModifications).toEqual(0);
+
+      console.log(nb);
       // Check the shape of the message
       await checkMessage(messages[0].id, {
         ...message,
@@ -233,7 +248,15 @@ describe('Dataset edition', () => {
       // Check that the original node has been deleted
       const deletedNode = await getItemData('person', person.id, true);
       expect(deletedNode!.deleted).toBe(true);
-
+      // check apply modifications in ElasticSearch
+      // check Pending Modifications labels works
+      const nbImpactedMessages = (await edition.getMessageIdsWithPendingModifications()).length;
+      expect(nbImpactedMessages).toBeGreaterThan(0);
+      const nb = await edition.indexPendingModifications();
+      expect(nb).toEqual(nbImpactedMessages);
+      // check Pending Modifications labels works
+      const nbPendingModifications = (await edition.getMessageIdsWithPendingModifications()).length;
+      expect(nbPendingModifications).toEqual(0);
       // Check the shape of the message
       await checkMessage(message.id, {
         ...message,

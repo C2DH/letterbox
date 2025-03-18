@@ -26,7 +26,8 @@ export default {
   },
   elastic: {
     node: process.env.ELASTICSEARCH_URL || 'http://localhost:9200/',
-    batchSize: 5000,
+    importBatchSize: 5000,
+    updateBatchSize: 10,
     index_prefix: process.env.ELASTICSEARCH_INDEX_PREFIX || '',
     nested_objects_limit: 1000,
     idValueSeparator: '@',
