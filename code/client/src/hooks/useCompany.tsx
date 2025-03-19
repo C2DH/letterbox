@@ -2,6 +2,7 @@ import { useLazyQuery, useQuery } from '@apollo/client';
 import { useCallback, useMemo } from 'react';
 
 import {
+  aggregateCompanies,
   getCompanyAddresses,
   getCompanyById,
   getCompanyCountries,
@@ -55,14 +56,22 @@ export const useGetCompanyById = (id?: string) => {
   );
 
   // Fetch messages
-  const [lazymessage] = useLazyQuery(getCompanyMessages);
+  const [lazyMessage] = useLazyQuery(getCompanyMessages);
   const fetchMessages = useCallback(
     async (skip: number, limit: number) => {
-      const result = await lazymessage({ variables: { id: id || '', skip, limit } });
+      const result = await lazyMessage({ variables: { id: id || '', skip, limit } });
       return result.data?.result[0] ? result.data.result[0].messages : [];
     },
-    [lazymessage, id],
+    [lazyMessage, id],
   );
 
   return { loading, company, fetchAddresses, fetchCountries, fetchPeople, fetchMessages };
+};
+
+/**
+ * Hook to retrive top values for companies
+ */
+export const useGetCompanyAggregations = () => {
+  const { loading, error, data } = useQuery(aggregateCompanies, {});
+  return { loading, error, data };
 };

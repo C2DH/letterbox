@@ -65,3 +65,33 @@ export const getCompanyPeople = graphql(`
     }
   }
 `);
+
+// TODO add filters
+export const aggregateCompanies = graphql(`
+  query AggregateCompanies {
+    people: aggregate(itemType: company, field: people, size: 20) {
+      total
+      values {
+        label
+        id
+        count
+      }
+    }
+    addresses: aggregate(itemType: company, field: addresses, size: 20) {
+      total
+      values {
+        label
+        id
+        count
+      }
+    }
+    countries: aggregate(itemType: company, field: countries, size: 20) {
+      total
+      values {
+        label
+        id
+        count
+      }
+    }
+  }
+`);

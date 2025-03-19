@@ -4,7 +4,7 @@ import { useMemo, type FC, type PropsWithChildren } from 'react';
 /**
  * Build an instance of the apollo client.
  */
-function getApploCLient() {
+function getApolloCLient() {
   const client = new ApolloClient({
     uri: '/graphql',
     cache: new InMemoryCache(),
@@ -16,6 +16,6 @@ function getApploCLient() {
  * Apollo  client provider.
  */
 export const ApolloProvider: FC<PropsWithChildren> = ({ children }) => {
-  const apolloClient = useMemo(() => getApploCLient(), []);
+  const apolloClient = useMemo(() => getApolloCLient(), []);
   return <AP client={apolloClient}>{children}</AP>;
 };

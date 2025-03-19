@@ -5,13 +5,17 @@ const config: CodegenConfig = {
   documents: ['src/**/*.ts([x])?', '!src/core/graphql/generated/*'],
   generates: {
     './src/core/graphql/generated/': {
-      plugins: ['typescript', 'typescript-operations'],
+      //plugins: ['typescript', 'typescript-operations'],
       preset: 'client',
       presetConfig: {
         fragmentMasking: false,
       },
       config: {
         dedupeFragments: true,
+        //     scalars: {
+        //       DateTime: 'Date',
+        //       Int64: 'string',
+        //     },
       },
     },
   },
