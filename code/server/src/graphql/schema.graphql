@@ -611,13 +611,6 @@ type IndexingPendingModification
 # Inputs
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-type ImportReport
-  @query(read: false, aggregate: false)
-  @mutation(operations: [])
-  @subscription(events: []) {
-  count: Int!
-  errors: [String!]
-}
 # Filters
 
 enum FilterTypes {
@@ -701,6 +694,25 @@ enum AggregationFields {
 
 # RETURN TYPE
 
+type ImportReport
+  @query(read: false, aggregate: false)
+  @mutation(operations: [])
+  @subscription(events: []) {
+  count: Int!
+  errors: [String!]
+}
+
+type PendingModificationsIndexationReport
+  @query(read: false, aggregate: false)
+  @mutation(operations: [])
+  @subscription(events: []) {
+  message: ImportReport
+  company: ImportReport
+  person: ImportReport
+  address: ImportReport
+  country: ImportReport
+}
+
 type SearchResults
   @query(read: false, aggregate: false)
   @mutation(operations: [])
@@ -716,11 +728,6 @@ type AggregateValue
   id: String!
   label: String!
   count: Int!
-}
-
-type AggregateResults {
-  total: Int!
-  values: [AggregateValue!]!
 }
 
 type AggregateResults
@@ -781,7 +788,7 @@ type Query {
   # Pending modifications
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-  countPendingModifications: Int!
+  countItemsWithPendingModifications: Int!
 
   #
   # Internal methods
@@ -857,5 +864,5 @@ type Mutation {
   """
   Index Pending modifications
   """
-  indexPendingModifications: Int!
+  indexPendingModifications: PendingModificationsIndexationReport
 }

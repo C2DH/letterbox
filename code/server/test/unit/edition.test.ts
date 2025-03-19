@@ -1,4 +1,5 @@
 import { afterEach } from 'node:test';
+import { sum, values } from 'lodash';
 import { v4 as uuid } from 'uuid';
 import { beforeAll, describe, expect, test } from 'vitest';
 
@@ -180,7 +181,7 @@ describe('Dataset edition', () => {
         nodeName,
       );
       // check Pending Modifications labels works
-      const nbImpactedMessages = (await edition.getMessageIdsWithPendingModifications()).length;
+      const nbImpactedMessages = await edition.countItemsWithPendingModifications();
       expect(nbImpactedMessages).toBeGreaterThan(0);
 
       // Checks
@@ -193,13 +194,12 @@ describe('Dataset edition', () => {
         await expect(getItemData('person', person.id)).resolves.toBeNull();
       }
       // apply modifications in ElasticSearch
-      const nb = await edition.indexPendingModifications();
-      expect(nb).toEqual(nbImpactedMessages);
+      const reports = await edition.indexPendingModifications();
+      expect(sum(values(reports).map((r) => r.count))).toEqual(nbImpactedMessages);
       // check Pending Modifications labels works
-      const nbPendingModifications = (await edition.getMessageIdsWithPendingModifications()).length;
+      const nbPendingModifications = await edition.countItemsWithPendingModifications();
       expect(nbPendingModifications).toEqual(0);
 
-      console.log(nb);
       // Check the shape of the message
       await checkMessage(messages[0].id, {
         ...message,
@@ -250,12 +250,12 @@ describe('Dataset edition', () => {
       expect(deletedNode!.deleted).toBe(true);
       // check apply modifications in ElasticSearch
       // check Pending Modifications labels works
-      const nbImpactedMessages = (await edition.getMessageIdsWithPendingModifications()).length;
+      const nbImpactedMessages = await edition.countItemsWithPendingModifications();
       expect(nbImpactedMessages).toBeGreaterThan(0);
-      const nb = await edition.indexPendingModifications();
-      expect(nb).toEqual(nbImpactedMessages);
+      const reports = await edition.indexPendingModifications();
+      expect(sum(values(reports).map((r) => r.count))).toEqual(nbImpactedMessages);
       // check Pending Modifications labels works
-      const nbPendingModifications = (await edition.getMessageIdsWithPendingModifications()).length;
+      const nbPendingModifications = await edition.countItemsWithPendingModifications();
       expect(nbPendingModifications).toEqual(0);
       // Check the shape of the message
       await checkMessage(message.id, {

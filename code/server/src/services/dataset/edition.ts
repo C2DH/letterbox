@@ -1,12 +1,11 @@
 import Boom from '@hapi/boom';
 import { getLogger } from '@ouestware/node-logger';
-import { chunk } from 'lodash';
 import type { Transaction } from 'neo4j-driver';
 import { inject, singleton } from 'tsyringe';
 import { v4 as uuid } from 'uuid';
 
-import config from '../../config';
 import {
+  ImportReport,
   Neo4jLabels,
   Neo4jLabelsPendingModificationsLabels,
   type ItemType,
@@ -48,7 +47,10 @@ export class DatasetEdition {
         CREATE (n:${Neo4jLabels[type]} { id: $id, name: $name, created: datetime(), updated: datetime() }) 
         CREATE (m)-[:CONTAINS { created: datetime(), updated: datetime() }]->(n)
         SET m:${Neo4jLabelsPendingModificationsLabels.ToReIndexFlag}
-        RETURN 1 as result`,
+        WITH m 
+          OPTIONAL MATCH (m)-[r:CONTAINS]->(e) WHERE NOT coalesce(r.deleted, false) 
+          SET e:${Neo4jLabelsPendingModificationsLabels.ToReIndexFlag}        
+          RETURN 1 as result`,
       { messageId, id: nodeId, name },
     );
     return { type, id: nodeId };
@@ -73,7 +75,10 @@ export class DatasetEdition {
             r.created = datetime(), 
             r.updated = datetime()
         SET m:${Neo4jLabelsPendingModificationsLabels.ToReIndexFlag}
-        RETURN 1 as result`,
+        WITH m
+          OPTIONAL MATCH (m)-[r:CONTAINS]->(e) WHERE NOT coalesce(r.deleted, false) 
+          SET e:${Neo4jLabelsPendingModificationsLabels.ToReIndexFlag}
+          RETURN 1 as result`,
       { messageId, id },
     );
   }
@@ -92,8 +97,9 @@ export class DatasetEdition {
         SET n.name = $name,
             n.updated = datetime()
         WITH n
-          MATCH (n)<-[r:CONTAINS]-(msg:Message) WHERE NOT coalesce(r.deleted, false) 
+          MATCH (n)<-[rm:CONTAINS]-(msg:Message)-[re:CONTAINS]->(e) WHERE NOT coalesce(rm.deleted, false) AND NOT coalesce(re.deleted, false) 
           SET msg:${Neo4jLabelsPendingModificationsLabels.ToReIndexFlag}
+          SET e:${Neo4jLabelsPendingModificationsLabels.ToReIndexFlag}
           RETURN 1 as result`,
       { id, name },
     );
@@ -115,8 +121,9 @@ export class DatasetEdition {
         SET n:${Neo4jLabels[newType]}
         SET n.updated = datetime()
         WITH n
-          MATCH (n)<-[r:CONTAINS]-(msg:Message) WHERE NOT coalesce(r.deleted, false)
+          MATCH (n)<-[rm:CONTAINS]-(msg:Message)-[re:CONTAINS]->(e) WHERE NOT coalesce(rm.deleted, false) AND NOT coalesce(re.deleted, false) 
           SET msg:${Neo4jLabelsPendingModificationsLabels.ToReIndexFlag}
+          SET e:${Neo4jLabelsPendingModificationsLabels.ToReIndexFlag}
           RETURN 1 as result`,
       { id },
     );
@@ -138,11 +145,12 @@ export class DatasetEdition {
       SET n.deleted = true,
           n.updated = datetime()
       WITH n
-        OPTIONAL MATCH (n)<-[r:CONTAINS]-(msg:Message) WHERE NOT coalesce(r.deleted, false) 
+        MATCH (n)<-[rm:CONTAINS]-(msg:Message)-[re:CONTAINS]->(e) WHERE NOT coalesce(rm.deleted, false) AND NOT coalesce(re.deleted, false) 
         SET msg:${Neo4jLabelsPendingModificationsLabels.ToReIndexFlag}
-      WITH n
-        OPTIONAL MATCH (n)-[r]-() SET r.deleted = true, r.updated = datetime()
+        SET e:${Neo4jLabelsPendingModificationsLabels.ToReIndexFlag}
+        SET rm.deleted = true, rm.updated = datetime()
         RETURN 1 AS result`;
+    console.debug(query);
     await (tx
       ? this.neo4j.getTxFirstResultQuery<string[]>(tx, query, { id })
       : this.neo4j.getFirstResultQuery<string[]>(query, { id }));
@@ -168,7 +176,7 @@ export class DatasetEdition {
         nodes.map(async (nodeDef) => {
           // Check that the node exists and get its graph fingerprint
           const data = await this.getItemGraphFingerprint(tx, nodeDef.type, nodeDef.id);
-          // delete the node: this action will flag all impacted message
+          // delete the node: this action will flag all impacted items
           await this.deleteNode(nodeDef.type, nodeDef.id, tx);
           return data;
         }),
@@ -178,7 +186,7 @@ export class DatasetEdition {
       const targetId = uuid();
       const targetElementId = await this.neo4j.getTxFirstResultQuery<string>(
         tx,
-        /*cypher*/ `CREATE (n:${Neo4jLabels[targetType]} { id: $id, name: $name, created: datetime(), updated: datetime() }) RETURN elementId(n) AS result`,
+        /*cypher*/ `CREATE (n:${Neo4jLabels[targetType]}:${Neo4jLabelsPendingModificationsLabels.ToReIndexFlag} { id: $id, name: $name, created: datetime(), updated: datetime() }) RETURN elementId(n) AS result`,
         { id: targetId, name: targetName },
       );
 
@@ -235,7 +243,7 @@ export class DatasetEdition {
       await this.neo4j.getTxFirstResultQuery(
         tx,
         /* cypher */ ` UNWIND $newNodes AS newNode
-            CREATE (n:${Neo4jLabels[type]} { id: newNode.id, name: newNode.name, created: datetime(), updated: datetime() })
+            CREATE (n:${Neo4jLabels[type]}:${Neo4jLabelsPendingModificationsLabels.ToReIndexFlag} { id: newNode.id, name: newNode.name, created: datetime(), updated: datetime() })
             WITH n 
               CALL(n) {
                 UNWIND $inEdges as edge
@@ -278,57 +286,91 @@ export class DatasetEdition {
    * Apply pending changes to ElasticSearch
    * returns number of indexed messages
    * */
-  async indexPendingModifications(): Promise<number> {
+  async indexPendingModifications() {
     // Check lock node existence
     const lockNode = await this.getIndexingPendingModificationLockNode();
     if (lockNode !== null) {
-      console.log(lockNode);
       throw new Error(
         `Can't index pending modification, an existing process is already running since ${lockNode}`,
       );
     }
-
+    const nbItems = await this.countItemsWithPendingModifications();
+    console.debug(`start indexation task for ${nbItems}`);
     // create a indexation status node
-    await this.neo4j.getFirstResultQuery(
-      /* cypher */ `CREATE (n:${Neo4jLabelsPendingModificationsLabels.IndexingPendingModification}) SET n.startTime = $startTime RETURN 1 as result`,
-      { startTime: new Date().toISOString() },
+    const idLock = await this.neo4j.getFirstResultQuery(
+      /* cypher */ `CREATE (n:${Neo4jLabelsPendingModificationsLabels.IndexingPendingModification}) SET n= {startTime: $startTime, nbItems: $nbItems} RETURN id(n) as result`,
+      { startTime: new Date().toISOString(), nbItems },
     );
-    const messagesIds = await this.getMessageIdsWithPendingModifications();
-    try {
-      if (messagesIds && messagesIds.length > 0) {
-        for (const messagesIdsBatch of chunk(messagesIds, config.elastic.updateBatchSize)) {
-          await this.indexation.indexMessagesInCascade(messagesIdsBatch);
-          // remove ToReIndex labels
-          await this.neo4j.getFirstResultQuery<string[]>(
-            /* cypher */ `UNWIND $messagesIds AS msgId
-          MATCH (msg {id:msgId}) 
-          REMOVE msg:${Neo4jLabelsPendingModificationsLabels.ToReIndexFlag}
-          RETURN collect(msg.id) as result
+    const removeToBeIndexFlag = (itemType: ItemType) => async (ids: string[]) => {
+      await this.neo4j.getFirstResultQuery<void>(
+        /* cypher */ `
+        MATCH (item:${Neo4jLabels[itemType]}:${Neo4jLabelsPendingModificationsLabels.ToReIndexFlag})
+        WHERE  item.id IN $ids
+        WITH item
+        REMOVE item:${Neo4jLabelsPendingModificationsLabels.ToReIndexFlag}
+        RETURN 1 as result
         `,
-            { messagesIds: messagesIdsBatch },
-          );
-        }
-      }
+        { ids },
+      );
+      this.log.debug(`indexation ${idLock}: marked ${ids.length} items as indexed`);
+    };
+
+    const reports: Partial<Record<ItemType, ImportReport>> = {};
+    try {
+      reports.message = await this.indexation.indexMessages(
+        undefined,
+        true,
+        removeToBeIndexFlag('message'),
+        5000,
+      );
+      reports.company = await this.indexation.indexCompanies(
+        undefined,
+        true,
+        removeToBeIndexFlag('company'),
+        1000,
+      );
+      reports.person = await this.indexation.indexPeople(
+        undefined,
+        true,
+        removeToBeIndexFlag('person'),
+        100,
+      );
+      reports.address = await this.indexation.indexAddresses(
+        undefined,
+        true,
+        removeToBeIndexFlag('address'),
+        1000,
+      );
+      reports.country = await this.indexation.indexCountries(
+        undefined,
+        true,
+        removeToBeIndexFlag('country'),
+        5,
+      );
+    } catch (error) {
+      this.log.error(error + '');
     } finally {
       // make sure to delete lock node
+      // TODO: should we keep this node for log?
+      console.debug(`indexation ${idLock} task done`);
       await this.neo4j.getFirstResultQuery(
-        `MATCH (n:${Neo4jLabelsPendingModificationsLabels.IndexingPendingModification}) DELETE n RETURN count(n) AS result`,
+        `MATCH (n:${Neo4jLabelsPendingModificationsLabels.IndexingPendingModification}) DELETE n RETURN 1 AS result`,
         {},
       );
     }
-
-    // return number of impacted messages
-    return messagesIds?.length || 0;
+    // return number of impacted items by itemType
+    return reports;
   }
 
-  async getMessageIdsWithPendingModifications(): Promise<string[]> {
-    const messagesIds = await this.neo4j.getFirstResultQuery<string[]>(
+  async countItemsWithPendingModifications(): Promise<number> {
+    const nbItems = await this.neo4j.getFirstResultQuery<number>(
       /* cypher */ `
-        MATCH (msg:Message:${Neo4jLabelsPendingModificationsLabels.ToReIndexFlag}) RETURN collect(msg.id) as result
+        MATCH (i:${Neo4jLabelsPendingModificationsLabels.ToReIndexFlag})
+        RETURN count(i) as result
       `,
       {},
     );
-    return messagesIds || [];
+    return nbItems || 0;
   }
 
   getIndexingPendingModificationLockNode() {

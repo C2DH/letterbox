@@ -172,8 +172,8 @@ export const resolvers: Resolvers<unknown> = {
     },
 
     // Pending modifications
-    countPendingModifications: async () => {
-      return (await datasetEdition.getMessageIdsWithPendingModifications()).length;
+    countItemsWithPendingModifications: async () => {
+      return await datasetEdition.countItemsWithPendingModifications();
     },
   },
   Mutation: {
@@ -249,6 +249,15 @@ export const resolvers: Resolvers<unknown> = {
       const data = await getGraphQlItem(node.type, node.id, context, info);
       if (!data) throw Boom.internal(`Node ${type} ${name} not found`);
       return data;
+    },
+    /**
+     * Index pendign mutations
+     */
+    indexPendingModifications: async () => {
+      const report = await datasetEdition.indexPendingModifications();
+      console.log('indexPendingModifications done');
+      console.log(report);
+      return report;
     },
   },
 };

@@ -5,7 +5,13 @@ import { batcher } from 'ts-stream';
 import { inject, singleton } from 'tsyringe';
 
 import config from '../../config';
-import { EsIndices, ImportReport, ItemType, itemTypes } from '../../types';
+import {
+  EsIndices,
+  ImportReport,
+  ItemType,
+  itemTypes,
+  Neo4jLabelsPendingModificationsLabels,
+} from '../../types';
 import { Elastic } from '../elastic';
 import { Neo4j } from '../neo4j';
 
@@ -59,85 +65,79 @@ export class DatasetIndexation {
    * Index messages.
    * If <code>ids</code> is provided, only the messages with the given ids will be indexed.
    */
-  async indexMessages(ids?: string[], batchSize?: number): Promise<ImportReport> {
+  async indexMessages(
+    ids?: string[],
+    withPendingModifications?: boolean,
+    onBatchDone?: (ids: string[]) => Promise<void>,
+    batchSize?: number,
+  ): Promise<ImportReport> {
     return new Promise((resolve, reject) => {
       let batchNumber = 0;
       const result: ImportReport = { count: 0, errors: [] };
 
       this.neo4j
-        .streamReadQuery<{ id: string }>(this.getIndexMessagesQuery(ids), { ids })
+        .streamReadQuery<{ id: string }>(
+          this.getIndexMessagesQuery(ids, withPendingModifications),
+          { ids },
+        )
         .transform(batcher(batchSize || config.elastic.importBatchSize))
         .forEach(
           async (batch) => {
             batchNumber++;
             this.log.info('Exec batch', batchNumber);
             const report = await this.es.bulkImport(EsIndices['message'], batch);
+            if (onBatchDone) await onBatchDone(batch.map((b) => b.id));
             result.count += batch.length;
             result.errors.push(...report.map((e) => e.error));
             this.log.info('Batch finished', batchNumber);
           },
           (error) => {
-            if (error) reject(error);
+            if (error) {
+              this.log.error(error + '');
+              reject(error);
+            }
             this.log.info('Messages indexation finished', result);
             resolve(result);
           },
-        );
+        )
+        .catch((error) => {
+          if (error) {
+            this.log.error(error + '');
+            reject(error);
+          }
+        });
     });
-  }
-
-  /**
-   * Index messages.
-   * If <code>ids</code> is provided, only the messages with the given ids will be indexed.
-   */
-  async indexMessagesInCascade(ids: string[]): Promise<void> {
-    await this.indexMessages(ids);
-    const impacted = await this.neo4j.getFirstResultQuery<{
-      companies: string[];
-      people: string[];
-      addresses: string[];
-      countries: [];
-    }>(
-      ` MATCH (n:Message) WHERE n.id IN $ids
-        RETURN 
-          {
-            companies: collect { MATCH (n)-[r:CONTAINS]->(m:Company) WHERE NOT coalesce(r.deleted) AND NOT coalesce(m.deleted) RETURN DISTINCT m.id },
-            people:    collect { MATCH (n)-[r:CONTAINS]->(m:Person)  WHERE NOT coalesce(r.deleted) AND NOT coalesce(m.deleted) RETURN DISTINCT m.id },
-            addresses: collect { MATCH (n)-[r:CONTAINS]->(m:Address) WHERE NOT coalesce(r.deleted) AND NOT coalesce(m.deleted) RETURN DISTINCT m.id },
-            countries: collect { MATCH (n)-[r:CONTAINS]->(m:Country) WHERE NOT coalesce(r.deleted) AND NOT coalesce(m.deleted) RETURN DISTINCT m.id }
-          } AS result
-      `,
-      { ids },
-    );
-    if (impacted) {
-      await Promise.all([
-        this.indexCompanies(impacted.companies),
-        this.indexPeople(impacted.people),
-        this.indexAddresses(impacted.addresses),
-        this.indexCountries(impacted.countries),
-      ]);
-    }
   }
 
   /**
    * Index people.
    * If <code>ids</code> is provided, only the people with the given ids will be indexed.
    */
-  async indexPeople(ids?: string[]): Promise<ImportReport> {
+  async indexPeople(
+    ids?: string[],
+    withPendingModifications?: boolean,
+    onBatchDone?: (ids: string[]) => Promise<void>,
+    batchSize?: number,
+  ): Promise<ImportReport> {
     return new Promise((resolve, reject) => {
       let batchNumber = 0;
       const result: ImportReport = { count: 0, errors: [] };
 
       this.neo4j
-        .streamReadQuery<{ id: string; name: string }>(this.getIndexPeopleQuery(ids), { ids })
+        .streamReadQuery<{ id: string; name: string }>(
+          this.getIndexPeopleQuery(ids, withPendingModifications),
+          { ids },
+        )
         .map((doc) => {
           return { ...doc, fingerprint: fingerprint(doc.name) };
         })
-        .transform(batcher(config.elastic.importBatchSize))
+        .transform(batcher(batchSize || config.elastic.importBatchSize))
         .forEach(
           async (batch) => {
             batchNumber++;
             this.log.info('People exec batch', batchNumber);
             const report = await this.es.bulkImport(EsIndices['person'], batch);
+            if (onBatchDone) await onBatchDone(batch.map((b) => b.id));
             result.count += batch.length;
             result.errors.push(...report.map((e) => e.error));
             this.log.info('People batch finished', batchNumber);
@@ -155,22 +155,31 @@ export class DatasetIndexation {
    * Index companies.
    * If <code>ids</code> is provided, only the people with the given ids will be indexed.
    */
-  async indexCompanies(ids?: string[]): Promise<ImportReport> {
+  async indexCompanies(
+    ids?: string[],
+    withPendingModifications?: boolean,
+    onBatchDone?: (ids: string[]) => Promise<void>,
+    batchSize?: number,
+  ): Promise<ImportReport> {
     return new Promise((resolve, reject) => {
       let batchNumber = 0;
       const result: ImportReport = { count: 0, errors: [] };
 
       this.neo4j
-        .streamReadQuery<{ id: string; name: string }>(this.getIndexCompaniesQuery(ids), { ids })
+        .streamReadQuery<{ id: string; name: string }>(
+          this.getIndexCompaniesQuery(ids, withPendingModifications),
+          { ids },
+        )
         .map((doc) => {
           return { ...doc, fingerprint: fingerprint(doc.name) };
         })
-        .transform(batcher(config.elastic.importBatchSize))
+        .transform(batcher(batchSize || config.elastic.importBatchSize))
         .forEach(
           async (batch) => {
             batchNumber++;
             this.log.info('Company exec batch', batchNumber);
             const report = await this.es.bulkImport(EsIndices['company'], batch);
+            if (onBatchDone) await onBatchDone(batch.map((b) => b.id));
             result.count += batch.length;
             result.errors.push(...report.map((e) => e.error));
             this.log.info('Company batch finished', batchNumber);
@@ -188,22 +197,31 @@ export class DatasetIndexation {
    * Index Addresses.
    * If <code>ids</code> is provided, only the people with the given ids will be indexed.
    */
-  async indexAddresses(ids?: string[]): Promise<ImportReport> {
+  async indexAddresses(
+    ids?: string[],
+    withPendingModifications?: boolean,
+    onBatchDone?: (ids: string[]) => Promise<void>,
+    batchSize?: number,
+  ): Promise<ImportReport> {
     return new Promise((resolve, reject) => {
       let batchNumber = 0;
       const result: ImportReport = { count: 0, errors: [] };
 
       this.neo4j
-        .streamReadQuery<{ id: string; name: string }>(this.getIndexAddressesQuery(ids), {})
+        .streamReadQuery<{ id: string; name: string }>(
+          this.getIndexAddressesQuery(ids, withPendingModifications),
+          { ids },
+        )
         .map((doc) => {
           return { ...doc, fingerprint: fingerprint(doc.name) };
         })
-        .transform(batcher(config.elastic.importBatchSize))
+        .transform(batcher(batchSize || config.elastic.importBatchSize))
         .forEach(
           async (batch) => {
             batchNumber++;
             this.log.info('Address exec batch', batchNumber);
             const report = await this.es.bulkImport(EsIndices['address'], batch);
+            if (onBatchDone) await onBatchDone(batch.map((b) => b.id));
             result.count += batch.length;
             result.errors.push(...report.map((e) => e.error));
             this.log.info('Address batch finished', batchNumber);
@@ -221,19 +239,28 @@ export class DatasetIndexation {
    * Index Countries.
    * If <code>ids</code> is provided, only the people with the given ids will be indexed.
    */
-  async indexCountries(ids?: string[]): Promise<ImportReport> {
+  async indexCountries(
+    ids?: string[],
+    withPendingModifications?: boolean,
+    onBatchDone?: (ids: string[]) => Promise<void>,
+    batchSize?: number,
+  ): Promise<ImportReport> {
     return new Promise((resolve, reject) => {
       let batchNumber = 0;
       const result: ImportReport = { count: 0, errors: [] };
 
       this.neo4j
-        .streamReadQuery<{ id: string }>(this.getIndexCountriesQuery(ids), {})
-        .transform(batcher(config.elastic.importBatchSize))
+        .streamReadQuery<{ id: string }>(
+          this.getIndexCountriesQuery(ids, withPendingModifications),
+          { ids },
+        )
+        .transform(batcher(batchSize || config.elastic.importBatchSize))
         .forEach(
           async (batch) => {
             batchNumber++;
             this.log.info('Country exec batch', batchNumber);
             const report = await this.es.bulkImport(EsIndices['country'], batch);
+            if (onBatchDone) await onBatchDone(batch.map((b) => b.id));
             result.count += batch.length;
             result.errors.push(...report.map((e) => e.error));
             this.log.info('Country batch finished', batchNumber);
@@ -250,86 +277,86 @@ export class DatasetIndexation {
   /**
    * Return the cypher query to index people.
    */
-  getIndexMessagesQuery(ids?: string[]) {
+  getIndexMessagesQuery(ids?: string[], withPendingModifications?: boolean) {
     return `
-      MATCH (n:Message)
+      MATCH (n:Message${withPendingModifications ? `:${Neo4jLabelsPendingModificationsLabels.ToReIndexFlag}` : ''})
       ${ids && ids.length ? `WHERE n.id IN $ids` : ''}
       RETURN  {
         id: n.id,
         message: n.message,
         year: n.year,
-        people:    collect { MATCH (n)-[r:CONTAINS]->(m:Person)  WHERE NOT coalesce(r.deleted) AND NOT coalesce(m.deleted) RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name  },
-        addresses: collect { MATCH (n)-[r:CONTAINS]->(m:Address) WHERE NOT coalesce(r.deleted) AND NOT coalesce(m.deleted) RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name  },
-        companies: collect { MATCH (n)-[r:CONTAINS]->(m:Company) WHERE NOT coalesce(r.deleted) AND NOT coalesce(m.deleted) RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name  },
-        countries: collect { MATCH (n)-[r:CONTAINS]->(m:Country) WHERE NOT coalesce(r.deleted) AND NOT coalesce(m.deleted) RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name  }
+        people:    collect { MATCH (n)-[r:CONTAINS]->(m:Person)  WHERE NOT coalesce(r.deleted, false) AND NOT coalesce(m.deleted, false) RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name  },
+        addresses: collect { MATCH (n)-[r:CONTAINS]->(m:Address) WHERE NOT coalesce(r.deleted, false) AND NOT coalesce(m.deleted, false) RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name  },
+        companies: collect { MATCH (n)-[r:CONTAINS]->(m:Company) WHERE NOT coalesce(r.deleted, false) AND NOT coalesce(m.deleted, false) RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name  },
+        countries: collect { MATCH (n)-[r:CONTAINS]->(m:Country) WHERE NOT coalesce(r.deleted, false) AND NOT coalesce(m.deleted, false) RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name  }
       } as result`;
   }
 
   /**
    * Return the cypher query to index people.
    */
-  getIndexPeopleQuery(ids?: string[]) {
+  getIndexPeopleQuery(ids?: string[], withPendingModifications?: boolean) {
     return `
-      MATCH (n:Person)
+      MATCH (n:Person${withPendingModifications ? `:${Neo4jLabelsPendingModificationsLabels.ToReIndexFlag}` : ''})
       ${ids && ids.length ? `WHERE n.id IN $ids` : ''}
       RETURN  {
         id: n.id,
         name: n.name,
-        addresses: collect { MATCH (n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Address) WHERE NOT coalesce(r1.deleted) AND  NOT coalesce(r2.deleted) AND NOT coalesce(m.deleted) RETURN DISTINCT  m.id + "${config.elastic.idValueSeparator}" + m.name  },
-        companies: collect { MATCH (n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Company) WHERE NOT coalesce(r1.deleted) AND  NOT coalesce(r2.deleted) AND NOT coalesce(m.deleted) RETURN DISTINCT  m.id + "${config.elastic.idValueSeparator}" + m.name  },
-        countries: collect { MATCH (n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Country) WHERE NOT coalesce(r1.deleted) AND  NOT coalesce(r2.deleted) AND NOT coalesce(m.deleted) RETURN DISTINCT  m.id + "${config.elastic.idValueSeparator}" + m.name  },
-        years:     collect { MATCH (n)<--(m:Message) RETURN DISTINCT m.year  }
+        addresses: collect { MATCH (n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Address) WHERE NOT coalesce(r1.deleted, false) AND  NOT coalesce(r2.deleted, false) AND NOT coalesce(m.deleted, false) RETURN DISTINCT  m.id + "${config.elastic.idValueSeparator}" + m.name  },
+        companies: collect { MATCH (n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Company) WHERE NOT coalesce(r1.deleted, false) AND  NOT coalesce(r2.deleted, false) AND NOT coalesce(m.deleted, false) RETURN DISTINCT  m.id + "${config.elastic.idValueSeparator}" + m.name  },
+        countries: collect { MATCH (n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Country) WHERE NOT coalesce(r1.deleted, false) AND  NOT coalesce(r2.deleted, false) AND NOT coalesce(m.deleted, false) RETURN DISTINCT  m.id + "${config.elastic.idValueSeparator}" + m.name  },
+        years:     collect { MATCH (n)<-[r1:CONTAINS]-(m:Message) WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(m.deleted, false) RETURN DISTINCT m.year  }
       } as result`;
   }
 
   /**
    * Return the cypher query to index company.
    */
-  getIndexCompaniesQuery(ids?: string[]) {
+  getIndexCompaniesQuery(ids?: string[], withPendingModifications?: boolean) {
     return `
-      MATCH (n:Company)
+      MATCH (n:Company${withPendingModifications ? `:${Neo4jLabelsPendingModificationsLabels.ToReIndexFlag}` : ''})
       ${ids && ids.length ? `WHERE n.id IN $ids` : ''}
       RETURN  {
         id: n.id,
         name: n.name,
-        people:    collect { MATCH (n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Person)  WHERE NOT coalesce(r1.deleted) AND  NOT coalesce(r2.deleted) AND NOT coalesce(m.deleted) RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name  },
-        addresses: collect { MATCH (n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Address) WHERE NOT coalesce(r1.deleted) AND  NOT coalesce(r2.deleted) AND NOT coalesce(m.deleted) RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name  },
-        countries: collect { MATCH (n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Country) WHERE NOT coalesce(r1.deleted) AND  NOT coalesce(r2.deleted) AND NOT coalesce(m.deleted) RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name  },
-        years:     collect { MATCH (n)<--(m:Message) RETURN DISTINCT m.year  }
+        people:    collect { MATCH (n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Person)  WHERE NOT coalesce(r1.deleted, false) AND  NOT coalesce(r2.deleted, false) AND NOT coalesce(m.deleted, false) RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name  },
+        addresses: collect { MATCH (n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Address) WHERE NOT coalesce(r1.deleted, false) AND  NOT coalesce(r2.deleted, false) AND NOT coalesce(m.deleted, false) RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name  },
+        countries: collect { MATCH (n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Country) WHERE NOT coalesce(r1.deleted, false) AND  NOT coalesce(r2.deleted, false) AND NOT coalesce(m.deleted, false) RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name  },
+        years:     collect { MATCH (n)<-[r1:CONTAINS]-(m:Message) WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(m.deleted, false) RETURN DISTINCT m.year  }
       } as result`;
   }
 
   /**
    * Return the cypher query to index addresses.
    */
-  getIndexAddressesQuery(ids?: string[]) {
+  getIndexAddressesQuery(ids?: string[], withPendingModifications?: boolean) {
     return `
-      MATCH (n:Address)
+      MATCH (n:Address${withPendingModifications ? `:${Neo4jLabelsPendingModificationsLabels.ToReIndexFlag}` : ''})
       ${ids && ids.length ? `WHERE n.id IN $ids` : ''}
       RETURN  {
         id: n.id,
         name: n.name,
-        people:    collect { MATCH(n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Person)  WHERE NOT coalesce(r1.deleted) AND  NOT coalesce(r2.deleted) AND NOT coalesce(m.deleted) RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name  },
-        companies: collect { MATCH(n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Company) WHERE NOT coalesce(r1.deleted) AND  NOT coalesce(r2.deleted) AND NOT coalesce(m.deleted) RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name  },
-        countries: collect { MATCH(n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Country) WHERE NOT coalesce(r1.deleted) AND  NOT coalesce(r2.deleted) AND NOT coalesce(m.deleted) RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name  },
-        years:     collect { MATCH(n)<--(m:Message) RETURN DISTINCT m.year  }
+        people:    collect { MATCH(n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Person)  WHERE NOT coalesce(r1.deleted, false) AND  NOT coalesce(r2.deleted, false) AND NOT coalesce(m.deleted, false) RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name  },
+        companies: collect { MATCH(n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Company) WHERE NOT coalesce(r1.deleted, false) AND  NOT coalesce(r2.deleted, false) AND NOT coalesce(m.deleted, false) RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name  },
+        countries: collect { MATCH(n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Country) WHERE NOT coalesce(r1.deleted, false) AND  NOT coalesce(r2.deleted, false) AND NOT coalesce(m.deleted, false) RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name  },
+        years:     collect { MATCH(n)<-[r1:CONTAINS]-(m:Message) WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(m.deleted, false) RETURN DISTINCT m.year  }
       } as result`;
   }
 
   /**
    * Return the cypher query to index country.
    */
-  getIndexCountriesQuery(ids?: string[]) {
+  getIndexCountriesQuery(ids?: string[], withPendingModifications?: boolean) {
     return `
-      MATCH (n:Country) 
+      MATCH (n:Country${withPendingModifications ? `:${Neo4jLabelsPendingModificationsLabels.ToReIndexFlag}` : ''}) 
       ${ids && ids.length ? `WHERE n.id IN $ids` : ''}
       RETURN  {
         id: n.id,
         name: n.name,
-        people:    collect { MATCH (n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Person)  WHERE NOT coalesce(r1.deleted) AND  NOT coalesce(r2.deleted) AND NOT coalesce(m.deleted) RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name  LIMIT ${config.elastic.nested_objects_limit}},
-        companies: collect { MATCH (n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Company) WHERE NOT coalesce(r1.deleted) AND  NOT coalesce(r2.deleted) AND NOT coalesce(m.deleted) RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name LIMIT ${config.elastic.nested_objects_limit} },
-        addresses: collect { MATCH (n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Address) WHERE NOT coalesce(r1.deleted) AND  NOT coalesce(r2.deleted) AND NOT coalesce(m.deleted) RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name LIMIT ${config.elastic.nested_objects_limit} },
-        years:     collect { MATCH (n)<--(m:Message) RETURN DISTINCT m.year  }
+        people:    collect { MATCH (n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Person)  WHERE NOT coalesce(r1.deleted, false) AND  NOT coalesce(r2.deleted, false) AND NOT coalesce(m.deleted, false) RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name  LIMIT ${config.elastic.nested_objects_limit}},
+        companies: collect { MATCH (n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Company) WHERE NOT coalesce(r1.deleted, false) AND  NOT coalesce(r2.deleted, false) AND NOT coalesce(m.deleted, false) RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name LIMIT ${config.elastic.nested_objects_limit} },
+        addresses: collect { MATCH (n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Address) WHERE NOT coalesce(r1.deleted, false) AND  NOT coalesce(r2.deleted, false) AND NOT coalesce(m.deleted, false) RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name LIMIT ${config.elastic.nested_objects_limit} },
+        years:     collect { MATCH (n)<-[r1:CONTAINS]-(m:Message) WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(m.deleted, false) RETURN DISTINCT m.year  }
       } as result`;
   }
 
