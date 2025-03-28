@@ -4,6 +4,6 @@ export * from './generated/graphql';
 export * from './queries/addresses';
 export * from './queries/companies';
 export * from './queries/countries';
+export * from './queries/indexationManagement';
 export * from './queries/messages';
 export * from './queries/people';
-export * from './queries/search';

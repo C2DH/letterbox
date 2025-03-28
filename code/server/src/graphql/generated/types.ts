@@ -211,6 +211,7 @@ export type ImportReport = {
 
 export type IndexingPendingModification = {
   __typename?: 'IndexingPendingModification';
+  nbItems: Scalars['Int']['output'];
   startTime: Scalars['String']['output'];
 };
 
@@ -680,6 +681,7 @@ export type ImportReportResolvers<ContextType = any, ParentType extends Resolver
 };
 
 export type IndexingPendingModificationResolvers<ContextType = any, ParentType extends ResolversParentTypes['IndexingPendingModification'] = ResolversParentTypes['IndexingPendingModification']> = {
+  nbItems?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   startTime?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };

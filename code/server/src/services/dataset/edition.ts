@@ -314,39 +314,88 @@ export class DatasetEdition {
       );
       this.log.debug(`indexation ${idLock}: marked ${ids.length} items as indexed`);
     };
-
+    let nbItemsModifiedDuringProcess: number | undefined = undefined;
     const reports: Partial<Record<ItemType, ImportReport>> = {};
     try {
-      reports.message = await this.indexation.indexMessages(
-        undefined,
-        true,
-        removeToBeIndexFlag('message'),
-        5000,
-      );
-      reports.company = await this.indexation.indexCompanies(
-        undefined,
-        true,
-        removeToBeIndexFlag('company'),
-        1000,
-      );
-      reports.person = await this.indexation.indexPeople(
-        undefined,
-        true,
-        removeToBeIndexFlag('person'),
-        100,
-      );
-      reports.address = await this.indexation.indexAddresses(
-        undefined,
-        true,
-        removeToBeIndexFlag('address'),
-        1000,
-      );
-      reports.country = await this.indexation.indexCountries(
-        undefined,
-        true,
-        removeToBeIndexFlag('country'),
-        5,
-      );
+      // in case items were modified during the process we check at the end if there are new cases to treat
+      // is yes we loop
+      while (nbItemsModifiedDuringProcess !== 0) {
+        const messagesReport = await this.indexation.indexMessages(
+          undefined,
+          true,
+          removeToBeIndexFlag('message'),
+          5000,
+        );
+        reports.message = {
+          count: reports.message?.count || 0 + messagesReport.count,
+          errors: [...(reports.message?.errors || []), ...messagesReport.errors],
+        };
+
+        const companiesReport = await this.indexation.indexCompanies(
+          undefined,
+          true,
+          removeToBeIndexFlag('company'),
+          1000,
+        );
+        reports.company = {
+          count: reports.company?.count || 0 + companiesReport.count,
+          errors: [...(reports.company?.errors || []), ...companiesReport.errors],
+        };
+
+        const peopleReport = await this.indexation.indexPeople(
+          undefined,
+          true,
+          removeToBeIndexFlag('person'),
+          100,
+        );
+        reports.person = {
+          count: reports.person?.count || 0 + peopleReport.count,
+          errors: [...(reports.person?.errors || []), ...peopleReport.errors],
+        };
+
+        const addressesReport = await this.indexation.indexAddresses(
+          undefined,
+          true,
+          removeToBeIndexFlag('address'),
+          1000,
+        );
+        reports.address = {
+          count: reports.address?.count || 0 + addressesReport.count,
+          errors: [...(reports.address?.errors || []), ...addressesReport.errors],
+        };
+
+        const countriesReports = await this.indexation.indexCountries(
+          undefined,
+          true,
+          removeToBeIndexFlag('country'),
+          5,
+        );
+        reports.country = {
+          count: reports.country?.count || 0 + countriesReports.count,
+          errors: [...(reports.country?.errors || []), ...countriesReports.errors],
+        };
+
+        // how many items were modified during the process
+        nbItemsModifiedDuringProcess = await this.countItemsWithPendingModifications();
+        if (nbItemsModifiedDuringProcess > 0) {
+          this.log.info(
+            `Indexation process restarting for ${nbItemsModifiedDuringProcess} new modified items`,
+          );
+          //update total cases in lock node
+          await this.neo4j.getFirstResultQuery(
+            /* cypher */ `MATCH (n:${Neo4jLabelsPendingModificationsLabels.IndexingPendingModification})
+            WHERE id(n) = $idLock 
+            // total is to the new total number of items to process. Progress bar will be reset to 0...
+            // to do better it would require ro update the lock nbItems total after each edit action if a lock exist
+            // but so far we just tag items we don't count them
+            // anyway having a precise count is going to be tedious as items can be affected multiple times by edits
+            // therefore we will leave that not-ideal solution as is for now
+            SET n.nbItems =  $nbItemsModifiedDuringProcess
+            RETURN 1 as result`,
+            { idLock, nbItemsModifiedDuringProcess },
+          );
+        }
+      }
     } catch (error) {
       this.log.error(error + '');
     } finally {

@@ -605,6 +605,7 @@ type IndexingPendingModification
   @mutation(operations: [])
   @subscription(events: []) {
   startTime: String!
+  nbItems: Int!
 }
 
 #
