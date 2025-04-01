@@ -32,6 +32,8 @@ type Address
   @subscription(events: []) {
   id: ID! @unique
   name: String!
+  tags: [String]
+  verified: Boolean
 
   #
   # Message relationships
@@ -145,6 +147,8 @@ type Company
   @subscription(events: []) {
   id: ID! @unique
   name: String!
+  tags: [String]
+  verified: Boolean
 
   #
   # Message relationships
@@ -258,6 +262,8 @@ type Country
   @subscription(events: []) {
   id: ID! @unique
   name: String!
+  tags: [String]
+  verified: Boolean
 
   #
   # Message relationships
@@ -374,6 +380,8 @@ type Message
   filename: String!
   pageNumber: Int!
   message: String!
+  tags: [String]
+  verified: Boolean
 
   # saving raw data of the CSV
   raw_company: String!
@@ -494,6 +502,8 @@ type Person
   @subscription(events: []) {
   id: ID! @unique
   name: String!
+  tags: [String]
+  verified: Boolean
 
   #
   # Message relationships
@@ -668,6 +678,8 @@ input SearchFilters {
   addresses: KeywordsFilter
   addressName: ContentFilter
   countries: KeywordsFilter
+  tags: KeywordsFilter
+  verified: BooleanFilter
 }
 
 # SORT
@@ -691,6 +703,8 @@ enum AggregationFields {
   addresses
   years
   year
+  tags
+  verified
 }
 
 # RETURN TYPE
@@ -866,4 +880,13 @@ type Mutation {
   Index Pending modifications
   """
   indexPendingModifications: PendingModificationsIndexationReport
+
+  """
+  set Tags
+  """
+  setNodeTags(type: DataItemType!, id: ID!, tags: [String]!): NodeItem!
+  """
+  set Verified
+  """
+  setNodeVerified(type: DataItemType!, id: ID!, verified: Boolean!): NodeItem!
 }

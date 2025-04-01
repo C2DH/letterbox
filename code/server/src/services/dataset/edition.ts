@@ -4,6 +4,7 @@ import type { Transaction } from 'neo4j-driver';
 import { inject, singleton } from 'tsyringe';
 import { v4 as uuid } from 'uuid';
 
+import { NodeItem } from '../../graphql/generated/types';
 import {
   ImportReport,
   Neo4jLabels,
@@ -427,6 +428,25 @@ export class DatasetEdition {
       `MATCH (n:${Neo4jLabelsPendingModificationsLabels.IndexingPendingModification}) return n as result`,
       {},
     );
+  }
+
+  /**
+   * Set Node tags
+   */
+  async updateNodeTagsVerified(
+    type: ItemType,
+    id: string,
+    props: Partial<Pick<NodeItem, 'tags' | 'verified'>>,
+  ) {
+    await this.neo4j.getFirstResultQuery(
+      `MATCH (n:${Neo4jLabels[type]} {id:$id})
+      SET n += $props
+      RETURN 1 as result
+      `,
+      { id, props },
+    );
+    // update ES index
+    await this.indexation.updateNode(type, id, props);
   }
 
   /**

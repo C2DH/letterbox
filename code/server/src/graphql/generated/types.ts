@@ -29,6 +29,8 @@ export type Address = {
   name: Scalars['String']['output'];
   people: Array<Person>;
   peopleCount: Scalars['Int']['output'];
+  tags?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
+  verified?: Maybe<Scalars['Boolean']['output']>;
 };
 
 
@@ -73,6 +75,8 @@ export enum AggregationFields {
   Companies = 'companies',
   Countries = 'countries',
   People = 'people',
+  Tags = 'tags',
+  Verified = 'verified',
   Year = 'year',
   Years = 'years'
 }
@@ -100,6 +104,8 @@ export type Company = {
   name: Scalars['String']['output'];
   people: Array<Person>;
   peopleCount: Scalars['Int']['output'];
+  tags?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
+  verified?: Maybe<Scalars['Boolean']['output']>;
 };
 
 
@@ -149,6 +155,8 @@ export type Country = {
   name: Scalars['String']['output'];
   people: Array<Person>;
   peopleCount: Scalars['Int']['output'];
+  tags?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
+  verified?: Maybe<Scalars['Boolean']['output']>;
 };
 
 
@@ -239,6 +247,8 @@ export type Message = {
   raw_countries?: Maybe<Array<Scalars['String']['output']>>;
   raw_message: Scalars['String']['output'];
   raw_people?: Maybe<Array<Scalars['String']['output']>>;
+  tags?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
+  verified?: Maybe<Scalars['Boolean']['output']>;
   year: Scalars['Int']['output'];
 };
 
@@ -284,6 +294,10 @@ export type Mutation = {
   mergeNodes: NodeItem;
   /** Rename a node value */
   renameNode: NodeItem;
+  /** set Tags */
+  setNodeTags: NodeItem;
+  /** set Verified */
+  setNodeVerified: NodeItem;
   /** Split a node */
   splitNode: Array<NodeItem>;
 };
@@ -328,6 +342,20 @@ export type MutationRenameNodeArgs = {
 };
 
 
+export type MutationSetNodeTagsArgs = {
+  id: Scalars['ID']['input'];
+  tags: Array<InputMaybe<Scalars['String']['input']>>;
+  type: DataItemType;
+};
+
+
+export type MutationSetNodeVerifiedArgs = {
+  id: Scalars['ID']['input'];
+  type: DataItemType;
+  verified: Scalars['Boolean']['input'];
+};
+
+
 export type MutationSplitNodeArgs = {
   id: Scalars['ID']['input'];
   type: DataItemType;
@@ -368,6 +396,8 @@ export type Person = {
   messages: Array<Message>;
   messagesCount: Scalars['Int']['output'];
   name: Scalars['String']['output'];
+  tags?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
+  verified?: Maybe<Scalars['Boolean']['output']>;
 };
 
 
@@ -446,6 +476,8 @@ export type SearchFilters = {
   messageContent?: InputMaybe<ContentFilter>;
   people?: InputMaybe<KeywordsFilter>;
   peopleName?: InputMaybe<ContentFilter>;
+  tags?: InputMaybe<KeywordsFilter>;
+  verified?: InputMaybe<BooleanFilter>;
   year?: InputMaybe<DateFilter>;
   years?: InputMaybe<DateFilter>;
 };
@@ -624,6 +656,8 @@ export type AddressResolvers<ContextType = any, ParentType extends ResolversPare
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   people?: Resolver<Array<ResolversTypes['Person']>, ParentType, ContextType, RequireFields<AddressPeopleArgs, 'limit' | 'skip'>>;
   peopleCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  tags?: Resolver<Maybe<Array<Maybe<ResolversTypes['String']>>>, ParentType, ContextType>;
+  verified?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -651,6 +685,8 @@ export type CompanyResolvers<ContextType = any, ParentType extends ResolversPare
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   people?: Resolver<Array<ResolversTypes['Person']>, ParentType, ContextType, RequireFields<CompanyPeopleArgs, 'limit' | 'skip'>>;
   peopleCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  tags?: Resolver<Maybe<Array<Maybe<ResolversTypes['String']>>>, ParentType, ContextType>;
+  verified?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -671,6 +707,8 @@ export type CountryResolvers<ContextType = any, ParentType extends ResolversPare
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   people?: Resolver<Array<ResolversTypes['Person']>, ParentType, ContextType, RequireFields<CountryPeopleArgs, 'limit' | 'skip'>>;
   peopleCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  tags?: Resolver<Maybe<Array<Maybe<ResolversTypes['String']>>>, ParentType, ContextType>;
+  verified?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -704,6 +742,8 @@ export type MessageResolvers<ContextType = any, ParentType extends ResolversPare
   raw_countries?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;
   raw_message?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   raw_people?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;
+  tags?: Resolver<Maybe<Array<Maybe<ResolversTypes['String']>>>, ParentType, ContextType>;
+  verified?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   year?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
@@ -717,6 +757,8 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   indexPendingModifications?: Resolver<Maybe<ResolversTypes['PendingModificationsIndexationReport']>, ParentType, ContextType>;
   mergeNodes?: Resolver<ResolversTypes['NodeItem'], ParentType, ContextType, RequireFields<MutationMergeNodesArgs, 'name' | 'nodes' | 'type'>>;
   renameNode?: Resolver<ResolversTypes['NodeItem'], ParentType, ContextType, RequireFields<MutationRenameNodeArgs, 'id' | 'name' | 'type'>>;
+  setNodeTags?: Resolver<ResolversTypes['NodeItem'], ParentType, ContextType, RequireFields<MutationSetNodeTagsArgs, 'id' | 'tags' | 'type'>>;
+  setNodeVerified?: Resolver<ResolversTypes['NodeItem'], ParentType, ContextType, RequireFields<MutationSetNodeVerifiedArgs, 'id' | 'type' | 'verified'>>;
   splitNode?: Resolver<Array<ResolversTypes['NodeItem']>, ParentType, ContextType, RequireFields<MutationSplitNodeArgs, 'id' | 'type' | 'values'>>;
 };
 
@@ -744,6 +786,8 @@ export type PersonResolvers<ContextType = any, ParentType extends ResolversParen
   messages?: Resolver<Array<ResolversTypes['Message']>, ParentType, ContextType, RequireFields<PersonMessagesArgs, 'limit' | 'skip'>>;
   messagesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  tags?: Resolver<Maybe<Array<Maybe<ResolversTypes['String']>>>, ParentType, ContextType>;
+  verified?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 

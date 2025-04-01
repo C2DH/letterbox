@@ -5,6 +5,7 @@ import { batcher } from 'ts-stream';
 import { inject, singleton } from 'tsyringe';
 
 import config from '../../config';
+import { NodeItem } from '../../graphql/generated/types';
 import {
   EsIndices,
   ImportReport,
@@ -285,6 +286,8 @@ export class DatasetIndexation {
         id: n.id,
         message: n.message,
         year: n.year,
+        tags: n.tags,
+        verified: n.verified,
         people:    collect { MATCH (n)-[r:CONTAINS]->(m:Person)  WHERE NOT coalesce(r.deleted, false) AND NOT coalesce(m.deleted, false) RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name  },
         addresses: collect { MATCH (n)-[r:CONTAINS]->(m:Address) WHERE NOT coalesce(r.deleted, false) AND NOT coalesce(m.deleted, false) RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name  },
         companies: collect { MATCH (n)-[r:CONTAINS]->(m:Company) WHERE NOT coalesce(r.deleted, false) AND NOT coalesce(m.deleted, false) RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name  },
@@ -302,6 +305,8 @@ export class DatasetIndexation {
       RETURN  {
         id: n.id,
         name: n.name,
+        tags: n.tags,
+        verified: n.verified,
         addresses: collect { MATCH (n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Address) WHERE NOT coalesce(r1.deleted, false) AND  NOT coalesce(r2.deleted, false) AND NOT coalesce(m.deleted, false) RETURN DISTINCT  m.id + "${config.elastic.idValueSeparator}" + m.name  },
         companies: collect { MATCH (n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Company) WHERE NOT coalesce(r1.deleted, false) AND  NOT coalesce(r2.deleted, false) AND NOT coalesce(m.deleted, false) RETURN DISTINCT  m.id + "${config.elastic.idValueSeparator}" + m.name  },
         countries: collect { MATCH (n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Country) WHERE NOT coalesce(r1.deleted, false) AND  NOT coalesce(r2.deleted, false) AND NOT coalesce(m.deleted, false) RETURN DISTINCT  m.id + "${config.elastic.idValueSeparator}" + m.name  },
@@ -319,6 +324,8 @@ export class DatasetIndexation {
       RETURN  {
         id: n.id,
         name: n.name,
+        tags: n.tags,
+        verified: n.verified,
         people:    collect { MATCH (n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Person)  WHERE NOT coalesce(r1.deleted, false) AND  NOT coalesce(r2.deleted, false) AND NOT coalesce(m.deleted, false) RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name  },
         addresses: collect { MATCH (n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Address) WHERE NOT coalesce(r1.deleted, false) AND  NOT coalesce(r2.deleted, false) AND NOT coalesce(m.deleted, false) RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name  },
         countries: collect { MATCH (n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Country) WHERE NOT coalesce(r1.deleted, false) AND  NOT coalesce(r2.deleted, false) AND NOT coalesce(m.deleted, false) RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name  },
@@ -336,6 +343,8 @@ export class DatasetIndexation {
       RETURN  {
         id: n.id,
         name: n.name,
+        tags: n.tags,
+        verified: n.verified,
         people:    collect { MATCH(n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Person)  WHERE NOT coalesce(r1.deleted, false) AND  NOT coalesce(r2.deleted, false) AND NOT coalesce(m.deleted, false) RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name  },
         companies: collect { MATCH(n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Company) WHERE NOT coalesce(r1.deleted, false) AND  NOT coalesce(r2.deleted, false) AND NOT coalesce(m.deleted, false) RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name  },
         countries: collect { MATCH(n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Country) WHERE NOT coalesce(r1.deleted, false) AND  NOT coalesce(r2.deleted, false) AND NOT coalesce(m.deleted, false) RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name  },
@@ -353,11 +362,33 @@ export class DatasetIndexation {
       RETURN  {
         id: n.id,
         name: n.name,
+        tags: n.tags,
+        verified: n.verified,
         people:    collect { MATCH (n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Person)  WHERE NOT coalesce(r1.deleted, false) AND  NOT coalesce(r2.deleted, false) AND NOT coalesce(m.deleted, false) RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name  LIMIT ${config.elastic.nested_objects_limit}},
         companies: collect { MATCH (n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Company) WHERE NOT coalesce(r1.deleted, false) AND  NOT coalesce(r2.deleted, false) AND NOT coalesce(m.deleted, false) RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name LIMIT ${config.elastic.nested_objects_limit} },
         addresses: collect { MATCH (n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Address) WHERE NOT coalesce(r1.deleted, false) AND  NOT coalesce(r2.deleted, false) AND NOT coalesce(m.deleted, false) RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name LIMIT ${config.elastic.nested_objects_limit} },
         years:     collect { MATCH (n)<-[r1:CONTAINS]-(m:Message) WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(m.deleted, false) RETURN DISTINCT m.year  }
       } as result`;
+  }
+
+  /**
+   * update tags
+   */
+  async updateNode(
+    itemType: ItemType,
+    id: string,
+    nodeUpdate: Partial<Pick<NodeItem, 'tags' | 'verified'>>,
+  ) {
+    const result = await this.es.client.update({
+      index: EsIndices[itemType],
+      id,
+      doc: nodeUpdate,
+    });
+    this.log.info(JSON.stringify(result, undefined, 2));
+    if (result.result === 'not_found')
+      throw new Error(
+        `Node could not be updated in ES for ${itemType} ${id} update: ${JSON.stringify(this.updateNode, undefined, 2)}`,
+      );
   }
 
   /**
@@ -408,6 +439,8 @@ export class DatasetIndexation {
               },
             },
           },
+          tags: { type: 'keyword' },
+          verified: { type: 'boolean' },
           ...(item === 'message'
             ? {
                 message: {

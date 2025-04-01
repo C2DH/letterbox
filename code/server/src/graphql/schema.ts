@@ -45,7 +45,6 @@ async function getGraphQlItems<T>(
         }),
       ]
     : undefined;
-
   const data = await delegateToSchema({
     schema: info.schema,
     operation: 'query' as OperationTypeNode,
@@ -59,7 +58,10 @@ async function getGraphQlItems<T>(
     // @ts-ignore
     transforms,
   });
-  return data.map((d: object) => ({ __typename: Neo4jLabels[type], ...d }) as unknown as NodeItem);
+  console.log(ids, data, query);
+  return data
+    ? data.map((d: object) => ({ __typename: Neo4jLabels[type], ...d }) as unknown as NodeItem)
+    : undefined;
 }
 
 /**
@@ -79,7 +81,8 @@ async function getGraphQlItem<T>(
     context: { ...ctx, cypherParams: { ids: [id] } },
     info: info,
   });
-  return head(data);
+  const item = head(data);
+  return item ? ({ __typename: Neo4jLabels[type], ...item } as unknown as NodeItem) : undefined;
 }
 
 /**
@@ -115,14 +118,17 @@ export const resolvers: Resolvers<unknown> = {
           mapFn: (hit: estypes.SearchHit) => ({ id: hit._id }),
         },
       );
-
-      const resultAugmented = await getGraphQlItems(
-        itemType,
-        results.filter((r): r is { id: string } => r.id !== undefined).map((r) => r.id),
-        _context,
-        _info,
-        ['results'],
-      );
+      console.log(results);
+      const resultAugmented =
+        results.length > 0
+          ? await getGraphQlItems(
+              itemType,
+              results?.filter((r): r is { id: string } => r.id !== undefined).map((r) => r.id),
+              _context,
+              _info,
+              ['results'],
+            )
+          : [];
 
       return {
         total,
@@ -251,13 +257,28 @@ export const resolvers: Resolvers<unknown> = {
       return data;
     },
     /**
-     * Index pendign mutations
+     * Index pending mutations
      */
     indexPendingModifications: async () => {
       const report = await datasetEdition.indexPendingModifications();
       console.log('indexPendingModifications done');
       console.log(report);
       return report;
+    },
+    /**
+     * Tags and verified
+     */
+    setNodeTags: async (_root, { type, id, tags }, context, info) => {
+      await datasetEdition.updateNodeTagsVerified(type, id, { tags });
+      const data = await getGraphQlItem(type, id, context, info);
+      if (!data) throw Boom.internal(`Node ${type} ${id} not found`);
+      return data;
+    },
+    setNodeVerified: async (_root, { type, id, verified }, context, info) => {
+      await datasetEdition.updateNodeTagsVerified(type, id, { verified });
+      const data = await getGraphQlItem(type, id, context, info);
+      if (!data) throw Boom.internal(`Node ${type} ${id} not found`);
+      return data;
     },
   },
 };
