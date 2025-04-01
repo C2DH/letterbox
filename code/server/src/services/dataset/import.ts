@@ -1,13 +1,13 @@
-import { basename } from 'path';
+import path, { basename } from 'path';
 import { getLogger } from '@ouestware/node-logger';
 import { toNumber, toString } from '@ouestware/type-utils';
 import { parse } from 'csv-parse';
-import { isNil } from 'lodash';
+import { fromPairs, isNil } from 'lodash';
 import hash from 'object-hash';
 import { inject, singleton } from 'tsyringe';
 
 import config from '../../config';
-import { DataMessage, ImportReport } from '../../types';
+import { DataMessage, ImportReport, itemTypes, Neo4jLabels } from '../../types';
 import { checkNilOREmptyString } from '../../utils/string';
 import { FileSystem } from '../filesystem';
 import { Neo4j } from '../neo4j';
@@ -35,6 +35,9 @@ export class DatasetImport {
    * Execute the import job.
    */
   async doImport(fileNamePattern?: RegExp): Promise<ImportReport> {
+    // import tags lists
+    await this.importTags();
+
     let files = await this.fs.listFiles(
       config.server.import.pathToMessages,
       config.server.import.messages_file_glob_pattern,
@@ -207,6 +210,64 @@ export class DatasetImport {
     }
 
     return records;
+  }
+  /**
+   * Import tags from CSV files
+   */
+  async importTags() {
+    const results = await Promise.all(
+      itemTypes
+        .filter((it) => it !== 'message')
+        .map(async (itemType) => {
+          let nbItems = 0;
+          const tagsPath = path.join(config.server.import.pathToTags, `${itemType}.csv`);
+          if (this.fs.fileExists(tagsPath)) {
+            this.log.info(`Importing tags for ${itemType} from ${tagsPath}`);
+            const session = this.neo4j.getWriteSession();
+            const tx = await session.beginTransaction();
+
+            const stream = this.fs.streamFile(tagsPath).pipe(
+              parse({
+                delimiter: ',',
+                encoding: 'utf8',
+                columns: ['name', 'tags'],
+                cast: (value, ctx) => (ctx.column === 'tags' ? value.split('|') : value),
+              }),
+            );
+            try {
+              for await (const record of stream) {
+                const result = await this.neo4j.getTxFirstResultQuery<number>(
+                  tx,
+                  /* cypher */ `
+                MERGE (p:${Neo4jLabels[itemType]} { id: $record.id }) 
+                  ON CREATE SET 
+                    p = $record,
+                    // times
+                    p.created = datetime(),
+                    p.updated = datetime()
+                  ON MATCH SET
+                    p.tags = $record.tags,
+                    p.updated = datetime()
+                RETURN 1 as result`,
+                  { record: { ...record, id: hash(record.name) } },
+                );
+                if (result) nbItems += result;
+                else throw new Error(`Could not import tags ${record}`);
+              }
+              await tx.commit();
+              this.log.info(`Imported ${nbItems} items with tags`);
+            } catch (error) {
+              this.log.error(error + '');
+              await tx.rollback();
+            } finally {
+              await tx.close();
+              await session.close();
+            }
+          }
+          return [itemType, nbItems];
+        }),
+    );
+    return fromPairs(results);
   }
 
   /**

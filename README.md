@@ -16,6 +16,15 @@ docker compose -p letterbox up
 ### import data
 
 Add the dataset txt files into `docker/project/data/messages/`.
+Add tags csv files into `docker/project/data/tags/`.
+Tags must be named from entities type and contain tow columns: `name` and `tags`.
+`tags` must be separated by a `|` separator.
+
+```bash
+cat docker/project/data/tags/person.csv
+name,tags
+Joe Itch,lawyer|notary
+```
 
 Run import/index script
 

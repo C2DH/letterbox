@@ -18,6 +18,7 @@ export default {
       value_separator: ' *_* ',
       // path relative to the data folder
       pathToMessages: '/messages',
+      pathToTags: '/tags',
       messages_file_glob_pattern: '*.txt',
       batchSize: 5000,
       iso1FileNameRegexp: /^196[1-5].*/,
