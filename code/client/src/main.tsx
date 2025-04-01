@@ -10,7 +10,7 @@ import './styles/index.scss';
 import { Error } from './components/error';
 import { ApolloProvider } from './core/graphql';
 import { AddressView } from './views/AddressView';
-import { CompanySearchView } from './views/CompanySearchView';
+import { CompanyExploreView } from './views/CompanyExploreView';
 import { CompanyView } from './views/CompanyView';
 import { CountryView } from './views/CountryView';
 import { HomeView } from './views/HomeView';
@@ -27,7 +27,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
               <Routes>
                 <Route path="/" element={<HomeView />} />
                 <Route path="/address/:id" element={<AddressView />} />
-                <Route path="/company/" element={<CompanySearchView />} />
+                <Route path="/company/" element={<CompanyExploreView />} />
                 <Route path="/company/:id" element={<CompanyView />} />
                 <Route path="/country/:id" element={<CountryView />} />
                 <Route path="/message/:id" element={<MessageView />} />

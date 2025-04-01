@@ -4,15 +4,15 @@ import { useNotifications } from '@ouestware/notifications';
 import { FC, useEffect } from 'react';
 
 import { TopValues } from '../components/TopValues';
-import { aggregateCompanies } from '../core/graphql';
+import { aggregateCompaniesQuery } from '../core/graphql';
 import { Layout } from './layout';
 
-export const CompanySearchView: FC = () => {
+export const CompanyExploreView: FC = () => {
   const {
     loading,
     error,
     data: topData,
-  } = useQuery(aggregateCompanies, { fetchPolicy: 'no-cache' });
+  } = useQuery(aggregateCompaniesQuery, { fetchPolicy: 'no-cache' });
   const { notify } = useNotifications();
 
   useEffect(() => {

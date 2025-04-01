@@ -67,9 +67,9 @@ export const getCompanyPeople = graphql(`
 `);
 
 // TODO add filters
-export const aggregateCompanies = graphql(`
-  query AggregateCompanies {
-    people: aggregate(itemType: company, field: people, size: 20) {
+export const aggregateCompaniesQuery = graphql(`
+  query AggregateCompanies($filters: SearchFilters) {
+    people: aggregate(itemType: company, field: people, size: 20, filters: $filters) {
       total
       values {
         label
@@ -77,7 +77,7 @@ export const aggregateCompanies = graphql(`
         count
       }
     }
-    addresses: aggregate(itemType: company, field: addresses, size: 20) {
+    addresses: aggregate(itemType: company, field: addresses, size: 20, filters: $filters) {
       total
       values {
         label
@@ -85,7 +85,7 @@ export const aggregateCompanies = graphql(`
         count
       }
     }
-    countries: aggregate(itemType: company, field: countries, size: 20) {
+    countries: aggregate(itemType: company, field: countries, size: 20, filters: $filters) {
       total
       values {
         label

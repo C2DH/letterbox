@@ -2,7 +2,7 @@ import { useLazyQuery, useQuery } from '@apollo/client';
 import { useCallback, useMemo } from 'react';
 
 import {
-  aggregateCompanies,
+  aggregateCompaniesQuery,
   getCompanyAddresses,
   getCompanyById,
   getCompanyCountries,
@@ -72,6 +72,6 @@ export const useGetCompanyById = (id?: string) => {
  * Hook to retrive top values for companies
  */
 export const useGetCompanyAggregations = () => {
-  const { loading, error, data } = useQuery(aggregateCompanies, {});
+  const { loading, error, data } = useQuery(aggregateCompaniesQuery, {});
   return { loading, error, data };
 };
