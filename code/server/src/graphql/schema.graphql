@@ -668,18 +668,22 @@ input BooleanFilter {
 }
 
 input SearchFilters {
+  # for message only
   year: DateFilter
+  # for items only
   years: DateFilter
-  messageContent: ContentFilter
-  companies: KeywordsFilter
-  companyName: ContentFilter
-  people: KeywordsFilter
-  peopleName: ContentFilter
-  addresses: KeywordsFilter
-  addressName: ContentFilter
-  countries: KeywordsFilter
+  # for all
+  content: ContentFilter
   tags: KeywordsFilter
   verified: BooleanFilter
+  # for all but companies
+  companies: KeywordsFilter
+  # for all but people
+  people: KeywordsFilter
+  # for all but addresses
+  addresses: KeywordsFilter
+  # for all but countries
+  countries: KeywordsFilter
 }
 
 # SORT
@@ -697,14 +701,23 @@ input SortBy {
 # TOP INPUTS
 
 enum AggregationFields {
-  companies
-  people
-  countries
-  addresses
-  years
-  year
+  # for all
   tags
   verified
+  # for message only
+  year
+  # for items only
+  years
+  # all but companies
+  companies
+  # all but people
+  people
+  # all but countries
+  countries
+  # all but addresses
+  addresses
+  # for companies, people and addresses
+  fingerprint
 }
 
 # RETURN TYPE

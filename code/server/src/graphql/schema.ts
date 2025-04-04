@@ -58,7 +58,6 @@ async function getGraphQlItems<T>(
     // @ts-ignore
     transforms,
   });
-  console.log(ids, data, query);
   return data
     ? data.map((d: object) => ({ __typename: Neo4jLabels[type], ...d }) as unknown as NodeItem)
     : undefined;
@@ -105,10 +104,11 @@ export const resolvers: Resolvers<unknown> = {
       _info,
     ) => {
       const sort = sortBy ? elasticSearch.formatSort(sortBy) : undefined;
+      const transformedFilters = await datasetIndexation.formatFilters(filters);
       const { total, results, scrollId } = await elasticSearch.search(
         EsIndices[itemType as ItemType],
         '',
-        filters as Record<string, Filter>,
+        transformedFilters as Record<string, Filter>,
         {
           from,
           size: limit || 10,
@@ -118,7 +118,6 @@ export const resolvers: Resolvers<unknown> = {
           mapFn: (hit: estypes.SearchHit) => ({ id: hit._id }),
         },
       );
-      console.log(results);
       const resultAugmented =
         results.length > 0
           ? await getGraphQlItems(
@@ -168,13 +167,13 @@ export const resolvers: Resolvers<unknown> = {
       const results = await elasticSearch.fieldAggregation(
         EsIndices[itemType],
         field,
-        filters as Record<string, Filter>,
+        (await datasetIndexation.formatFilters(filters)) as Record<string, Filter>,
         query,
         includes,
         size,
       );
 
-      return elasticSearch.formatAggregationResults(field, results);
+      return datasetIndexation.formatAggregationResults(field, results);
     },
 
     // Pending modifications
@@ -261,8 +260,6 @@ export const resolvers: Resolvers<unknown> = {
      */
     indexPendingModifications: async () => {
       const report = await datasetEdition.indexPendingModifications();
-      console.log('indexPendingModifications done');
-      console.log(report);
       return report;
     },
     /**

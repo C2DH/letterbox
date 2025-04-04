@@ -31,7 +31,7 @@ export default {
     updateBatchSize: 10,
     index_prefix: process.env.ELASTICSEARCH_INDEX_PREFIX || '',
     nested_objects_limit: 1000,
-    idValueSeparator: '@',
+    idValueSeparator: '¤¤',
   },
   neo4j: {
     url: process.env.NEO4J_URL || 'bolt://localhost:7687',

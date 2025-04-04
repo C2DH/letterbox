@@ -74,6 +74,7 @@ export enum AggregationFields {
   Addresses = 'addresses',
   Companies = 'companies',
   Countries = 'countries',
+  Fingerprint = 'fingerprint',
   People = 'people',
   Tags = 'tags',
   Verified = 'verified',
@@ -468,14 +469,11 @@ export type QuerySearchArgs = {
 };
 
 export type SearchFilters = {
-  addressName?: InputMaybe<ContentFilter>;
   addresses?: InputMaybe<KeywordsFilter>;
   companies?: InputMaybe<KeywordsFilter>;
-  companyName?: InputMaybe<ContentFilter>;
+  content?: InputMaybe<ContentFilter>;
   countries?: InputMaybe<KeywordsFilter>;
-  messageContent?: InputMaybe<ContentFilter>;
   people?: InputMaybe<KeywordsFilter>;
-  peopleName?: InputMaybe<ContentFilter>;
   tags?: InputMaybe<KeywordsFilter>;
   verified?: InputMaybe<BooleanFilter>;
   year?: InputMaybe<DateFilter>;

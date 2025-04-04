@@ -1,16 +1,24 @@
 import { estypes } from '@elastic/elasticsearch';
+import { AggregationResult } from '@ouestware/node-elasticsearch';
 import { getLogger } from '@ouestware/node-logger';
+import { fromPairs, toPairs } from 'lodash';
 import fingerprint from 'talisman/keyers/fingerprint';
 import { batcher } from 'ts-stream';
 import { inject, singleton } from 'tsyringe';
 
 import config from '../../config';
-import { NodeItem } from '../../graphql/generated/types';
+import {
+  AggregateResults,
+  AggregationFields,
+  NodeItem,
+  SearchFilters,
+} from '../../graphql/generated/types';
 import {
   EsIndices,
   ImportReport,
   ItemType,
   itemTypes,
+  Neo4jLabels,
   Neo4jLabelsPendingModificationsLabels,
 } from '../../types';
 import { Elastic } from '../elastic';
@@ -392,6 +400,93 @@ export class DatasetIndexation {
   }
 
   /**
+   * formatAggregationResults
+   * Transform aggregation results given by ES to transform the combine value indexes into {id, label} object
+   * @param field
+   * @param result
+   * @returns
+   */
+  formatAggregationResults(field: AggregationFields, result: AggregationResult): AggregateResults {
+    const valueSeparatorRE = new RegExp(config.elastic.idValueSeparator, 'g');
+    return {
+      total: result.total,
+      values: result.values
+        .map((v) => {
+          switch (field) {
+            case 'people':
+            case 'companies':
+            case 'addresses':
+            case 'countries':
+              if ((v.value.match(valueSeparatorRE) || []).length === 1) {
+                const [id, value] = v.value.split(config.elastic.idValueSeparator);
+                return {
+                  id,
+                  label: value,
+                  count: v.count,
+                };
+              } else return undefined;
+            default:
+              return {
+                id: v.value,
+                label: v.value + '',
+                count: v.count,
+              };
+          }
+        })
+        .filter((v): v is { id: string; label: string; count: number } => v !== undefined),
+    };
+  }
+
+  /**
+   * formatFilters
+   * Transform standard filters by transforming filters value into `id{separator}label` values which are stored in ES
+   * @param filters
+   */
+  async formatFilters(filters?: SearchFilters): Promise<SearchFilters | undefined> {
+    if (filters === undefined) return undefined;
+    const transformedFilters = fromPairs(
+      await Promise.all(
+        toPairs(filters).map(async ([field, filter]) => {
+          let transformedFilter = filter;
+          if (filter !== undefined && filter.type === 'keywords' && 'values' in filter) {
+            const idsToTransform = filter.values;
+            let itemType: ItemType | undefined = undefined;
+            switch (field) {
+              case 'companies':
+                itemType = 'company';
+                break;
+              case 'people':
+                itemType = 'person';
+                break;
+              case 'addresses':
+                itemType = 'address';
+                break;
+              case 'countries':
+                itemType = 'country';
+                break;
+            }
+            if (itemType !== undefined) {
+              // delegate to Neo4J to get the label and craft the id{separator}label special key
+              const idsWithLabels = await this.neo4j.getResultQuery<string>(
+                /* cypher */ `
+                MATCH (n:${Neo4jLabels[itemType]})
+                WHERE n.id IN $ids
+                RETURN n.id + "${config.elastic.idValueSeparator}" + n.name as result
+                `,
+                { ids: idsToTransform },
+              );
+              transformedFilter = { ...filter, values: idsWithLabels };
+            }
+          }
+
+          return [field, transformedFilter];
+        }),
+      ),
+    );
+    return transformedFilters;
+  }
+
+  /**
    * Returns the elastic configuration for a dataset.
    */
   private getIndexConfig(item: ItemType): Omit<estypes.IndicesCreateRequest, 'index'> {
@@ -429,16 +524,6 @@ export class DatasetIndexation {
       mappings: {
         properties: {
           id: { type: 'keyword' },
-          name: {
-            type: 'keyword',
-            fields: {
-              text: {
-                type: 'text', // optimization ? match_only_text ?
-                analyzer: 'IndexAnalyzer',
-                search_analyzer: 'SearchAnalyzer',
-              },
-            },
-          },
           tags: { type: 'keyword' },
           verified: { type: 'boolean' },
           ...(item === 'message'
@@ -449,6 +534,10 @@ export class DatasetIndexation {
                   search_analyzer: 'SearchAnalyzer',
                 },
                 year: { type: 'integer' },
+                content: {
+                  type: 'alias',
+                  path: 'message',
+                },
               }
             : {}),
           ...(item !== 'person' ? { people: { type: 'keyword' } } : {}),
@@ -457,8 +546,22 @@ export class DatasetIndexation {
           ...(item !== 'country' ? { countries: { type: 'keyword' } } : {}),
           ...(item !== 'message'
             ? {
+                name: {
+                  type: 'keyword',
+                  fields: {
+                    text: {
+                      type: 'text', // match_only_text?
+                      analyzer: 'IndexAnalyzer',
+                      search_analyzer: 'SearchAnalyzer',
+                    },
+                  },
+                },
                 years: { type: 'integer' },
                 fingerprint: { type: 'keyword' },
+                content: {
+                  type: 'alias',
+                  path: 'name.text',
+                },
               }
             : {}),
         },
