@@ -1,0 +1,38 @@
+@font-face {
+  font-family: Jost;
+  src:
+    url('/fonts/jost.ttf') format('truetype'),
+    url('/fonts/jost.woff2') format('woff2'),
+    url('/fonts/jost.woff') format('woff');
+  font-style: normal;
+}
+
+@font-face {
+  font-family: Jost;
+  src:
+    url('/fonts/jost-italic.ttf') format('truetype'),
+    url('/fonts/jost-italic.woff2') format('woff2'),
+    url('/fonts/jost-italic.woff') format('woff');
+  font-style: italic;
+}
+
+h1,
+.h1,
+h3,
+.h3,
+h4,
+.h4 {
+  font-weight: $font-weight-medium;
+}
+
+h2,
+.h2 {
+  font-weight: $font-weight-semibold;
+}
+
+.with-icon {
+  svg {
+    font-size: 0.7em;
+    vertical-align: baseline;
+  }
+}

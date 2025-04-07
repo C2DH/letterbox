@@ -3,19 +3,6 @@
   height: 100vh;
   overflow-x: hidden;
   overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  padding-bottom: 5em;
-
-  main {
-    flex-grow: 1;
-  }
-
-  header,
-  footer {
-    flex-grow: 0;
-    flex-shrink: 0;
-  }
 }
 
 #portal-root {
