@@ -365,7 +365,7 @@ export class DatasetIndexation {
    */
   getIndexCountriesQuery(ids?: string[], withPendingModifications?: boolean) {
     return `
-      MATCH (n:Country${withPendingModifications ? `:${Neo4jLabelsPendingModificationsLabels.ToReIndexFlag}` : ''}) 
+      MATCH (n:Country${withPendingModifications ? `:${Neo4jLabelsPendingModificationsLabels.ToReIndexFlag}` : ''})
       ${ids && ids.length ? `WHERE n.id IN $ids` : ''}
       RETURN  {
         id: n.id,

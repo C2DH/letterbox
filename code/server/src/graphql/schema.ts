@@ -99,7 +99,7 @@ export const resolvers: Resolvers<unknown> = {
     // SEARCH
     search: async (
       _root,
-      { itemType, filters, sortBy, limit, from, scrollTimeout },
+      { itemType, filters, sortBy, limit, from, scrollTimeout, includes },
       _context,
       _info,
     ) => {
@@ -107,7 +107,7 @@ export const resolvers: Resolvers<unknown> = {
       const transformedFilters = await datasetIndexation.formatFilters(filters);
       const { total, results, scrollId } = await elasticSearch.search(
         EsIndices[itemType as ItemType],
-        '',
+        includes || '',
         transformedFilters as Record<string, Filter>,
         {
           from,

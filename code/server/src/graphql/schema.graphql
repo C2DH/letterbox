@@ -797,6 +797,7 @@ type Query {
     limit: Int
     from: Int
     scrollTimeout: String
+    includes: String
   ): SearchResults
 
   "Scroll results"

@@ -462,6 +462,7 @@ export type QueryScrollArgs = {
 export type QuerySearchArgs = {
   filters: SearchFilters;
   from?: InputMaybe<Scalars['Int']['input']>;
+  includes?: InputMaybe<Scalars['String']['input']>;
   itemType: DataItemType;
   limit?: InputMaybe<Scalars['Int']['input']>;
   scrollTimeout?: InputMaybe<Scalars['String']['input']>;

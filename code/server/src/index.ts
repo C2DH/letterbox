@@ -4,7 +4,7 @@ import express, { json, urlencoded } from 'express';
 
 import config from './config';
 import { errorFilter } from './error';
-import { initGraphql } from './graphql/index';
+import { initGraphql } from './graphql';
 
 async function initServer() {
   const log = getLogger('Server');
