@@ -12,6 +12,10 @@ import {
 } from 'react-icons/ri';
 import { Props } from 'react-select';
 
+import { AggregationFields, DataItemType } from './graphql';
+
+export const APP_LANGUAGE = 'en-US';
+
 export const ITEM_TYPES = ['company', 'address', 'country', 'people', 'message'] as const;
 export const ITEM_TYPES_SET = new Set<string>(ITEM_TYPES);
 export type ItemType = (typeof ITEM_TYPES)[number];
@@ -49,12 +53,47 @@ export const ITEM_TYPE_LABELS: Record<ItemType, string> = {
   message: 'Message',
 };
 
+export const ITEM_TYPE_TO_FIELD = {
+  company: AggregationFields.Companies,
+  address: AggregationFields.Addresses,
+  country: AggregationFields.Countries,
+  people: AggregationFields.People,
+  message: AggregationFields.Tags,
+} as const;
+
+export const ITEM_TYPE_TO_DATA_TYPE = {
+  company: DataItemType.Company,
+  address: DataItemType.Address,
+  country: DataItemType.Country,
+  people: DataItemType.Person,
+  message: DataItemType.Message,
+} as const;
+
 export const ITEM_TYPE_LABELS_PLURAL: Record<ItemType, string> = {
   company: 'Companies',
   address: 'Addresses',
   country: 'Countries',
   people: 'People',
   message: 'Messages',
+};
+
+export const VERIFIED_FACET = {
+  id: 'verified',
+  type: 'boolean',
+  label: 'Verified',
+};
+export const DATE_FACET = {
+  id: 'date',
+  type: 'date',
+  label: 'Dates',
+};
+export const TAGS_FACET = {
+  id: 'tags',
+  type: 'keywords',
+  label: 'Tags',
+  autocomplete: false,
+  histogram: false,
+  isMulti: true,
 };
 
 export const FACETS = FILTERABLE_ITEM_TYPES.map(
@@ -68,18 +107,7 @@ export const FACETS = FILTERABLE_ITEM_TYPES.map(
       placeholder: true,
       autocomplete: true,
     }) as Facet,
-).concat([
-  {
-    id: 'date',
-    type: 'date',
-    label: 'Dates',
-  },
-  {
-    id: 'verified',
-    type: 'boolean',
-    label: 'Verified',
-  },
-]);
+).concat([DATE_FACET as Facet, VERIFIED_FACET as Facet, TAGS_FACET as Facet]);
 
 export const FACETS_DICT = keyBy(FACETS, 'id');
 

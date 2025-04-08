@@ -3,6 +3,7 @@ import {
   InputKeywordsProps,
   KeywordsFacetHistogramProps,
   useFacet,
+  useFacetsContext,
   useInputKeywords,
   ValueWithCount,
 } from '@ouestware/facets-client';
@@ -11,9 +12,10 @@ import { FC, useMemo, useState } from 'react';
 import { IconType } from 'react-icons';
 import { RiFilterLine, RiFilterOffLine, RiShareBoxLine } from 'react-icons/ri';
 import { Link } from 'react-router-dom';
-import AsyncCreatableSelect from 'react-select/async-creatable';
+import AsyncSelect from 'react-select/async';
 
 import {
+  APP_LANGUAGE,
   FACETS_DICT,
   ITEM_TYPE_LABELS_PLURAL,
   ItemType,
@@ -61,11 +63,11 @@ const HistogramRow: FC<
           </div>
 
           {(index === 0 || !((index + 1) % 5)) && (
-            <span className="text-muted position-absolute end-100 pe-2">{index + 1}</span>
+            <span className="text-muted position-absolute end-100 pe-2 top-0">{index + 1}</span>
           )}
         </div>
 
-        <Icon />
+        <Icon className="flex-shrink-0" />
       </div>
     </button>
   );
@@ -105,8 +107,10 @@ const Histogram: FC<KeywordsFacetHistogramProps<ItemValue>> = ({
 
   if (!histogramData)
     return (
-      <div className="spinner-border" role="status">
-        <span className="sr-only">Loading...</span>
+      <div className="text-center pt-3">
+        <div className="spinner-border" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
       </div>
     );
 
@@ -158,7 +162,8 @@ const Histogram: FC<KeywordsFacetHistogramProps<ItemValue>> = ({
         {!!remainingCount && (
           <li className="small text-muted">
             <i>
-              ...and {remainingCount} other{remainingCount > 1 ? 's' : ''} value
+              ...and {remainingCount.toLocaleString(APP_LANGUAGE)} other
+              {remainingCount > 1 ? 's' : ''} value
               {remainingCount > 1 ? 's' : ''}
             </i>
           </li>
@@ -169,8 +174,20 @@ const Histogram: FC<KeywordsFacetHistogramProps<ItemValue>> = ({
 };
 
 export const ItemFacet: FC<{ itemType: ItemType }> = ({ itemType }) => {
+  const { state, loadHistogram, autocomplete } = useFacetsContext();
   const facet = useMemo(() => FACETS_DICT[itemType], [itemType]);
   const { filter, onChange } = useFacet(facet);
+  const fnAutocomplete = useMemo(() => {
+    return facet.type === 'keywords' && facet.autocomplete && autocomplete
+      ? (inputValue: string) => autocomplete(facet, state, inputValue)
+      : undefined;
+  }, [facet, autocomplete, state]);
+
+  const fnLoadHistogram = useMemo(() => {
+    return facet.type === 'keywords' && facet.histogram && loadHistogram
+      ? () => loadHistogram(facet, state)
+      : undefined;
+  }, [facet, loadHistogram, state]);
   const inputKeywordsProps = useMemo<InputKeywordsProps<ItemValue>>(
     () => ({
       isMulti: true,
@@ -180,47 +197,19 @@ export const ItemFacet: FC<{ itemType: ItemType }> = ({ itemType }) => {
           type: 'keywords',
           values: values || [],
         }),
-      autocomplete: async (_inputValue: string) => ({
-        total: 2,
-        values: [
-          {
-            value: 'Lorem ipsum',
-            link: `/${itemType}/${1}`,
-            count: 456,
-          },
-          {
-            value: 'Dolor sit amet',
-            link: `/${itemType}/${2}`,
-            count: 123,
-          },
-        ],
-      }),
-      loadHistogramData: async () => ({
-        total: 2,
-        values: [
-          {
-            value: 'Lorem ipsum',
-            link: `/${itemType}/${1}`,
-            count: 456,
-          },
-          {
-            value: 'Dolor sit amet',
-            link: `/${itemType}/${2}`,
-            count: 123,
-          },
-        ],
-      }),
+      autocomplete: fnAutocomplete,
+      loadHistogramData: fnLoadHistogram,
     }),
-    [filter, itemType, onChange],
+    [filter, fnAutocomplete, fnLoadHistogram, onChange],
   );
   const { selectProps, histogramProps } = useInputKeywords(inputKeywordsProps);
 
   return (
     <>
-      <AsyncCreatableSelect
+      <AsyncSelect
         {...selectProps}
         {...REACT_SELECT_BASE_PROPS}
-        value={undefined}
+        value={null}
         placeholder={`Search for ${ITEM_TYPE_LABELS_PLURAL[itemType].toLowerCase()}`}
       />
       {histogramProps && <Histogram {...histogramProps} />}

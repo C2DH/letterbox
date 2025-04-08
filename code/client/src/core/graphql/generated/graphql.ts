@@ -28,6 +28,8 @@ export type Address = {
   name: Scalars['String']['output'];
   people: Array<Person>;
   peopleCount: Scalars['Int']['output'];
+  tags?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
+  verified?: Maybe<Scalars['Boolean']['output']>;
 };
 
 
@@ -75,6 +77,7 @@ export type AddressSort = {
   messagesCount?: InputMaybe<SortDirection>;
   name?: InputMaybe<SortDirection>;
   peopleCount?: InputMaybe<SortDirection>;
+  verified?: InputMaybe<SortDirection>;
 };
 
 export type AddressWhere = {
@@ -115,6 +118,9 @@ export type AddressWhere = {
   peopleCount_IN?: InputMaybe<Array<Scalars['Int']['input']>>;
   peopleCount_LT?: InputMaybe<Scalars['Int']['input']>;
   peopleCount_LTE?: InputMaybe<Scalars['Int']['input']>;
+  tags_EQ?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  tags_INCLUDES?: InputMaybe<Scalars['String']['input']>;
+  verified_EQ?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type AddressesConnection = {
@@ -141,10 +147,18 @@ export enum AggregationFields {
   Addresses = 'addresses',
   Companies = 'companies',
   Countries = 'countries',
+  Fingerprint = 'fingerprint',
   People = 'people',
+  Tags = 'tags',
+  Verified = 'verified',
   Year = 'year',
   Years = 'years'
 }
+
+export type BooleanFilter = {
+  type: FilterTypes;
+  value: Scalars['Boolean']['input'];
+};
 
 export type CompaniesConnection = {
   __typename?: 'CompaniesConnection';
@@ -165,6 +179,8 @@ export type Company = {
   name: Scalars['String']['output'];
   people: Array<Person>;
   peopleCount: Scalars['Int']['output'];
+  tags?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
+  verified?: Maybe<Scalars['Boolean']['output']>;
 };
 
 
@@ -212,6 +228,7 @@ export type CompanySort = {
   messagesCount?: InputMaybe<SortDirection>;
   name?: InputMaybe<SortDirection>;
   peopleCount?: InputMaybe<SortDirection>;
+  verified?: InputMaybe<SortDirection>;
 };
 
 export type CompanyWhere = {
@@ -252,6 +269,9 @@ export type CompanyWhere = {
   peopleCount_IN?: InputMaybe<Array<Scalars['Int']['input']>>;
   peopleCount_LT?: InputMaybe<Scalars['Int']['input']>;
   peopleCount_LTE?: InputMaybe<Scalars['Int']['input']>;
+  tags_EQ?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  tags_INCLUDES?: InputMaybe<Scalars['String']['input']>;
+  verified_EQ?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type ContentFilter = {
@@ -278,6 +298,8 @@ export type Country = {
   name: Scalars['String']['output'];
   people: Array<Person>;
   peopleCount: Scalars['Int']['output'];
+  tags?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
+  verified?: Maybe<Scalars['Boolean']['output']>;
 };
 
 
@@ -325,6 +347,7 @@ export type CountrySort = {
   messagesCount?: InputMaybe<SortDirection>;
   name?: InputMaybe<SortDirection>;
   peopleCount?: InputMaybe<SortDirection>;
+  verified?: InputMaybe<SortDirection>;
 };
 
 export type CountryWhere = {
@@ -365,6 +388,9 @@ export type CountryWhere = {
   peopleCount_IN?: InputMaybe<Array<Scalars['Int']['input']>>;
   peopleCount_LT?: InputMaybe<Scalars['Int']['input']>;
   peopleCount_LTE?: InputMaybe<Scalars['Int']['input']>;
+  tags_EQ?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  tags_INCLUDES?: InputMaybe<Scalars['String']['input']>;
+  verified_EQ?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export enum DataItemType {
@@ -474,6 +500,8 @@ export type Message = {
   raw_countries?: Maybe<Array<Scalars['String']['output']>>;
   raw_message: Scalars['String']['output'];
   raw_people?: Maybe<Array<Scalars['String']['output']>>;
+  tags?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
+  verified?: Maybe<Scalars['Boolean']['output']>;
   year: Scalars['Int']['output'];
 };
 
@@ -527,6 +555,7 @@ export type MessageSort = {
   raw_address?: InputMaybe<SortDirection>;
   raw_company?: InputMaybe<SortDirection>;
   raw_message?: InputMaybe<SortDirection>;
+  verified?: InputMaybe<SortDirection>;
   year?: InputMaybe<SortDirection>;
 };
 
@@ -598,6 +627,9 @@ export type MessageWhere = {
   raw_message_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
   raw_people_EQ?: InputMaybe<Array<Scalars['String']['input']>>;
   raw_people_INCLUDES?: InputMaybe<Scalars['String']['input']>;
+  tags_EQ?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  tags_INCLUDES?: InputMaybe<Scalars['String']['input']>;
+  verified_EQ?: InputMaybe<Scalars['Boolean']['input']>;
   year_EQ?: InputMaybe<Scalars['Int']['input']>;
   year_GT?: InputMaybe<Scalars['Int']['input']>;
   year_GTE?: InputMaybe<Scalars['Int']['input']>;
@@ -631,6 +663,10 @@ export type Mutation = {
   mergeNodes: NodeItem;
   /** Rename a node value */
   renameNode: NodeItem;
+  /** set Tags */
+  setNodeTags: NodeItem;
+  /** set Verified */
+  setNodeVerified: NodeItem;
   /** Split a node */
   splitNode: Array<NodeItem>;
 };
@@ -672,6 +708,20 @@ export type MutationRenameNodeArgs = {
   id: Scalars['ID']['input'];
   name: Scalars['String']['input'];
   type: DataItemType;
+};
+
+
+export type MutationSetNodeTagsArgs = {
+  id: Scalars['ID']['input'];
+  tags: Array<InputMaybe<Scalars['String']['input']>>;
+  type: DataItemType;
+};
+
+
+export type MutationSetNodeVerifiedArgs = {
+  id: Scalars['ID']['input'];
+  type: DataItemType;
+  verified: Scalars['Boolean']['input'];
 };
 
 
@@ -725,6 +775,8 @@ export type Person = {
   messages: Array<Message>;
   messagesCount: Scalars['Int']['output'];
   name: Scalars['String']['output'];
+  tags?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
+  verified?: Maybe<Scalars['Boolean']['output']>;
 };
 
 
@@ -772,6 +824,7 @@ export type PersonSort = {
   id?: InputMaybe<SortDirection>;
   messagesCount?: InputMaybe<SortDirection>;
   name?: InputMaybe<SortDirection>;
+  verified?: InputMaybe<SortDirection>;
 };
 
 export type PersonWhere = {
@@ -812,6 +865,9 @@ export type PersonWhere = {
   name_EQ?: InputMaybe<Scalars['String']['input']>;
   name_IN?: InputMaybe<Array<Scalars['String']['input']>>;
   name_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  tags_EQ?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  tags_INCLUDES?: InputMaybe<Scalars['String']['input']>;
+  verified_EQ?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type Query = {
@@ -959,6 +1015,7 @@ export type QueryScrollArgs = {
 export type QuerySearchArgs = {
   filters: SearchFilters;
   from?: InputMaybe<Scalars['Int']['input']>;
+  includes?: InputMaybe<Scalars['String']['input']>;
   itemType: DataItemType;
   limit?: InputMaybe<Scalars['Int']['input']>;
   scrollTimeout?: InputMaybe<Scalars['String']['input']>;
@@ -966,14 +1023,13 @@ export type QuerySearchArgs = {
 };
 
 export type SearchFilters = {
-  addressName?: InputMaybe<ContentFilter>;
   addresses?: InputMaybe<KeywordsFilter>;
   companies?: InputMaybe<KeywordsFilter>;
-  companyName?: InputMaybe<ContentFilter>;
+  content?: InputMaybe<ContentFilter>;
   countries?: InputMaybe<KeywordsFilter>;
-  messageContent?: InputMaybe<ContentFilter>;
   people?: InputMaybe<KeywordsFilter>;
-  peopleName?: InputMaybe<ContentFilter>;
+  tags?: InputMaybe<KeywordsFilter>;
+  verified?: InputMaybe<BooleanFilter>;
   year?: InputMaybe<DateFilter>;
   years?: InputMaybe<DateFilter>;
 };
@@ -1275,6 +1331,28 @@ export type GetPersonPeopleQueryVariables = Exact<{
 
 export type GetPersonPeopleQuery = { __typename?: 'Query', result: Array<{ __typename?: 'Person', countries: Array<{ __typename?: 'Country', id: string, name: string, addressesCount: number, companiesCount: number, messagesCount: number, peopleCount: number }> }> };
 
+export type SearchItemsQueryVariables = Exact<{
+  itemType: DataItemType;
+  includes: Scalars['String']['input'];
+  filters: SearchFilters;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type SearchItemsQuery = { __typename?: 'Query', search?: { __typename?: 'SearchResults', total: number, results: Array<{ __typename?: 'Address', id: string, name: string } | { __typename?: 'Company', id: string, name: string } | { __typename?: 'Country', id: string, name: string } | { __typename?: 'Message', id: string, name: string } | { __typename?: 'Person', id: string, name: string } | null> } | null };
+
+export type AggregateItemsQueryVariables = Exact<{
+  itemType: DataItemType;
+  field: AggregationFields;
+  filters: SearchFilters;
+  query?: InputMaybe<Scalars['String']['input']>;
+  includes?: InputMaybe<Scalars['String']['input']>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type AggregateItemsQuery = { __typename?: 'Query', aggregate: { __typename?: 'AggregateResults', total: number, values: Array<{ __typename?: 'AggregateValue', label: string, id: string, count: number }> } };
+
 export const AddressInlineFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"AddressInline"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Address"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"companiesCount"}},{"kind":"Field","name":{"kind":"Name","value":"countriesCount"}},{"kind":"Field","name":{"kind":"Name","value":"messagesCount"}},{"kind":"Field","name":{"kind":"Name","value":"peopleCount"}}]}}]} as unknown as DocumentNode<AddressInlineFragment, unknown>;
 export const CompanyInlineFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"CompanyInline"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Company"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"addressesCount"}},{"kind":"Field","name":{"kind":"Name","value":"countriesCount"}},{"kind":"Field","name":{"kind":"Name","value":"messagesCount"}},{"kind":"Field","name":{"kind":"Name","value":"peopleCount"}}]}}]} as unknown as DocumentNode<CompanyInlineFragment, unknown>;
 export const CountryInlineFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"CountryInline"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Country"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"addressesCount"}},{"kind":"Field","name":{"kind":"Name","value":"companiesCount"}},{"kind":"Field","name":{"kind":"Name","value":"messagesCount"}},{"kind":"Field","name":{"kind":"Name","value":"peopleCount"}}]}}]} as unknown as DocumentNode<CountryInlineFragment, unknown>;
@@ -1312,3 +1390,5 @@ export const GetPersonCompaniesDocument = {"kind":"Document","definitions":[{"ki
 export const GetPersonCountriesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetPersonCountries"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"limit"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","alias":{"kind":"Name","value":"result"},"name":{"kind":"Name","value":"people"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"id_EQ"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"addresses"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"Variable","name":{"kind":"Name","value":"limit"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"AddressInline"}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"AddressInline"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Address"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"companiesCount"}},{"kind":"Field","name":{"kind":"Name","value":"countriesCount"}},{"kind":"Field","name":{"kind":"Name","value":"messagesCount"}},{"kind":"Field","name":{"kind":"Name","value":"peopleCount"}}]}}]} as unknown as DocumentNode<GetPersonCountriesQuery, GetPersonCountriesQueryVariables>;
 export const GetPersonMessagesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetPersonMessages"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"limit"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","alias":{"kind":"Name","value":"result"},"name":{"kind":"Name","value":"people"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"id_EQ"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"messages"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"Variable","name":{"kind":"Name","value":"limit"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"MessageInline"}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"MessageInline"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Message"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"year"}},{"kind":"Field","name":{"kind":"Name","value":"message"}},{"kind":"Field","name":{"kind":"Name","value":"addressesCount"}},{"kind":"Field","name":{"kind":"Name","value":"companiesCount"}},{"kind":"Field","name":{"kind":"Name","value":"companies"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"IntValue","value":"3"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"countriesCount"}},{"kind":"Field","name":{"kind":"Name","value":"peopleCount"}}]}}]} as unknown as DocumentNode<GetPersonMessagesQuery, GetPersonMessagesQueryVariables>;
 export const GetPersonPeopleDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetPersonPeople"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"limit"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","alias":{"kind":"Name","value":"result"},"name":{"kind":"Name","value":"people"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"id_EQ"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"countries"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"Variable","name":{"kind":"Name","value":"limit"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"CountryInline"}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"CountryInline"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Country"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"addressesCount"}},{"kind":"Field","name":{"kind":"Name","value":"companiesCount"}},{"kind":"Field","name":{"kind":"Name","value":"messagesCount"}},{"kind":"Field","name":{"kind":"Name","value":"peopleCount"}}]}}]} as unknown as DocumentNode<GetPersonPeopleQuery, GetPersonPeopleQueryVariables>;
+export const SearchItemsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"SearchItems"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"itemType"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"DataItemType"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"includes"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"filters"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"SearchFilters"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"limit"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}},"defaultValue":{"kind":"IntValue","value":"10"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"search"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"itemType"},"value":{"kind":"Variable","name":{"kind":"Name","value":"itemType"}}},{"kind":"Argument","name":{"kind":"Name","value":"filters"},"value":{"kind":"Variable","name":{"kind":"Name","value":"filters"}}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"Variable","name":{"kind":"Name","value":"limit"}}},{"kind":"Argument","name":{"kind":"Name","value":"includes"},"value":{"kind":"Variable","name":{"kind":"Name","value":"includes"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"total"}},{"kind":"Field","name":{"kind":"Name","value":"results"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Company"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Address"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Country"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Message"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","alias":{"kind":"Name","value":"name"},"name":{"kind":"Name","value":"message"}}]}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Person"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]}}]}}]} as unknown as DocumentNode<SearchItemsQuery, SearchItemsQueryVariables>;
+export const AggregateItemsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"AggregateItems"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"itemType"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"DataItemType"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"field"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"AggregationFields"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"filters"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"SearchFilters"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"query"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"includes"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"limit"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}},"defaultValue":{"kind":"IntValue","value":"10"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"aggregate"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"itemType"},"value":{"kind":"Variable","name":{"kind":"Name","value":"itemType"}}},{"kind":"Argument","name":{"kind":"Name","value":"field"},"value":{"kind":"Variable","name":{"kind":"Name","value":"field"}}},{"kind":"Argument","name":{"kind":"Name","value":"filters"},"value":{"kind":"Variable","name":{"kind":"Name","value":"filters"}}},{"kind":"Argument","name":{"kind":"Name","value":"query"},"value":{"kind":"Variable","name":{"kind":"Name","value":"query"}}},{"kind":"Argument","name":{"kind":"Name","value":"includes"},"value":{"kind":"Variable","name":{"kind":"Name","value":"includes"}}},{"kind":"Argument","name":{"kind":"Name","value":"size"},"value":{"kind":"Variable","name":{"kind":"Name","value":"limit"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"total"}},{"kind":"Field","name":{"kind":"Name","value":"values"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"label"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"count"}}]}}]}}]}}]} as unknown as DocumentNode<AggregateItemsQuery, AggregateItemsQueryVariables>;

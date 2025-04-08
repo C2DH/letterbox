@@ -1,28 +1,35 @@
-import { BooleanFilter, DateFilter } from '@ouestware/facets';
+import { useApolloClient } from '@apollo/client';
+import { BooleanFilter, DateFilter, FiltersState } from '@ouestware/facets';
 import {
+  FacetsContextType,
   FacetsRoot,
+  KeywordsFacet,
   searchToState,
   stateToSearch,
   useFacetsContext,
 } from '@ouestware/facets-client';
 import cx from 'classnames';
 import { isNil, without } from 'lodash';
-import { FC, useEffect, useMemo, useState } from 'react';
+import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { RiDownloadLine, RiPriceTagLine, RiSearch2Line } from 'react-icons/ri';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import Select from 'react-select';
 
-import { ItemFacet } from '../components/ItemFacet.tsx';
+import { ItemFacet } from '../components/ItemFacet';
 import {
   FACETS,
   FILTERABLE_ITEM_TYPES,
   ITEM_TYPE_LABELS_PLURAL,
+  ITEM_TYPE_TO_DATA_TYPE,
+  ITEM_TYPE_TO_FIELD,
   ITEM_TYPES,
   ITEM_TYPES_SET,
   ItemIcon,
   ItemType,
   REACT_SELECT_BASE_PROPS,
-} from '../core/consts.tsx';
+} from '../core/consts';
+import { aggregateItems, searchItems } from '../core/graphql/queries/search.ts';
+import { filtersStateToSearchFilters } from '../utils/filters.ts';
 
 const STATUSES: {
   id: string;
@@ -154,6 +161,7 @@ export const Explore: FC = () => {
   const { type: inputType } = useParams();
   const { search } = useLocation();
   const navigate = useNavigate();
+  const client = useApolloClient();
 
   const [state, setState] = useState(searchToState(new URLSearchParams(search), FACETS));
   const selectedType = useMemo(() => {
@@ -161,34 +169,95 @@ export const Explore: FC = () => {
     if (!ITEM_TYPES_SET.has(inputType)) throw new Error(`Type ${inputType} is not handled yet.`);
     return inputType as ItemType;
   }, [inputType]);
+  const listBlocks = useMemo(() => without(FILTERABLE_ITEM_TYPES, selectedType), [selectedType]);
+
+  const loadHistogram = useCallback<NonNullable<FacetsContextType['loadHistogram']>>(
+    async (facet: KeywordsFacet, filters: FiltersState) => {
+      if (!ITEM_TYPES_SET.has(facet.id)) throw new Error(`${facet.id} is not a valid item type.`);
+      const itemType = facet.id as ItemType;
+      const {
+        data: { aggregate },
+        error,
+      } = await client.query({
+        query: aggregateItems,
+        variables: {
+          itemType: ITEM_TYPE_TO_DATA_TYPE[selectedType],
+          field: ITEM_TYPE_TO_FIELD[itemType],
+          limit: 10,
+          filters: filtersStateToSearchFilters(filters),
+        },
+      });
+      if (error) throw error;
+      if (!aggregate) throw new Error('No proper data was received from searchCompanies.');
+
+      return {
+        total: aggregate.total,
+        values: aggregate.values.flatMap((item) =>
+          item
+            ? [
+                {
+                  value: item.label,
+                  id: item.id,
+                  count: item.count,
+                },
+              ]
+            : [],
+        ),
+      };
+    },
+    [client, selectedType],
+  );
+  const autocomplete = useCallback<NonNullable<FacetsContextType['autocomplete']>>(
+    async (facet: KeywordsFacet, filters: FiltersState, input: string) => {
+      if (!ITEM_TYPES_SET.has(facet.id)) throw new Error(`${facet.id} is not a valid item type.`);
+      const itemType = facet.id as ItemType;
+      const {
+        data: { search },
+        error,
+      } = await client.query({
+        query: searchItems,
+        variables: {
+          itemType: ITEM_TYPE_TO_DATA_TYPE[itemType],
+          includes: input,
+          limit: 10,
+          filters: filtersStateToSearchFilters(filters),
+        },
+      });
+      if (error) throw error;
+      if (!search) throw new Error('No proper data was received from searchCompanies.');
+
+      return {
+        total: search.total,
+        values: search.results.flatMap((item) =>
+          item
+            ? [
+                {
+                  value: item.name,
+                  id: item.id,
+                  count: 0,
+                },
+              ]
+            : [],
+        ),
+      };
+    },
+    [client],
+  );
 
   // Update URL search:
   useEffect(() => {
     const newSearch = stateToSearch(state).toString();
-    console.log({ search, newSearch });
     if (newSearch !== search)
       navigate(`/explore/${selectedType}${newSearch ? '?' + newSearch : ''}`, { replace: true });
   }, [navigate, search, selectedType, state]);
-
-  const listBlocks = useMemo(() => without(FILTERABLE_ITEM_TYPES, selectedType), [selectedType]);
 
   return (
     <FacetsRoot
       filtersState={state}
       onFiltersStateChange={setState}
       portalId="portal-root"
-      autocomplete={async (_facet, _state, _includes) => {
-        return {
-          values: [],
-          total: 0,
-        };
-      }}
-      loadHistogram={async (_facet, _state) => {
-        return {
-          values: [],
-          total: 0,
-        };
-      }}
+      autocomplete={autocomplete}
+      loadHistogram={loadHistogram}
     >
       {/* SIDEBAR */}
       <aside className="py-5">
