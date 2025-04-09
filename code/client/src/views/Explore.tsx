@@ -41,6 +41,11 @@ export const Explore: FC = () => {
   }, [inputType]);
   const listBlocks = useMemo(() => without(FILTERABLE_ITEM_TYPES, selectedType), [selectedType]);
 
+  const fingerprint = useMemo(
+    () => JSON.stringify({ selectedType, ...state }),
+    [selectedType, state],
+  );
+
   const fetchItems = useCallback(
     async (facet: KeywordsFacet, filters: FiltersState, input = '') => {
       if (!ITEM_TYPES_SET.has(facet.id)) throw new Error(`${facet.id} is not a valid item type.`);
@@ -152,7 +157,7 @@ export const Explore: FC = () => {
         </section>
 
         {/* CORE ITEMS LIST */}
-        <ItemsList key={selectedType} itemType={selectedType} />
+        <ItemsList key={fingerprint} itemType={selectedType} />
       </main>
     </FacetsRoot>
   );

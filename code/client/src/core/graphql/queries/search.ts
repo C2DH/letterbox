@@ -5,9 +5,16 @@ export const searchItems = graphql(`
     $itemType: DataItemType!
     $filters: SearchFilters!
     $includes: String = ""
+    $from: Int = 0
     $limit: Int = 10
   ) {
-    search(itemType: $itemType, filters: $filters, limit: $limit, includes: $includes) {
+    search(
+      itemType: $itemType
+      filters: $filters
+      limit: $limit
+      includes: $includes
+      from: $from
+    ) {
       total
       results {
         ... on Company {
