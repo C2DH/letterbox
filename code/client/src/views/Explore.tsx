@@ -68,8 +68,8 @@ export const Explore: FC = () => {
           item
             ? [
                 {
-                  value: item.label,
-                  id: item.id,
+                  value: item.id,
+                  label: item.label,
                   count: item.count,
                 },
               ]

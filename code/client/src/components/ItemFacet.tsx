@@ -1,11 +1,12 @@
 import { KeywordsFilter } from '@ouestware/facets';
 import {
+  AutocompleteData,
+  HistogramData,
   InputKeywordsProps,
   KeywordsFacetHistogramProps,
   useFacet,
   useFacetsContext,
   useInputKeywords,
-  ValueWithCount,
 } from '@ouestware/facets-client';
 import { keyBy, max, without } from 'lodash';
 import { FC, useMemo, useState } from 'react';
@@ -20,14 +21,13 @@ import {
   ITEM_TYPE_LABELS_PLURAL,
   ItemIcon,
   ItemType,
+  ItemValue,
   REACT_SELECT_BASE_PROPS,
 } from '../core/consts.tsx';
 
-type ItemValue = ValueWithCount & { link?: string };
-
 const HistogramRow: FC<
   { onClick: () => void; maxCount: number; index: number; Icon: IconType } & ItemValue
-> = ({ onClick, value, link, maxCount, count, index, Icon }) => {
+> = ({ onClick, label, link, maxCount, count, index, Icon }) => {
   return (
     <button
       className="btn btn-light bg-transparent w-100 border-0 p-3 position-relative"
@@ -39,7 +39,7 @@ const HistogramRow: FC<
       <div className="d-flex flex-row align-items-baseline">
         <div className="position-relative flex-grow-1 text-start me-2">
           <span>
-            {value}
+            {label}
             {link && (
               <>
                 {' '}
@@ -114,7 +114,7 @@ const Histogram: FC<KeywordsFacetHistogramProps<ItemValue>> = ({
   return (
     <>
       <ul className="list-unstyled bg-light rounded my-2">
-        {selected.map(({ value, count, link }, i) => (
+        {selected.map(({ label, value, count, link }, i) => (
           <li
             key={i}
             className={`${hover === i ? 'bg-light' : ''} d-flex`}
@@ -122,6 +122,7 @@ const Histogram: FC<KeywordsFacetHistogramProps<ItemValue>> = ({
             onMouseLeave={() => setHover(null)}
           >
             <HistogramRow
+              label={label}
               value={value}
               count={count}
               link={link}
@@ -136,7 +137,7 @@ const Histogram: FC<KeywordsFacetHistogramProps<ItemValue>> = ({
         ))}
       </ul>
       <ul className="list-unstyled">
-        {unselected.map(({ value, count, link }, i) => (
+        {unselected.map(({ label, value, count, link }, i) => (
           <li
             key={i}
             className={`${hover === i ? 'bg-light' : ''} d-flex`}
@@ -144,6 +145,7 @@ const Histogram: FC<KeywordsFacetHistogramProps<ItemValue>> = ({
             onMouseLeave={() => setHover(null)}
           >
             <HistogramRow
+              label={label}
               value={value}
               count={count}
               link={link}
@@ -176,13 +178,14 @@ export const ItemFacet: FC<{ itemType: ItemType }> = ({ itemType }) => {
   const { filter, onChange } = useFacet(facet);
   const fnAutocomplete = useMemo(() => {
     return facet.type === 'keywords' && facet.autocomplete && autocomplete
-      ? (inputValue: string) => autocomplete(facet, state, inputValue)
+      ? (inputValue: string) =>
+          autocomplete(facet, state, inputValue) as Promise<AutocompleteData<ItemValue>>
       : undefined;
   }, [facet, autocomplete, state]);
 
   const fnLoadHistogram = useMemo(() => {
     return facet.type === 'keywords' && facet.histogram && loadHistogram
-      ? () => loadHistogram(facet, state)
+      ? () => loadHistogram(facet, state) as Promise<HistogramData<ItemValue>>
       : undefined;
   }, [facet, loadHistogram, state]);
   const inputKeywordsProps = useMemo<InputKeywordsProps<ItemValue>>(

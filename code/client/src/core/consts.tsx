@@ -1,4 +1,4 @@
-import { Facet } from '@ouestware/facets-client';
+import { Facet, ValueWithCount } from '@ouestware/facets-client';
 import { keyBy, without } from 'lodash';
 import { FC, ReactNode, SVGAttributes } from 'react';
 import type { IconType } from 'react-icons';
@@ -119,6 +119,8 @@ export const FACETS = FILTERABLE_ITEM_TYPES.map(
 
 export const FACETS_DICT = keyBy(FACETS, 'id');
 
+export type ItemValue = ValueWithCount & { link?: string; label?: string };
+
 export const REACT_SELECT_BASE_PROPS: Partial<Props> = {
   classNames: {
     valueContainer: () => 'form-control px-3',
@@ -134,4 +136,5 @@ export const REACT_SELECT_BASE_PROPS: Partial<Props> = {
   components: {
     DropdownIndicator: () => <RiArrowDownSLine />,
   },
+  getOptionLabel: (o) => (o as ItemValue).label || (o as ItemValue).value,
 };
