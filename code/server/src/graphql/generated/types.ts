@@ -107,6 +107,7 @@ export type Company = {
   peopleCount: Scalars['Int']['output'];
   tags?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
   verified?: Maybe<Scalars['Boolean']['output']>;
+  years?: Maybe<Array<Maybe<Scalars['Int']['output']>>>;
 };
 
 
@@ -686,6 +687,7 @@ export type CompanyResolvers<ContextType = any, ParentType extends ResolversPare
   peopleCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   tags?: Resolver<Maybe<Array<Maybe<ResolversTypes['String']>>>, ParentType, ContextType>;
   verified?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
+  years?: Resolver<Maybe<Array<Maybe<ResolversTypes['Int']>>>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 

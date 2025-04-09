@@ -249,6 +249,20 @@ type Company
       LIMIT $limit
       """
     )
+
+  #
+  # Years
+  #
+  years: [Int]
+    @cypher(
+      columnName: "result"
+      statement: """
+      MATCH (this)<-[r1]-(m:Message)
+      WHERE NOT coalesce(r1.deleted, false)
+      RETURN DISTINCT m.year AS result
+      ORDER BY result ASC
+      """
+    )
 }
 
 #
