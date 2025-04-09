@@ -1,33 +1,35 @@
-import { type FC } from 'react';
-import { BsPerson } from 'react-icons/bs';
+import { filter, isNil } from 'lodash';
+import { useMemo, type FC } from 'react';
 import { Link } from 'react-router-dom';
 
-import { DataItemType, type PersonInlineFragment } from '../../../core/graphql';
-import { ItemActionMenu } from '../actions/ItemActions';
-import { ItemCounts } from '../ItemCount';
+import { type PersonInlineFragment } from '../../../core/graphql';
+import { ItemsCounts } from '../ItemsCounts';
 
-type PersonCardProps = { data: PersonInlineFragment };
-export const PersonCard: FC<PersonCardProps> = ({ data }) => {
+export const PersonCard: FC<{ data: PersonInlineFragment }> = ({ data }) => {
+  const { tags } = data;
+  const cleanedTags = useMemo(() => filter(tags || [], (s) => !isNil(s)) as string[], [tags]);
+
   return (
-    <div className="card">
-      {/* Action menu */}
-      <ItemActionMenu
-        type={DataItemType.Person}
-        id={data.id}
-        name={data.name}
-        className="position-absolute top-0 end-0"
-      />
+    <article className="card">
       <div className="card-body">
-        {/* Title */}
-        <BsPerson />
         <h5 className="card-title">
-          <Link title={`Link to person page "${data.name}"`} to={`/person/${data.id}`}>
+          <Link className="text-dark" to={`/people/${data.id}`}>
             {data.name}
           </Link>
         </h5>
-        {/* Count */}
-        <ItemCounts data={data} />
+
+        <ItemsCounts itemType="people" data={data} />
+
+        {!!cleanedTags.length && (
+          <section>
+            {cleanedTags.map((tag, i) => (
+              <span key={i} className="badge text-bg-primary me-2">
+                {tag}
+              </span>
+            ))}
+          </section>
+        )}
       </div>
-    </div>
+    </article>
   );
 };

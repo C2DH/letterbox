@@ -1,21 +1,17 @@
 import { useApolloClient } from '@apollo/client';
-import { BooleanFilter, DateFilter, FiltersState } from '@ouestware/facets';
-import {
-  FacetsContextType,
-  FacetsRoot,
-  KeywordsFacet,
-  searchToState,
-  stateToSearch,
-  useFacetsContext,
-} from '@ouestware/facets-client';
+import { FiltersState } from '@ouestware/facets';
+import { FacetsRoot, KeywordsFacet, searchToState, stateToSearch } from '@ouestware/facets-client';
 import cx from 'classnames';
-import { isNil, without } from 'lodash';
+import { without } from 'lodash';
 import { FC, useCallback, useEffect, useMemo, useState } from 'react';
-import { RiDownloadLine, RiPriceTagLine, RiSearch2Line } from 'react-icons/ri';
+import { RiPriceTagLine } from 'react-icons/ri';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import Select from 'react-select';
 
+import { DateFacet } from '../components/DateFacet';
 import { ItemFacet } from '../components/ItemFacet';
+import { ItemsList } from '../components/ItemsList';
+import { StatusFacet } from '../components/StatusFacet';
 import {
   FACETS,
   FILTERABLE_ITEM_TYPES,
@@ -28,134 +24,8 @@ import {
   ItemType,
   REACT_SELECT_BASE_PROPS,
 } from '../core/consts';
-import { aggregateItems, searchItems } from '../core/graphql/queries/search.ts';
-import { filtersStateToSearchFilters } from '../utils/filters.ts';
-
-const STATUSES: {
-  id: string;
-  label: string;
-  isChecked: (filter?: BooleanFilter) => boolean;
-  getFilter: () => BooleanFilter | undefined;
-}[] = [
-  {
-    id: 'all',
-    label: 'All statuses',
-    isChecked: (filter?: BooleanFilter) => isNil(filter?.value),
-    getFilter: () => undefined,
-  },
-  {
-    id: 'verified',
-    label: 'Verified',
-    isChecked: (filter?: BooleanFilter) => filter?.value === true,
-    getFilter: () => ({
-      type: 'boolean',
-      value: true,
-    }),
-  },
-  {
-    id: 'unverified',
-    label: 'Unverified',
-    isChecked: (filter?: BooleanFilter) => filter?.value === false,
-    getFilter: () => ({
-      type: 'boolean',
-      value: false,
-    }),
-  },
-];
-
-const StatusFacet: FC = () => {
-  const { state, setFilter } = useFacetsContext();
-
-  return (
-    <>
-      <h2 className="with-icon fw-semibold">Status</h2>
-      <div>
-        {STATUSES.map(({ id, label, isChecked, getFilter }) => (
-          <div key={id} className="form-check">
-            <input
-              className="form-check-input"
-              type="radio"
-              name="statuses"
-              id={id}
-              checked={isChecked((state.filters || {})['verified'] as BooleanFilter | undefined)}
-              onChange={(e) => {
-                if (e.target.checked) {
-                  setFilter('verified', getFilter());
-                }
-              }}
-            />
-            <label className="form-check-label" htmlFor={id}>
-              {label}
-            </label>
-          </div>
-        ))}
-      </div>
-    </>
-  );
-};
-
-const DateFacet: FC = () => {
-  const {
-    state: { filters },
-    setFilter,
-  } = useFacetsContext();
-  const [state, setState] = useState<{ min?: number; max?: number }>({});
-  const filter = useMemo(() => (filters || {}).date as DateFilter | undefined, [filters]);
-  const isDisabled = useMemo(
-    () => filter?.min === state.min && filter?.max === state.max,
-    [filter?.max, filter?.min, state.max, state.min],
-  );
-
-  useEffect(() => {
-    setState({
-      min: filter?.min,
-      max: filter?.max,
-    });
-  }, [filter?.max, filter?.min]);
-
-  return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        setFilter('date', {
-          ...(filter || {}),
-          type: 'date',
-          min: state.min,
-          max: state.max,
-        });
-      }}
-    >
-      <section className="d-flex flex-row align-items-end">
-        {(
-          [
-            { key: 'min', label: 'Start' },
-            { key: 'max', label: 'End' },
-          ] as const
-        ).map(({ key, label }) => (
-          <div key={key} className="ms-2">
-            <label htmlFor={`date-${key}`} className="form-label">
-              {label}
-            </label>
-            <input
-              type="number"
-              className="form-control"
-              style={{ width: 120 }}
-              id={`date-${key}`}
-              value={state[key] || ''}
-              onChange={(e) =>
-                setState({ ...state, [key]: e.target.value ? +e.target.value : undefined })
-              }
-            />
-          </div>
-        ))}
-        <button className="btn ms-2" type="submit" disabled={isDisabled}>
-          Update
-        </button>
-      </section>
-      <section className="text-end"></section>
-    </form>
-  );
-};
+import { aggregateItems } from '../core/graphql/queries/search';
+import { filtersStateToSearchFilters } from '../utils/filters';
 
 export const Explore: FC = () => {
   const { type: inputType } = useParams();
@@ -171,8 +41,8 @@ export const Explore: FC = () => {
   }, [inputType]);
   const listBlocks = useMemo(() => without(FILTERABLE_ITEM_TYPES, selectedType), [selectedType]);
 
-  const loadHistogram = useCallback<NonNullable<FacetsContextType['loadHistogram']>>(
-    async (facet: KeywordsFacet, filters: FiltersState) => {
+  const fetchItems = useCallback(
+    async (facet: KeywordsFacet, filters: FiltersState, input = '') => {
       if (!ITEM_TYPES_SET.has(facet.id)) throw new Error(`${facet.id} is not a valid item type.`);
       const itemType = facet.id as ItemType;
       const {
@@ -185,7 +55,9 @@ export const Explore: FC = () => {
           field: ITEM_TYPE_TO_FIELD[itemType],
           limit: 10,
           filters: filtersStateToSearchFilters(filters),
+          includes: input,
         },
+        fetchPolicy: 'no-cache',
       });
       if (error) throw error;
       if (!aggregate) throw new Error('No proper data was received from searchCompanies.');
@@ -207,42 +79,6 @@ export const Explore: FC = () => {
     },
     [client, selectedType],
   );
-  const autocomplete = useCallback<NonNullable<FacetsContextType['autocomplete']>>(
-    async (facet: KeywordsFacet, filters: FiltersState, input: string) => {
-      if (!ITEM_TYPES_SET.has(facet.id)) throw new Error(`${facet.id} is not a valid item type.`);
-      const itemType = facet.id as ItemType;
-      const {
-        data: { search },
-        error,
-      } = await client.query({
-        query: searchItems,
-        variables: {
-          itemType: ITEM_TYPE_TO_DATA_TYPE[itemType],
-          includes: input,
-          limit: 10,
-          filters: filtersStateToSearchFilters(filters),
-        },
-      });
-      if (error) throw error;
-      if (!search) throw new Error('No proper data was received from searchCompanies.');
-
-      return {
-        total: search.total,
-        values: search.results.flatMap((item) =>
-          item
-            ? [
-                {
-                  value: item.name,
-                  id: item.id,
-                  count: 0,
-                },
-              ]
-            : [],
-        ),
-      };
-    },
-    [client],
-  );
 
   // Update URL search:
   useEffect(() => {
@@ -256,8 +92,8 @@ export const Explore: FC = () => {
       filtersState={state}
       onFiltersStateChange={setState}
       portalId="portal-root"
-      autocomplete={autocomplete}
-      loadHistogram={loadHistogram}
+      autocomplete={fetchItems}
+      loadHistogram={fetchItems}
     >
       {/* SIDEBAR */}
       <aside className="py-5">
@@ -290,19 +126,8 @@ export const Explore: FC = () => {
         <section className="row align-items-stretch">
           {listBlocks.map((itemType) => (
             <div key={itemType} className={cx('mb-4', listBlocks.length === 3 ? 'col-4' : 'col-6')}>
-              <div className="card">
+              <div className="card overflow-y-auto" style={{ height: 800 }}>
                 <div className="card-body">
-                  <div className="card-title d-flex flex-row align-items-baseline">
-                    <h2 className="with-icon fw-semibold flex-grow-1 m-0">
-                      <ItemIcon type={itemType} /> {ITEM_TYPE_LABELS_PLURAL[itemType]}{' '}
-                      <span className="text-muted">123</span>
-                    </h2>
-
-                    <button className="btn btn-dark py-1 px-2">
-                      <RiDownloadLine />
-                    </button>
-                  </div>
-
                   <ItemFacet itemType={itemType} />
                 </div>
               </div>
@@ -327,27 +152,7 @@ export const Explore: FC = () => {
         </section>
 
         {/* CORE ITEMS LIST */}
-        <section>
-          <div className="row">
-            <h2 className="with-icon fw-semibold flex-grow-1 col-8">
-              <ItemIcon type={selectedType} /> {ITEM_TYPE_LABELS_PLURAL[selectedType]}{' '}
-              <span className="text-muted">123</span>
-            </h2>
-            <div className="col-4">
-              <div className="input-group">
-                <input
-                  type="text"
-                  className="form-control"
-                  placeholder={`Search for ${ITEM_TYPE_LABELS_PLURAL[selectedType].toLowerCase()}`}
-                  aria-label={`Search for ${ITEM_TYPE_LABELS_PLURAL[selectedType].toLowerCase()}`}
-                />
-                <span className="input-group-text">
-                  <RiSearch2Line />
-                </span>
-              </div>
-            </div>
-          </div>
-        </section>
+        <ItemsList key={selectedType} itemType={selectedType} />
       </main>
     </FacetsRoot>
   );

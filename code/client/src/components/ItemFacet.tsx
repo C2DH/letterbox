@@ -10,7 +10,7 @@ import {
 import { keyBy, max, without } from 'lodash';
 import { FC, useMemo, useState } from 'react';
 import { IconType } from 'react-icons';
-import { RiFilterLine, RiFilterOffLine, RiShareBoxLine } from 'react-icons/ri';
+import { RiDownloadLine, RiFilterLine, RiFilterOffLine, RiShareBoxLine } from 'react-icons/ri';
 import { Link } from 'react-router-dom';
 import AsyncSelect from 'react-select/async';
 
@@ -18,6 +18,7 @@ import {
   APP_LANGUAGE,
   FACETS_DICT,
   ITEM_TYPE_LABELS_PLURAL,
+  ItemIcon,
   ItemType,
   REACT_SELECT_BASE_PROPS,
 } from '../core/consts.tsx';
@@ -96,10 +97,6 @@ const Histogram: FC<KeywordsFacetHistogramProps<ItemValue>> = ({
       unselected: (histogramData?.values || []).filter(({ value }) => !selectedValues.has(value)),
     };
   }, [histogramData?.values, selectedValues, values]);
-  const remainingCount = useMemo(
-    () => (histogramData ? histogramData.total - histogramData.values.length : 0),
-    [histogramData],
-  );
   const maxCount = useMemo<number>(
     () => histogramData?.maxCount || max(histogramData?.values.map((v) => v.count)) || 1,
     [histogramData],
@@ -159,16 +156,16 @@ const Histogram: FC<KeywordsFacetHistogramProps<ItemValue>> = ({
             />
           </li>
         ))}
-        {!!remainingCount && (
-          <li className="small text-muted">
-            <i>
-              ...and {remainingCount.toLocaleString(APP_LANGUAGE)} other
-              {remainingCount > 1 ? 's' : ''} value
-              {remainingCount > 1 ? 's' : ''}
-            </i>
-          </li>
-        )}
       </ul>
+      <div className="d-flex align-items-baseline flex-row small">
+        <button type="button" className="btn btn-sm btn-outline-dark" disabled>
+          TODO: Load more
+        </button>{' '}
+        <span className="text-muted ms-2">
+          {histogramData.values.length.toLocaleString(APP_LANGUAGE)} of{' '}
+          {histogramData.total.toLocaleString(APP_LANGUAGE)}
+        </span>
+      </div>
     </>
   );
 };
@@ -206,10 +203,29 @@ export const ItemFacet: FC<{ itemType: ItemType }> = ({ itemType }) => {
 
   return (
     <>
+      <div className="card-title d-flex flex-row align-items-baseline">
+        <h2 className="with-icon fw-semibold flex-grow-1 m-0">
+          <ItemIcon type={itemType} /> {ITEM_TYPE_LABELS_PLURAL[itemType]}
+          {!!histogramProps?.histogramData?.total && (
+            <>
+              {' '}
+              <span className="text-muted">
+                {histogramProps.histogramData.total.toLocaleString(APP_LANGUAGE)}
+              </span>
+            </>
+          )}
+        </h2>
+
+        <button className="btn btn-dark py-1 px-2">
+          <RiDownloadLine />
+        </button>
+      </div>
+
       <AsyncSelect
         {...selectProps}
         {...REACT_SELECT_BASE_PROPS}
         value={null}
+        noOptionsMessage={() => 'Start typing'}
         placeholder={`Search for ${ITEM_TYPE_LABELS_PLURAL[itemType].toLowerCase()}`}
       />
       {histogramProps && <Histogram {...histogramProps} />}

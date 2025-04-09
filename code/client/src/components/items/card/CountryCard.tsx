@@ -1,33 +1,35 @@
-import { type FC } from 'react';
-import { BsFlag } from 'react-icons/bs';
+import { filter, isNil } from 'lodash';
+import { useMemo, type FC } from 'react';
 import { Link } from 'react-router-dom';
 
-import { DataItemType, type CountryInlineFragment } from '../../../core/graphql';
-import { ItemActionMenu } from '../actions/ItemActions';
-import { ItemCounts } from '../ItemCount';
+import { type CountryInlineFragment } from '../../../core/graphql';
+import { ItemsCounts } from '../ItemsCounts';
 
-type CountryCardProps = { data: CountryInlineFragment };
-export const CountryCard: FC<CountryCardProps> = ({ data }) => {
+export const CountryCard: FC<{ data: CountryInlineFragment }> = ({ data }) => {
+  const { tags } = data;
+  const cleanedTags = useMemo(() => filter(tags || [], (s) => !isNil(s)) as string[], [tags]);
+
   return (
-    <div className="card">
-      {/* Action menu */}
-      <ItemActionMenu
-        type={DataItemType.Country}
-        id={data.id}
-        name={data.name}
-        className="position-absolute top-0 end-0"
-      />
+    <article className="card">
       <div className="card-body">
-        {/* Title */}
-        <BsFlag />
         <h5 className="card-title">
-          <Link title={`Link to country page "${data.name}"`} to={`/country/${data.id}`}>
+          <Link className="text-dark" to={`/country/${data.id}`}>
             {data.name}
           </Link>
         </h5>
-        {/* Count */}
-        <ItemCounts data={data} />
+
+        <ItemsCounts itemType="country" data={data} />
+
+        {!!cleanedTags.length && (
+          <section>
+            {cleanedTags.map((tag, i) => (
+              <span key={i} className="badge text-bg-primary me-2">
+                {tag}
+              </span>
+            ))}
+          </section>
+        )}
       </div>
-    </div>
+    </article>
   );
 };

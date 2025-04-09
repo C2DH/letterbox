@@ -8,6 +8,7 @@ export const AddressInline = graphql(`
     countriesCount
     messagesCount
     peopleCount
+    tags
   }
 `);
 
@@ -19,6 +20,8 @@ export const CompanyInline = graphql(`
     countriesCount
     messagesCount
     peopleCount
+    years
+    tags
   }
 `);
 
@@ -30,6 +33,7 @@ export const CountryInline = graphql(`
     companiesCount
     messagesCount
     peopleCount
+    tags
   }
 `);
 
@@ -45,6 +49,7 @@ export const MessageInline = graphql(`
     }
     countriesCount
     peopleCount
+    tags
   }
 `);
 
@@ -56,5 +61,6 @@ export const PersonInline = graphql(`
     companiesCount
     countriesCount
     messagesCount
+    tags
   }
 `);

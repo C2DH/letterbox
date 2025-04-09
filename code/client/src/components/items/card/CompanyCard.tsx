@@ -1,33 +1,43 @@
-import { type FC } from 'react';
-import { BsBuildings } from 'react-icons/bs';
+import { filter, isNil, max, min } from 'lodash';
+import { useMemo, type FC } from 'react';
 import { Link } from 'react-router-dom';
 
-import { DataItemType, type CompanyInlineFragment } from '../../../core/graphql';
-import { ItemActionMenu } from '../actions/ItemActions';
-import { ItemCounts } from '../ItemCount';
+import { type CompanyInlineFragment } from '../../../core/graphql';
+import { ItemsCounts } from '../ItemsCounts';
 
-type CompanyCardProps = { data: CompanyInlineFragment };
-export const CompanyCard: FC<CompanyCardProps> = ({ data }) => {
+export const CompanyCard: FC<{ data: CompanyInlineFragment }> = ({ data }) => {
+  const { tags, years } = data;
+  const cleanedTags = useMemo(() => filter(tags || [], (s) => !isNil(s)) as string[], [tags]);
+  const minYear = min(years);
+  const maxYear = max(years);
+
   return (
-    <div className="card">
-      {/* Action menu */}
-      <ItemActionMenu
-        type={DataItemType.Company}
-        id={data.id}
-        name={data.name}
-        className="position-absolute top-0 end-0"
-      />
+    <article className="card">
       <div className="card-body">
-        {/* Title */}
-        <BsBuildings />
         <h5 className="card-title">
-          <Link title={`Link to company page "${data.name}"`} to={`/company/${data.id}`}>
+          <Link className="text-dark" to={`/company/${data.id}`}>
             {data.name}
           </Link>
         </h5>
-        {/* Count */}
-        <ItemCounts data={data} />
+
+        <ItemsCounts itemType="company" data={data} />
+
+        {typeof minYear === 'number' && typeof maxYear === 'number' && (
+          <section className="text-muted">
+            {minYear === maxYear ? minYear : `${minYear} - ${maxYear}`}
+          </section>
+        )}
+
+        {!!cleanedTags.length && (
+          <section>
+            {cleanedTags.map((tag, i) => (
+              <span key={i} className="badge text-bg-primary me-2">
+                {tag}
+              </span>
+            ))}
+          </section>
+        )}
       </div>
-    </div>
+    </article>
   );
 };

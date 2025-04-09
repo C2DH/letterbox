@@ -49,8 +49,16 @@ export const ITEM_TYPE_LABELS: Record<ItemType, string> = {
   company: 'Company',
   address: 'Address',
   country: 'Country',
-  people: 'People',
+  people: 'Person',
   message: 'Message',
+};
+
+export const ITEM_TYPES_AFFINITIES: Record<ItemType, Set<ItemType>> = {
+  company: new Set(['address', 'people']),
+  address: new Set(['people', 'company']),
+  country: new Set(['address', 'people', 'company', 'country']),
+  people: new Set(['people', 'company']),
+  message: new Set(['address', 'people', 'company', 'country']),
 };
 
 export const ITEM_TYPE_TO_FIELD = {

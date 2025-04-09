@@ -3,32 +3,27 @@ import { graphql } from '../generated';
 export const searchItems = graphql(`
   query SearchItems(
     $itemType: DataItemType!
-    $includes: String!
     $filters: SearchFilters!
+    $includes: String = ""
     $limit: Int = 10
   ) {
     search(itemType: $itemType, filters: $filters, limit: $limit, includes: $includes) {
       total
       results {
         ... on Company {
-          id
-          name
+          ...CompanyInline
         }
         ... on Address {
-          id
-          name
+          ...AddressInline
         }
         ... on Country {
-          id
-          name
+          ...CountryInline
         }
         ... on Message {
-          id
-          name: message
+          ...MessageInline
         }
         ... on Person {
-          id
-          name
+          ...PersonInline
         }
       }
     }
