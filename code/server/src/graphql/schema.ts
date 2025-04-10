@@ -14,7 +14,7 @@ import { DatasetImport } from '../services/dataset/import';
 import { DatasetIndexation } from '../services/dataset/indexation';
 import { Elastic } from '../services/elastic';
 import { EsIndices, Neo4jLabels, type ItemType } from '../types';
-import { Resolvers, type NodeItem } from './generated/types';
+import { KeywordsFilter, Resolvers, SearchFilters, type NodeItem } from './generated/types';
 
 export const typeDefs = readFileSync(path.resolve(__dirname, './schema.graphql'), 'utf8');
 
@@ -24,7 +24,7 @@ const datasetEdition = Services.get(DatasetEdition);
 const elasticSearch = Services.get(Elastic);
 
 /**
- * Deletegate part of the graphql query to dynamically return NodeItems
+ * Delegate part of the graphql query to dynamically return NodeItems
  */
 async function getGraphQlItems<T>(
   type: ItemType,
@@ -64,7 +64,7 @@ async function getGraphQlItems<T>(
 }
 
 /**
- * Deletegate part of the graphql query to dynamically a unique NodeItem
+ * Delegate part of the graphql query to dynamically a unique NodeItem
  */
 async function getGraphQlItem<T>(
   type: ItemType,
@@ -164,14 +164,23 @@ export const resolvers: Resolvers<unknown> = {
       _context,
       _info,
     ) => {
-      const results = await elasticSearch.fieldAggregation(
-        EsIndices[itemType],
+      const formattedFilters = (await datasetIndexation.formatFilters(filters)) as Record<
+        string,
+        Filter
+      >;
+      const fieldFilter = formattedFilters[field as keyof SearchFilters] as
+        | KeywordsFilter
+        | undefined;
+      const results = await elasticSearch.fieldAggregation({
+        index: EsIndices[itemType],
         field,
-        (await datasetIndexation.formatFilters(filters)) as Record<string, Filter>,
+        size,
         query,
         includes,
-        size,
-      );
+        includesValues: fieldFilter?.values,
+        filters: formattedFilters,
+      });
+      if (fieldFilter?.values?.length) console.log(JSON.stringify(results, null, '  '));
 
       return datasetIndexation.formatAggregationResults(field, results);
     },

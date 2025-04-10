@@ -25,7 +25,7 @@
     "@ouestware/async": "^0.0.1-alpha.3",
     "@ouestware/facets": "^0.0.1-alpha.4",
     "@ouestware/facets-server": "^0.0.1-alpha.5",
-    "@ouestware/node-elasticsearch": "^0.0.1-alpha.6",
+    "@ouestware/node-elasticsearch": "^0.0.1-alpha.7",
     "@ouestware/node-logger": "^0.0.1-aplha.2",
     "csv-parse": "^5.6.0",
     "express": "^4.21.0",
