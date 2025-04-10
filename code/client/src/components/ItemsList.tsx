@@ -72,7 +72,7 @@ export const ItemsList: FC<{ itemType: ItemType }> = ({ itemType }) => {
         query: searchItems,
         variables: {
           itemType: ITEM_TYPE_TO_DATA_TYPE[itemType],
-          limit: 29,
+          limit: 30,
           filters: filtersStateToSearchFilters(state),
           from,
         },
@@ -134,7 +134,7 @@ export const ItemsList: FC<{ itemType: ItemType }> = ({ itemType }) => {
       <ListComponent
         element={ItemComponent}
         elementProps={{ itemType }}
-        // getDataId={(data) => data.id}
+        getDataId={(data) => data.id}
         loadData={loadData}
         bottom={Bottom}
         list={List}
