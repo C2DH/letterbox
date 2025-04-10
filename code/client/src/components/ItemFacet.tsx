@@ -162,11 +162,18 @@ const Histogram: FC<KeywordsFacetHistogramProps<ItemValue>> = ({
       <div className="d-flex align-items-baseline flex-row small">
         <button type="button" className="btn btn-sm btn-outline-dark" disabled>
           TODO: Load more
-        </button>{' '}
-        <span className="text-muted ms-2">
-          {histogramData.values.length.toLocaleString(APP_LANGUAGE)} of{' '}
-          {histogramData.total.toLocaleString(APP_LANGUAGE)}
-        </span>
+        </button>
+        {!!histogramData.total && (
+          <>
+            {' '}
+            <span className="text-muted ms-2">
+              {(histogramData.values.filter((v) => !!v.count).length || 0).toLocaleString(
+                APP_LANGUAGE,
+              )}{' '}
+              of {histogramData.total.toLocaleString(APP_LANGUAGE)}
+            </span>
+          </>
+        )}
       </div>
     </>
   );
@@ -219,7 +226,7 @@ export const ItemFacet: FC<{ itemType: ItemType }> = ({ itemType }) => {
           )}
         </h2>
 
-        <button className="btn btn-dark py-1 px-2">
+        <button className="btn btn-dark py-1 px-2 ms-2">
           <RiDownloadLine />
         </button>
       </div>
