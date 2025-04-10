@@ -7,7 +7,7 @@ import hash from 'object-hash';
 import { inject, singleton } from 'tsyringe';
 
 import config from '../../config';
-import { DataMessage, ImportReport, itemTypes, Neo4jLabels } from '../../types';
+import { DataMessage, ImportReport, itemTypes, MessageCsvRecord, Neo4jLabels } from '../../types';
 import { checkNilOREmptyString } from '../../utils/string';
 import { FileSystem } from '../filesystem';
 import { Neo4j } from '../neo4j';
@@ -52,12 +52,7 @@ export class DatasetImport {
     for (const file of files) {
       try {
         this.log.info(`Importing file ${file}`);
-        const encoding: BufferEncoding = config.server.import.iso1FileNameRegexp.test(
-          basename(file),
-        )
-          ? 'latin1'
-          : 'utf-8';
-        const fileResult = await this.importFile(file, encoding);
+        const fileResult = await this.importFile(file, 'utf8');
         this.log.info(
           `Imported ${fileResult.count} records from file ${file} ignored ${fileResult.wrong} wrong messages and ${fileResult.errors.length} errors`,
         );
@@ -83,33 +78,45 @@ export class DatasetImport {
     const stream = this.fs.streamFile(file).pipe(
       parse({
         delimiter: config.server.import.column_seperator,
-        columns: config.server.import.headers,
+        columns: true, //config.server.import.headers as unknown as string[],
         encoding,
-        quote: null,
-        skip_records_with_error: true,
+        //quote: '"',
+        //skip_records_with_error: true,
       }),
     );
-
-    for await (const record of stream) {
+    let wrongFileHeaders = false;
+    for await (const _record of stream) {
       count++;
-      try {
-        if (Object.keys(record).length !== 9) {
-          errors.push(
-            `Invalid number of columns in record n°${count} in file ${file} : ${Object.keys(record).join(',')}`,
-          );
-        } else {
-          if (/.*wrong.*/i.test(record.year) || /.*wrong.*/i.test(record.company)) wrong += 1;
-          else records.push(this.parseRecord(record));
+      if (wrongFileHeaders === false)
+        try {
+          // check columns
+          if (!config.server.import.headers.every((h) => _record[h] !== undefined)) {
+            wrongFileHeaders = true;
+            throw new Error(
+              `file ${file} does not have those required columns: ${config.server.import.headers.filter((h) => _record[h] === undefined)}`,
+            );
+          }
+          const record = _record as MessageCsvRecord;
+          if (Object.keys(record).length !== config.server.import.headers.length) {
+            errors.push(
+              `Invalid number of columns in record n°${count} in file ${file} : ${Object.keys(record).join(',')}`,
+            );
+          } else {
+            if (/.*wrong.*/i.test(record.Year) || /.*wrong.*/i.test(record.Company_Name_Main))
+              wrong += 1;
+            else records.push(this.parseRecord(record));
+          }
+        } catch (e) {
+          errors.push(`Error parsing record n°${count} in file ${file}: ${(e as Error).message}`);
         }
-      } catch (e) {
-        errors.push(`Error parsing record n°${count} in file ${file}: ${(e as Error).message}`);
-      }
-      if (records.length > config.server.import.batchSize) {
+      if (records.length >= config.server.import.batchSize) {
         await this.importRecords(records);
         records = [];
       }
     }
-    if (records.length > 0) await this.importRecords(records);
+    if (records.length > 0) {
+      await this.importRecords(records);
+    }
     return { count, errors, wrong };
   }
 
@@ -139,6 +146,8 @@ export class DatasetImport {
           filename: record.filename,
           pageNumber: toInteger(record.pageNumber),
           message: record.message,
+          verified: record.verified,
+          tags: record.tags,
           year: toInteger(record.year),
           raw_company: record.raw_company.name,
           raw_address: [a IN coalesce(record.raw_address, []) | a.name],
@@ -278,7 +287,7 @@ export class DatasetImport {
     pageNumber: number;
     message: string;
   } {
-    const group = message.match(/^.*File Name: ?.*?([^\\]+\.pdf) Page Number ?: ?(\d+)(.*)$/i);
+    const group = message.match(/^.*File Name: ?.*?([^\\]+\.pdf) Page Number ?: ?(\d+) ?\+*(.*)$/i);
     if (!group) {
       const fileGroup = message.match(/.*(File name ?: .* Page Number ?: ?.*?) .*$/i);
       throw new Error(
@@ -295,51 +304,56 @@ export class DatasetImport {
   /**
    * From a CSV record (as an object), parse it and transform it into a DataMessage.
    */
-  private parseRecord(record: { [key: string]: unknown }): DataMessage {
+  private parseRecord(record: MessageCsvRecord): DataMessage {
     const fingerprint = hash(JSON.stringify(record, null, 2));
+    const { message } = this.parseRecordMessage(record.Description_Business);
 
-    const data = {
+    if (isNil(record.Description_Business))
+      throw new Error(`Can't parse 'message' column, reading "${record.Description_Business}"`);
+    if (checkNilOREmptyString(record.Year) || toNumber(record.Year) === undefined)
+      throw new Error(`Can't parse 'Year' column, reading "${record.Year}"`);
+    if (checkNilOREmptyString(record.Company_Name_Main))
+      throw new Error(`Missing required 'company' column, reading "${record.Company_Name_Main}`);
+
+    if (
+      checkNilOREmptyString(record.FileName) ||
+      (this.pdfFilenames && !this.pdfFilenames.has(record.FileName))
+    ) {
+      throw new Error(`Unknown PDF file "${record.FileName}`);
+    }
+    if (checkNilOREmptyString(record.PageNumber) || toNumber(record.PageNumber) === undefined)
+      throw new Error(`Can't parse 'PageNumber' column, reading "${record.PageNumber}"`);
+
+    const data: DataMessage = {
       id: fingerprint,
-      year: checkNilOREmptyString(record.year) ? undefined : toNumber(record.year),
-      raw_company: this.cleanRecordValue(record.company),
-      raw_company_spare: this.cleanRecordValue(record.company_spare),
-      raw_address: this.cleanRecordValue(record.address, false),
-      raw_address_spare: this.cleanRecordValue(record.address_spare, false),
-      raw_people: this.cleanRecordValue(record.people, true),
-      raw_people_abbr: this.cleanRecordValue(record.people_abbr, true),
-      raw_countries: this.cleanRecordValue(record.countries, true),
-      raw_message: this.cleanRecordValue(record.message),
+      year: toNumber(record.Year) as number,
+      filename: record.FileName,
+      pageNumber: toNumber(record.PageNumber) as number,
+      message,
+      verified: false,
+      tags: [],
+      raw_company: this.cleanRecordValue(record.Company_Name_Main) as string,
+      raw_company_spare: this.cleanRecordValue(record.Company_Name_Alternative),
+      raw_address: this.cleanRecordValue(record.Address_Main, false),
+      raw_address_spare: this.cleanRecordValue(record.Alternate_Address, false),
+      raw_people: this.cleanRecordValue(record.People, true),
+      raw_people_abbr: this.cleanRecordValue(record.People_Abbr, true),
+      raw_countries: this.cleanRecordValue(record.Countries, true).filter(
+        (c) => c !== 'Luxembourg',
+      ),
+      raw_message: this.cleanRecordValue(record.Description_Business) as string,
     };
 
-    if (isNil(data.raw_message))
-      throw new Error(`Can't parse 'message' column, reading "${record.message}"`);
-    if (isNil(data.year)) throw new Error(`Can't parse 'year' column, reading "${record.year}"`);
-    if (isNil(data.raw_company))
-      throw new Error(`Can't parse 'company' column, reading "${record.company}`);
-    if (isNil(data.raw_company_spare)) data.raw_company_spare = data.raw_company;
-
-    const { filename, pageNumber, message } = this.parseRecordMessage(data.raw_message as string);
-
-    if (this.pdfFilenames && !this.pdfFilenames.has(filename)) {
-      throw new Error(`Unknown PDF file "${filename}`);
-    }
-    return {
-      ...data,
-      filename,
-      pageNumber,
-      message,
-    } as DataMessage;
+    return data;
   }
 
   private cleanRecordValue(value: unknown): string | undefined;
   private cleanRecordValue(value: unknown, multiple: false): string | undefined;
-  private cleanRecordValue(value: unknown, multiple: true): string[] | undefined;
-  private cleanRecordValue(
-    value: unknown,
-    multiple: boolean = false,
-  ): string | string[] | undefined {
-    if (checkNilOREmptyString(value)) return undefined;
-    if (multiple) return `${value}`.split(config.server.import.value_separator);
-    return toString(value);
+  private cleanRecordValue(value: unknown, multiple: true): string[] | [];
+  private cleanRecordValue(value: unknown, multiple: boolean = false) {
+    if (checkNilOREmptyString(value)) return multiple ? [] : undefined;
+    if (multiple)
+      return `${value}`.split(config.server.import.value_separator).map((v) => v.trim());
+    return toString(value)?.trim();
   }
 }

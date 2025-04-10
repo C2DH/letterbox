@@ -1,5 +1,7 @@
 import config from './config';
 
+export type MessageCsvRecord = Record<(typeof config.server.import.headers)[number], string>;
+
 // This interface MUST be compatible with the "Message" defined in code/server/src/graphql/schema.ts
 export type DataMessage<T = string> = {
   id: string;
@@ -7,11 +9,16 @@ export type DataMessage<T = string> = {
   filename: string;
   pageNumber: number;
   message: string;
+  tags: string[];
+  verified: boolean;
 
   raw_company: T;
+  raw_company_spare?: string;
   raw_address?: T;
-  raw_people?: T[];
-  raw_countries?: T[];
+  raw_address_spare?: string;
+  raw_people: T[];
+  raw_people_abbr: string[];
+  raw_countries: T[];
   raw_message: string;
 };
 
