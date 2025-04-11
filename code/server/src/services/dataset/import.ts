@@ -164,6 +164,8 @@ export class DatasetImport {
         SET c = {
           id: record.raw_company.id,
           name: record.raw_company.name,
+          verified: false,
+          tags: [],
           // times
           created: datetime(),
           updated: datetime()
@@ -178,6 +180,8 @@ export class DatasetImport {
               MERGE (a:Address { id: address.id }) 
                 ON CREATE SET 
                   a.name = address.name,
+                  a.verified = false,
+                  a.tags = [],
                   // times
                   a.created = datetime(),
                   a.updated = datetime()
@@ -189,6 +193,8 @@ export class DatasetImport {
               MERGE (p:Person { id: person.id }) 
                 ON CREATE SET 
                   p.name = person.name,
+                  p.verified = false,
+                  p.tags = [],
                   // times
                   p.created = datetime(),
                   p.updated = datetime()
@@ -200,6 +206,8 @@ export class DatasetImport {
               MERGE (c:Country { id: country.id }) 
                 ON CREATE SET 
                   c.name = country.name,
+                  c.verified = false,
+                  c.tags = [],
                   // times
                   c.created = datetime(),
                   c.updated = datetime()
