@@ -4,22 +4,20 @@ import { FacetsRoot, KeywordsFacet, searchToState, stateToSearch } from '@ouestw
 import cx from 'classnames';
 import { without } from 'lodash';
 import { FC, useCallback, useEffect, useMemo, useState } from 'react';
-import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
-import { DateFacet } from '../components/DateFacet';
-import { ItemFacet } from '../components/ItemFacet';
+import { DateFacet } from '../components/facets/DateFacet.tsx';
+import { ItemFacet } from '../components/facets/ItemFacet.tsx';
+import { StatusFacet } from '../components/facets/StatusFacet.tsx';
+import { TagsFacet } from '../components/facets/TagsFacet.tsx';
 import { ItemsList } from '../components/ItemsList';
-import { StatusFacet } from '../components/StatusFacet';
-import { TagsFacet } from '../components/TagsFacet.tsx';
+import { Sidebar } from '../components/navigation/Sidebar.tsx';
 import {
   FACETS,
   FILTERABLE_ITEM_TYPES,
-  ITEM_TYPE_LABELS_PLURAL,
   ITEM_TYPE_TO_DATA_TYPE,
   ITEM_TYPE_TO_FIELD,
-  ITEM_TYPES,
   ITEM_TYPES_SET,
-  ItemIcon,
   ItemType,
 } from '../core/consts';
 import { AggregationFields } from '../core/graphql';
@@ -47,7 +45,7 @@ export const Explore: FC = () => {
 
   const fetchItems = useCallback(
     async (facet: KeywordsFacet, filters: FiltersState, input = '') => {
-      const field = (ITEM_TYPE_TO_FIELD as Record<string, AggregationFields>)[facet.id];
+      const field = (ITEM_TYPE_TO_FIELD as unknown as Record<string, AggregationFields>)[facet.id];
       if (!field) throw new Error(`${facet.id} is not a valid field.`);
       const itemType = ITEM_TYPES_SET.has(facet.id) ? (facet.id as ItemType) : null;
       const {
@@ -102,21 +100,7 @@ export const Explore: FC = () => {
       loadHistogram={fetchItems}
     >
       {/* SIDEBAR */}
-      <aside className="py-5 bg-transparent border-end">
-        <h3 className="text-muted fw-light px-4 text-dark">Explore by counting</h3>
-        {ITEM_TYPES.map((itemType) => (
-          <Link
-            key={itemType}
-            to={`/explore/${itemType}`}
-            className={cx(
-              'with-icon d-block link-dark link-underline-opacity-0 px-4 py-3 fs-3',
-              itemType === selectedType ? 'fw-medium' : 'fw-light',
-            )}
-          >
-            <ItemIcon type={itemType} /> {ITEM_TYPE_LABELS_PLURAL[itemType]}
-          </Link>
-        ))}
-      </aside>
+      <Sidebar activeItemType={selectedType} />
 
       {/* MAIN CONTENT */}
       <main className="p-4">
@@ -132,7 +116,10 @@ export const Explore: FC = () => {
         <section className="row align-items-stretch">
           {listBlocks.map((itemType) => (
             <div key={itemType} className={cx('mb-4', listBlocks.length === 3 ? 'col-4' : 'col-6')}>
-              <div className="card overflow-y-auto" style={{ height: listBlocks.length === 3 ? 800 : 400 }}>
+              <div
+                className="card overflow-y-auto"
+                style={{ height: listBlocks.length === 3 ? 800 : 400 }}
+              >
                 <div className="card-body">
                   <ItemFacet itemType={itemType} />
                 </div>

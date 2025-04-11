@@ -2,17 +2,12 @@ import { ModalProvider } from '@ouestware/modals';
 import { NotificationProvider } from '@ouestware/notifications';
 import { FC } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 
 import { Error } from '../components/error';
 import { ApolloProvider } from '../core/graphql';
-import { AddressView } from './AddressView.tsx';
-import { CompanyExploreView } from './CompanyExploreView.tsx';
-import { CompanyView } from './CompanyView.tsx';
-import { CountryView } from './CountryView.tsx';
 import { Explore } from './Explore.tsx';
-import { MessageView } from './MessageView.tsx';
-import { PersonView } from './PersonView.tsx';
+import { ItemView } from './ItemView.tsx';
 
 export const Root: FC = () => {
   return (
@@ -23,12 +18,8 @@ export const Root: FC = () => {
             <BrowserRouter>
               <Routes>
                 <Route path="/explore/:type" element={<Explore />} />
-                <Route path="/address/:id" element={<AddressView />} />
-                <Route path="/company/" element={<CompanyExploreView />} />
-                <Route path="/company/:id" element={<CompanyView />} />
-                <Route path="/country/:id" element={<CountryView />} />
-                <Route path="/message/:id" element={<MessageView />} />
-                <Route path="/person/:id" element={<PersonView />} />
+                <Route path="/:type/:id" element={<ItemView />} />
+                <Route path="/" element={<Navigate to="/explore/company" replace />} />
               </Routes>
             </BrowserRouter>
           </ModalProvider>

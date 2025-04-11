@@ -10,7 +10,7 @@ import { FC, useMemo } from 'react';
 import { RiPriceTagLine } from 'react-icons/ri';
 import AsyncSelect from 'react-select/async';
 
-import { ItemValue, REACT_SELECT_BASE_PROPS, TAGS_FACET } from '../core/consts.tsx';
+import { ItemValue, REACT_SELECT_BASE_PROPS, TAGS_FACET } from '../../core/consts.tsx';
 
 export const TagsFacet: FC = () => {
   const { state, autocomplete, setFilter } = useFacetsContext();

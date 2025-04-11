@@ -24,7 +24,7 @@ import {
   ItemType,
   ItemValue,
   REACT_SELECT_BASE_PROPS,
-} from '../core/consts.tsx';
+} from '../../core/consts.tsx';
 
 const HistogramRow: FC<
   {

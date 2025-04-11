@@ -23,12 +23,18 @@ export type ItemType = (typeof ITEM_TYPES)[number];
 export const FILTERABLE_ITEM_TYPES = without(ITEM_TYPES, 'message');
 export const FILTERABLE_ITEM_TYPES_SET = new Set(FILTERABLE_ITEM_TYPES);
 
+export const CompanyIcon = RiBuildingLine;
+export const AddressIcon = RiMapPin2Line;
+export const CountryIcon = RiFlagLine;
+export const PeopleIcon = RiUser2Line;
+export const MessageIcon = RiArticleLine;
+
 export const ITEM_TYPE_ICONS: Record<ItemType, IconType> = {
-  company: RiBuildingLine,
-  address: RiMapPin2Line,
-  country: RiFlagLine,
-  people: RiUser2Line,
-  message: RiArticleLine,
+  company: CompanyIcon,
+  address: AddressIcon,
+  country: CountryIcon,
+  people: PeopleIcon,
+  message: MessageIcon,
 };
 
 interface IconBaseProps extends SVGAttributes<SVGElement> {
@@ -67,6 +73,7 @@ export const ITEM_TYPE_TO_FIELD = {
   country: AggregationFields.Countries,
   people: AggregationFields.People,
   tags: AggregationFields.Tags,
+  message: 'messages',
 } as const;
 
 export const ITEM_TYPE_TO_COUNT_FIELD = {
@@ -74,6 +81,7 @@ export const ITEM_TYPE_TO_COUNT_FIELD = {
   address: 'addressesCount',
   country: 'countriesCount',
   people: 'peopleCount',
+  message: 'messagesCount',
 } as const;
 
 export const ITEM_TYPE_TO_DATA_TYPE = {

@@ -13,13 +13,14 @@ import {
   ItemType,
 } from '../../../core/consts.tsx';
 import { type MessageInlineFragment } from '../../../core/graphql';
-import { Collaspsable } from '../../Collapsable';
+import { getMessageName } from '../../../utils/data.ts';
+import { Collapsable } from '../../Collapsable';
 import { ItemsCounts } from '../ItemsCounts';
 
 const TYPES = FILTERABLE_ITEM_TYPES as Exclude<ItemType, 'message'>[];
 
 export const MessageCard: FC<{ data: MessageInlineFragment }> = ({ data }) => {
-  const name = `${data.year}, ${data.companies.map((company) => company.name).join(', ')}`;
+  const name = getMessageName(data);
   const cleanedTags = useMemo(
     () => filter(data.tags || [], (s) => !isNil(s)) as string[],
     [data.tags],
@@ -70,9 +71,9 @@ export const MessageCard: FC<{ data: MessageInlineFragment }> = ({ data }) => {
           );
         })}
 
-        <Collaspsable title="Content">
+        <Collapsable title="Content">
           <div className="card card-body bg-yellow-200">{data.message}</div>
-        </Collaspsable>
+        </Collapsable>
       </div>
     </div>
   );

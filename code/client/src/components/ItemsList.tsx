@@ -3,62 +3,30 @@ import { useFacetsContext } from '@ouestware/facets-client';
 import { InfiniteScroll, InfiniteScrollProps } from '@ouestware/infinite-scroll';
 import cx from 'classnames';
 import { isNil } from 'lodash';
-import { FC, ReactNode, useCallback, useMemo } from 'react';
+import { FC, useCallback, useMemo } from 'react';
 
 import {
   APP_LANGUAGE,
-  ITEM_TYPE_LABELS,
   ITEM_TYPE_LABELS_PLURAL,
   ITEM_TYPE_TO_DATA_TYPE,
   ItemIcon,
   ItemType,
 } from '../core/consts';
-import {
-  CompanyInlineFragment,
-  CountryInlineFragment,
-  MessageInlineFragment,
-  NodeItem,
-  PersonInlineFragment,
-  type AddressInlineFragment,
-} from '../core/graphql';
+import { NodeItem } from '../core/graphql';
 import { searchItems } from '../core/graphql/queries/search';
 import { filtersStateToSearchFilters } from '../utils/filters';
-import { AddressCard } from './items/card/AddressCard';
-import { CompanyCard } from './items/card/CompanyCard';
-import { CountryCard } from './items/card/CountryCard';
-import { MessageCard } from './items/card/MessageCard';
-import { PersonCard } from './items/card/PersonCard';
-import { QueryForm } from './QueryForm.tsx';
+import { QueryForm } from './facets/QueryForm.tsx';
+import { ItemCard } from './items/card/ItemCard.tsx';
 
 const ListComponent = InfiniteScroll<NodeItem, { itemType: ItemType }>;
 type ListProps = InfiniteScrollProps<NodeItem, { itemType: ItemType }>;
 
 const ItemComponent: ListProps['element'] = ({ itemType, data }) => {
-  if (data.__typename !== ITEM_TYPE_LABELS[itemType])
-    throw new Error(
-      `NodeItem __typename "${data.__typename}" should match page item type "${itemType}"`,
-    );
-
-  let content: ReactNode = null;
-  switch (itemType) {
-    case 'address':
-      content = <AddressCard data={data as AddressInlineFragment} />;
-      break;
-    case 'company':
-      content = <CompanyCard data={data as CompanyInlineFragment} />;
-      break;
-    case 'country':
-      content = <CountryCard data={data as CountryInlineFragment} />;
-      break;
-    case 'people':
-      content = <PersonCard data={data as PersonInlineFragment} />;
-      break;
-    case 'message':
-      content = <MessageCard data={data as MessageInlineFragment} />;
-      break;
-  }
-
-  return <div className={cx('mb-4', itemType === 'message' ? 'col-4' : 'col-2')}>{content}</div>;
+  return (
+    <div className={cx('mb-4', itemType === 'message' ? 'col-4' : 'col-2')}>
+      <ItemCard data={data} itemType={itemType} />
+    </div>
+  );
 };
 
 export const ItemsList: FC<{ itemType: ItemType }> = ({ itemType }) => {

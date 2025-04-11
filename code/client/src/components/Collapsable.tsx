@@ -1,13 +1,13 @@
 import cx from 'classnames';
 import { isNil } from 'lodash';
-import { useState, type FC, type HTMLAttributes, type PropsWithChildren } from 'react';
+import { ReactNode, useState, type FC, type HTMLAttributes, type PropsWithChildren } from 'react';
 import { RiArrowDownSLine, RiArrowRightSLine } from 'react-icons/ri';
 
 type CollapsableProps = HTMLAttributes<HTMLElement> & {
-  title: string;
+  title: ReactNode;
   defaultOpen?: boolean;
 };
-export const Collaspsable: FC<PropsWithChildren<CollapsableProps>> = ({
+export const Collapsable: FC<PropsWithChildren<CollapsableProps>> = ({
   children,
   title,
   defaultOpen,
@@ -15,9 +15,9 @@ export const Collaspsable: FC<PropsWithChildren<CollapsableProps>> = ({
 }) => {
   const [show, setShow] = useState(!isNil(defaultOpen) ? defaultOpen : false);
   return (
-    <div {...htmlAttributs}>
+    <section {...htmlAttributs}>
       <button
-        className="btn ps-0 with-icon"
+        className="btn ps-0 with-icon fw-medium mb-1"
         type="button"
         onClick={(e) => {
           e.stopPropagation();
@@ -28,6 +28,6 @@ export const Collaspsable: FC<PropsWithChildren<CollapsableProps>> = ({
       </button>
 
       <div className={cx('collapse', show && 'show')}>{children}</div>
-    </div>
+    </section>
   );
 };
