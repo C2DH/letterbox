@@ -206,10 +206,14 @@ export const ItemFacet: FC<{ itemType: ItemType }> = ({ itemType }) => {
         }),
       autocomplete: fnAutocomplete,
       loadHistogramData: fnLoadHistogram,
+      valueToOption: ({ value, label }) => ({
+        label: label || value,
+        value,
+      }),
     }),
     [filter, fnAutocomplete, fnLoadHistogram, onChange],
   );
-  const { selectProps, histogramProps } = useInputKeywords(inputKeywordsProps);
+  const { selectProps, histogramProps } = useInputKeywords<ItemValue>(inputKeywordsProps);
 
   return (
     <>
