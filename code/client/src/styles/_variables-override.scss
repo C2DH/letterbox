@@ -3,8 +3,9 @@
 $theme-colors: map.merge(
   $theme-colors,
   (
-    'yellow-flash': $yellow-flash,
-    'yellow-light': $yellow-light,
+    'yellow-100': $yellow-100,
+    'yellow-200': $yellow-200,
+    'yellow-300': $yellow-300,
     'light-gray': $light-gray,
   )
 );

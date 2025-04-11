@@ -19,14 +19,15 @@ $spacers: (
   6: $spacer * 4,
 ) !default;
 
-$yellow-light: #fffdf5;
-$yellow-flash: #ffee6d;
+$yellow-100: #fffdf5;
+$yellow-200: #fefce8;
+$yellow-300: #ffee6d;
 $light-gray: #eeeeee;
 
 $primary: #333331 !default;
 $secondary: #6c757d !default;
 
-$body-bg: $yellow-light !default;
-$body-tertiary-bg: $yellow-light !default;
+$body-bg: $yellow-100 !default;
+$body-tertiary-bg: $yellow-100 !default;
 
 $input-bg: white !default;

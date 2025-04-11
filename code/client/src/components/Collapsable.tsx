@@ -1,7 +1,7 @@
 import cx from 'classnames';
 import { isNil } from 'lodash';
 import { useState, type FC, type HTMLAttributes, type PropsWithChildren } from 'react';
-import { BsChevronDown, BsChevronRight } from 'react-icons/bs';
+import { RiArrowDownSLine, RiArrowRightSLine } from 'react-icons/ri';
 
 type CollapsableProps = HTMLAttributes<HTMLElement> & {
   title: string;
@@ -17,14 +17,14 @@ export const Collaspsable: FC<PropsWithChildren<CollapsableProps>> = ({
   return (
     <div {...htmlAttributs}>
       <button
-        className="btn ps-0"
+        className="btn ps-0 with-icon"
         type="button"
         onClick={(e) => {
           e.stopPropagation();
           setShow(!show);
         }}
       >
-        {show ? <BsChevronDown /> : <BsChevronRight />} {title}
+        {show ? <RiArrowDownSLine /> : <RiArrowRightSLine />} {title}
       </button>
 
       <div className={cx('collapse', show && 'show')}>{children}</div>

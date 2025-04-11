@@ -1,6 +1,7 @@
 import { useApolloClient } from '@apollo/client';
 import { useFacetsContext } from '@ouestware/facets-client';
 import { InfiniteScroll, InfiniteScrollProps } from '@ouestware/infinite-scroll';
+import cx from 'classnames';
 import { isNil } from 'lodash';
 import { FC, ReactNode, useCallback, useMemo } from 'react';
 
@@ -57,7 +58,7 @@ const ItemComponent: ListProps['element'] = ({ itemType, data }) => {
       break;
   }
 
-  return <div className="col-2 mb-4">{content}</div>;
+  return <div className={cx('mb-4', itemType === 'message' ? 'col-4' : 'col-2')}>{content}</div>;
 };
 
 export const ItemsList: FC<{ itemType: ItemType }> = ({ itemType }) => {
@@ -112,7 +113,7 @@ export const ItemsList: FC<{ itemType: ItemType }> = ({ itemType }) => {
 
   const Bottom: ListProps['bottom'] = useMemo(
     () => () => (
-      <div className="col-2 mb-4">
+      <div className={cx('mb-4', itemType === 'message' ? 'col-4' : 'col-2')}>
         <div className="text-center pt-3">
           <div className="spinner-border" role="status">
             <span className="visually-hidden">Loading...</span>
@@ -120,7 +121,7 @@ export const ItemsList: FC<{ itemType: ItemType }> = ({ itemType }) => {
         </div>
       </div>
     ),
-    [],
+    [itemType],
   );
 
   const List: ListProps['list'] = useMemo(

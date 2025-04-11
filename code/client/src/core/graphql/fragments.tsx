@@ -43,12 +43,25 @@ export const MessageInline = graphql(`
     year
     message
     addressesCount
+    addresses(limit: 5) {
+      id
+      name
+    }
     companiesCount
-    companies(limit: 3) {
+    companies(limit: 5) {
+      id
       name
     }
     countriesCount
+    countries(limit: 5) {
+      id
+      name
+    }
     peopleCount
+    people(limit: 5) {
+      id
+      name
+    }
     tags
   }
 `);

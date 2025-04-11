@@ -1,13 +1,30 @@
-import { type FC } from 'react';
+import { filter, isNil } from 'lodash';
+import { useMemo, type FC } from 'react';
 import { Link } from 'react-router-dom';
 
+import { Badge } from '../../../Badge.tsx';
+import {
+  FILTERABLE_ITEM_TYPES,
+  ITEM_TYPE_ICONS,
+  ITEM_TYPE_LABELS,
+  ITEM_TYPE_LABELS_PLURAL,
+  ITEM_TYPE_TO_COUNT_FIELD,
+  ITEM_TYPE_TO_FIELD,
+  ItemType,
+} from '../../../core/consts.tsx';
 import { type MessageInlineFragment } from '../../../core/graphql';
 import { Collaspsable } from '../../Collapsable';
 import { ItemsCounts } from '../ItemsCounts';
 
-type MessageCardProps = { data: MessageInlineFragment };
-export const MessageCard: FC<MessageCardProps> = ({ data }) => {
+const TYPES = FILTERABLE_ITEM_TYPES as Exclude<ItemType, 'message'>[];
+
+export const MessageCard: FC<{ data: MessageInlineFragment }> = ({ data }) => {
   const name = `${data.year}, ${data.companies.map((company) => company.name).join(', ')}`;
+  const cleanedTags = useMemo(
+    () => filter(data.tags || [], (s) => !isNil(s)) as string[],
+    [data.tags],
+  );
+
   return (
     <div className="card">
       <div className="card-body">
@@ -17,10 +34,44 @@ export const MessageCard: FC<MessageCardProps> = ({ data }) => {
             {data.companiesCount > 3 && ` and ${data.companiesCount - 3} more`}
           </Link>
         </h5>
+        <ItemsCounts itemType="message" data={data} />
+        {!!cleanedTags.length && (
+          <section>
+            {cleanedTags.map((tag, i) => (
+              <Badge key={i}>{tag}</Badge>
+            ))}
+          </section>
+        )}
 
-        <ItemsCounts data={data} />
+        {TYPES.map((type) => {
+          const list = data[ITEM_TYPE_TO_FIELD[type]];
+          const count = data[ITEM_TYPE_TO_COUNT_FIELD[type]];
+          const remaining = count - list.length;
+          const Icon = ITEM_TYPE_ICONS[type];
+          if (!list.length) return null;
+
+          return (
+            <section key={type}>
+              {list.map((item) => (
+                <span key={item.id} className="me-2 with-icon">
+                  <Icon /> {item.name}
+                </span>
+              ))}
+              {!!remaining && (
+                <span className="text-muted">
+                  and {remaining} other{' '}
+                  {(remaining > 1
+                    ? ITEM_TYPE_LABELS_PLURAL[type]
+                    : ITEM_TYPE_LABELS[type]
+                  ).toLowerCase()}
+                </span>
+              )}
+            </section>
+          );
+        })}
+
         <Collaspsable title="Content">
-          <div className="card card-body bg-light">{data.message}</div>
+          <div className="card card-body bg-yellow-200">{data.message}</div>
         </Collaspsable>
       </div>
     </div>

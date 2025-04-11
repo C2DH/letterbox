@@ -16,7 +16,7 @@ import { AggregationFields, DataItemType } from './graphql';
 
 export const APP_LANGUAGE = 'en-US';
 
-export const ITEM_TYPES = ['company', 'address', 'country', 'people', 'message'] as const;
+export const ITEM_TYPES = ['company', 'address', 'people', 'country', 'message'] as const;
 export const ITEM_TYPES_SET = new Set<string>(ITEM_TYPES);
 export type ItemType = (typeof ITEM_TYPES)[number];
 
@@ -67,6 +67,13 @@ export const ITEM_TYPE_TO_FIELD = {
   country: AggregationFields.Countries,
   people: AggregationFields.People,
   tags: AggregationFields.Tags,
+} as const;
+
+export const ITEM_TYPE_TO_COUNT_FIELD = {
+  company: 'companiesCount',
+  address: 'addressesCount',
+  country: 'countriesCount',
+  people: 'peopleCount',
 } as const;
 
 export const ITEM_TYPE_TO_DATA_TYPE = {

@@ -16,12 +16,10 @@ export const TagsFacet: FC = () => {
   const { state, autocomplete, setFilter } = useFacetsContext();
   const fnAutocomplete = useMemo(() => {
     return autocomplete
-      ? (inputValue: string) => (
-          console.log('INPUT', inputValue),
+      ? (inputValue: string) =>
           autocomplete(TAGS_FACET as KeywordsFacet, state, inputValue) as Promise<
             AutocompleteData<ItemValue>
           >
-        )
       : undefined;
   }, [autocomplete, state]);
   const inputKeywordsProps = useMemo<InputKeywordsProps<ItemValue>>(

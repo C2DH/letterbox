@@ -67,7 +67,7 @@ const HistogramRow: FC<
             }}
             className={cx(
               'position-absolute top-100 w-100 start-0 mt-1',
-              active ? 'bg-yellow-light' : 'bg-light-gray',
+              active ? 'bg-yellow-100' : 'bg-light-gray',
             )}
           >
             <div
@@ -125,7 +125,7 @@ const Histogram: FC<KeywordsFacetHistogramProps<ItemValue>> = ({
 
   return (
     <>
-      <ul className="list-unstyled bg-yellow-flash rounded my-2">
+      <ul className="list-unstyled bg-yellow-300 rounded my-2">
         {selected.map(({ label, value, count, link }, i) => (
           <li key={i} className="d-flex">
             <HistogramRow
