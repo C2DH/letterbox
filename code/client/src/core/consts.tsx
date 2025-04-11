@@ -66,7 +66,7 @@ export const ITEM_TYPE_TO_FIELD = {
   address: AggregationFields.Addresses,
   country: AggregationFields.Countries,
   people: AggregationFields.People,
-  message: AggregationFields.Tags,
+  tags: AggregationFields.Tags,
 } as const;
 
 export const ITEM_TYPE_TO_DATA_TYPE = {
@@ -99,7 +99,7 @@ export const TAGS_FACET = {
   id: 'tags',
   type: 'keywords',
   label: 'Tags',
-  autocomplete: false,
+  autocomplete: true,
   histogram: false,
   isMulti: true,
 };

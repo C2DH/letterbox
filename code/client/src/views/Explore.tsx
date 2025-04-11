@@ -4,14 +4,13 @@ import { FacetsRoot, KeywordsFacet, searchToState, stateToSearch } from '@ouestw
 import cx from 'classnames';
 import { without } from 'lodash';
 import { FC, useCallback, useEffect, useMemo, useState } from 'react';
-import { RiPriceTagLine } from 'react-icons/ri';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
-import Select from 'react-select';
 
 import { DateFacet } from '../components/DateFacet';
 import { ItemFacet } from '../components/ItemFacet';
 import { ItemsList } from '../components/ItemsList';
 import { StatusFacet } from '../components/StatusFacet';
+import { TagsFacet } from '../components/TagsFacet.tsx';
 import {
   FACETS,
   FILTERABLE_ITEM_TYPES,
@@ -22,8 +21,8 @@ import {
   ITEM_TYPES_SET,
   ItemIcon,
   ItemType,
-  REACT_SELECT_BASE_PROPS,
 } from '../core/consts';
+import { AggregationFields } from '../core/graphql';
 import { aggregateItems } from '../core/graphql/queries/search';
 import { filtersStateToSearchFilters } from '../utils/filters';
 
@@ -48,8 +47,9 @@ export const Explore: FC = () => {
 
   const fetchItems = useCallback(
     async (facet: KeywordsFacet, filters: FiltersState, input = '') => {
-      if (!ITEM_TYPES_SET.has(facet.id)) throw new Error(`${facet.id} is not a valid item type.`);
-      const itemType = facet.id as ItemType;
+      const field = (ITEM_TYPE_TO_FIELD as Record<string, AggregationFields>)[facet.id];
+      if (!field) throw new Error(`${facet.id} is not a valid field.`);
+      const itemType = ITEM_TYPES_SET.has(facet.id) ? (facet.id as ItemType) : null;
       const {
         data: { aggregate },
         error,
@@ -57,7 +57,7 @@ export const Explore: FC = () => {
         query: aggregateItems,
         variables: {
           itemType: ITEM_TYPE_TO_DATA_TYPE[selectedType],
-          field: ITEM_TYPE_TO_FIELD[itemType],
+          field,
           limit: 10,
           filters: filtersStateToSearchFilters(filters),
           includes: input,
@@ -76,6 +76,7 @@ export const Explore: FC = () => {
                   value: item.id,
                   label: item.label,
                   count: item.count,
+                  link: itemType ? `/${itemType}/${item.id}` : undefined,
                 },
               ]
             : [],
@@ -101,7 +102,7 @@ export const Explore: FC = () => {
       loadHistogram={fetchItems}
     >
       {/* SIDEBAR */}
-      <aside className="py-5">
+      <aside className="py-5 bg-transparent border-end">
         <h3 className="text-muted fw-light px-4 text-dark">Explore by counting</h3>
         {ITEM_TYPES.map((itemType) => (
           <Link
@@ -144,10 +145,7 @@ export const Explore: FC = () => {
         <section className="row mb-6">
           {/*TAG FILTERS*/}
           <section className="col-4">
-            <h2 className="with-icon fw-semibold">
-              <RiPriceTagLine /> Tags
-            </h2>
-            <Select {...REACT_SELECT_BASE_PROPS} isMulti placeholder="Search for tags and filter" />
+            <TagsFacet />
           </section>
 
           {/*TAG FILTERS*/}

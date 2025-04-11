@@ -8,8 +8,9 @@ import {
   useFacetsContext,
   useInputKeywords,
 } from '@ouestware/facets-client';
+import cx from 'classnames';
 import { keyBy, max, without } from 'lodash';
-import { FC, useMemo, useState } from 'react';
+import { FC, useMemo } from 'react';
 import { IconType } from 'react-icons';
 import { RiDownloadLine, RiFilterLine, RiFilterOffLine, RiShareBoxLine } from 'react-icons/ri';
 import { Link } from 'react-router-dom';
@@ -26,8 +27,14 @@ import {
 } from '../core/consts.tsx';
 
 const HistogramRow: FC<
-  { onClick: () => void; maxCount: number; index: number; Icon: IconType } & ItemValue
-> = ({ onClick, label, link, maxCount, count, index, Icon }) => {
+  {
+    onClick: () => void;
+    maxCount: number;
+    index?: number;
+    Icon: IconType;
+    active?: boolean;
+  } & ItemValue
+> = ({ onClick, label, link, maxCount, count, index, Icon, active }) => {
   return (
     <button
       className="btn btn-light bg-transparent w-100 border-0 p-3 position-relative"
@@ -58,12 +65,18 @@ const HistogramRow: FC<
             style={{
               height: 4,
             }}
-            className="bg-light position-absolute top-100 w-100 start-0 mt-1"
+            className={cx(
+              'position-absolute top-100 w-100 start-0 mt-1',
+              active ? 'bg-yellow-light' : 'bg-light-gray',
+            )}
           >
-            <div className="h-100 bg-dark" style={{ width: (count / maxCount) * 100 + '%' }} />
+            <div
+              className={cx('h-100', active ? 'bg-primary' : 'bg-secondary')}
+              style={{ width: (count / maxCount) * 100 + '%' }}
+            />
           </div>
 
-          {(index === 0 || !((index + 1) % 5)) && (
+          {typeof index === 'number' && (index === 0 || !((index + 1) % 5)) && (
             <span className="text-muted position-absolute end-100 pe-2 top-0">{index + 1}</span>
           )}
         </div>
@@ -79,7 +92,6 @@ const Histogram: FC<KeywordsFacetHistogramProps<ItemValue>> = ({
   values,
   onChange,
 }) => {
-  const [hover, setHover] = useState<number | null>(null);
   const selectedValues = useMemo(() => new Set(values || []), [values]);
   const { selected, unselected } = useMemo(() => {
     const valuesDict = keyBy(histogramData?.values || [], 'value');
@@ -113,14 +125,9 @@ const Histogram: FC<KeywordsFacetHistogramProps<ItemValue>> = ({
 
   return (
     <>
-      <ul className="list-unstyled bg-light rounded my-2">
+      <ul className="list-unstyled bg-yellow-flash rounded my-2">
         {selected.map(({ label, value, count, link }, i) => (
-          <li
-            key={i}
-            className={`${hover === i ? 'bg-light' : ''} d-flex`}
-            onMouseEnter={() => setHover(i)}
-            onMouseLeave={() => setHover(null)}
-          >
+          <li key={i} className="d-flex">
             <HistogramRow
               label={label}
               value={value}
@@ -130,20 +137,15 @@ const Histogram: FC<KeywordsFacetHistogramProps<ItemValue>> = ({
                 onChange(without(values, value));
               }}
               maxCount={maxCount}
-              index={i}
               Icon={RiFilterOffLine}
+              active
             />
           </li>
         ))}
       </ul>
       <ul className="list-unstyled">
         {unselected.map(({ label, value, count, link }, i) => (
-          <li
-            key={i}
-            className={`${hover === i ? 'bg-light' : ''} d-flex`}
-            onMouseEnter={() => setHover(i)}
-            onMouseLeave={() => setHover(null)}
-          >
+          <li key={i} className="d-flex">
             <HistogramRow
               label={label}
               value={value}
@@ -153,7 +155,7 @@ const Histogram: FC<KeywordsFacetHistogramProps<ItemValue>> = ({
                 onChange((values || []).concat([value]));
               }}
               maxCount={maxCount}
-              index={selected.length + i}
+              index={i}
               Icon={RiFilterLine}
             />
           </li>
@@ -230,7 +232,7 @@ export const ItemFacet: FC<{ itemType: ItemType }> = ({ itemType }) => {
           )}
         </h2>
 
-        <button className="btn btn-dark py-1 px-2 ms-2">
+        <button className="btn btn-outline-dark py-1 px-2 ms-2">
           <RiDownloadLine />
         </button>
       </div>

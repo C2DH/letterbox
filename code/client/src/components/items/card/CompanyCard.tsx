@@ -2,6 +2,7 @@ import { filter, isNil, max, min } from 'lodash';
 import { useMemo, type FC } from 'react';
 import { Link } from 'react-router-dom';
 
+import { Badge } from '../../../Badge.tsx';
 import { type CompanyInlineFragment } from '../../../core/graphql';
 import { ItemsCounts } from '../ItemsCounts';
 
@@ -31,9 +32,7 @@ export const CompanyCard: FC<{ data: CompanyInlineFragment }> = ({ data }) => {
         {!!cleanedTags.length && (
           <section>
             {cleanedTags.map((tag, i) => (
-              <span key={i} className="badge text-bg-primary me-2">
-                {tag}
-              </span>
+              <Badge key={i}>{tag}</Badge>
             ))}
           </section>
         )}

@@ -2,6 +2,7 @@ import { filter, isNil } from 'lodash';
 import { useMemo, type FC } from 'react';
 import { Link } from 'react-router-dom';
 
+import { Badge } from '../../../Badge.tsx';
 import { type AddressInlineFragment } from '../../../core/graphql';
 import { ItemsCounts } from '../ItemsCounts';
 
@@ -23,9 +24,7 @@ export const AddressCard: FC<{ data: AddressInlineFragment }> = ({ data }) => {
         {!!cleanedTags.length && (
           <section>
             {cleanedTags.map((tag, i) => (
-              <span key={i} className="badge text-bg-primary me-2">
-                {tag}
-              </span>
+              <Badge key={i}>{tag}</Badge>
             ))}
           </section>
         )}

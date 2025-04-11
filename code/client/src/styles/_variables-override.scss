@@ -1,0 +1,10 @@
+@use 'sass:map';
+
+$theme-colors: map.merge(
+  $theme-colors,
+  (
+    'yellow-flash': $yellow-flash,
+    'yellow-light': $yellow-light,
+    'light-gray': $light-gray,
+  )
+);
