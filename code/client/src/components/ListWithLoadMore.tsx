@@ -41,7 +41,7 @@ export function ListWithLoadMore<T>({
   }, [fetch, items]);
 
   useEffect(() => {
-    if (total && items.length >= total) {
+    if (typeof total === 'number' && items.length >= total) {
       setHasMore(false);
     }
   }, [total, items]);
@@ -55,18 +55,14 @@ export function ListWithLoadMore<T>({
       </div>
 
       {hasMore && (
-        <div className="row mt-3">
-          <div className="d-flex justify-content-center">
-            <button
-              disabled={loading}
-              className="btn btn-primary d-flex align-items-center"
-              onClick={fetchMore}
-            >
-              Load more
-              {loading && <Spinner className="ms-1 fs-4" style={{ width: '1em', height: '1em' }} />}
-            </button>
-          </div>
-        </div>
+        <button
+          disabled={loading}
+          className="btn btn-primary d-flex align-items-center mb-3"
+          onClick={fetchMore}
+        >
+          Load more
+          {loading && <Spinner className="ms-1 fs-4" style={{ width: '1em', height: '1em' }} />}
+        </button>
       )}
     </>
   );

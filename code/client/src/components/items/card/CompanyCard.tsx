@@ -13,30 +13,28 @@ export const CompanyCard: FC<{ data: CompanyInlineFragment }> = ({ data }) => {
   const maxYear = max(years);
 
   return (
-    <article className="card">
-      <div className="card-body">
-        <h5 className="card-title">
-          <Link className="text-dark" to={`/company/${data.id}`}>
-            {data.name}
-          </Link>
-        </h5>
+    <>
+      <h5 className="card-title">
+        <Link className="text-dark" to={`/company/${data.id}`}>
+          {data.name}
+        </Link>
+      </h5>
 
-        <ItemsCounts itemType="company" data={data} />
+      <ItemsCounts itemType="company" data={data} />
 
-        {typeof minYear === 'number' && typeof maxYear === 'number' && (
-          <section className="text-muted">
-            {minYear === maxYear ? minYear : `${minYear} - ${maxYear}`}
-          </section>
-        )}
+      {typeof minYear === 'number' && typeof maxYear === 'number' && (
+        <section className="text-muted">
+          {minYear === maxYear ? minYear : `${minYear} - ${maxYear}`}
+        </section>
+      )}
 
-        {!!cleanedTags.length && (
-          <section>
-            {cleanedTags.map((tag, i) => (
-              <Badge key={i}>{tag}</Badge>
-            ))}
-          </section>
-        )}
-      </div>
-    </article>
+      {!!cleanedTags.length && (
+        <section>
+          {cleanedTags.map((tag, i) => (
+            <Badge key={i}>{tag}</Badge>
+          ))}
+        </section>
+      )}
+    </>
   );
 };

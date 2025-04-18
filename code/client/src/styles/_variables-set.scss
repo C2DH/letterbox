@@ -22,6 +22,12 @@ $spacers: (
 $yellow-100: #fffdf5;
 $yellow-200: #fefce8;
 $yellow-300: #ffee6d;
+
+$purple-100: #eae8ff;
+$purple-200: #bab2ff;
+$purple-300: #7755fd;
+$purple-400: #6632f5;
+
 $light-gray: #eeeeee;
 
 $primary: #333331 !default;
@@ -31,3 +37,7 @@ $body-bg: $yellow-100 !default;
 $body-tertiary-bg: $yellow-100 !default;
 
 $input-bg: white !default;
+
+$form-switch-color: $purple-200;
+$form-switch-focus-color: $purple-300;
+$form-switch-checked-color: white;

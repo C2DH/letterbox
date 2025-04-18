@@ -3,10 +3,10 @@ import type { FC } from 'react';
 
 import {
   APP_LANGUAGE,
-  ITEM_TYPE_ICONS,
   ITEM_TYPE_LABELS,
   ITEM_TYPE_LABELS_PLURAL,
   ITEM_TYPES_AFFINITIES,
+  ItemIcon,
   ItemType,
 } from '../../core/consts';
 import { shortenNumber } from '../../utils/number.ts';
@@ -32,7 +32,6 @@ export const ItemsCounts: FC<{
           { field: 'messagesCount', type: 'message' },
         ] as const
       ).map(({ field, type }) => {
-        const Icon = ITEM_TYPE_ICONS[type];
         const value = data[field] || 0;
         return (
           <li
@@ -43,7 +42,7 @@ export const ItemsCounts: FC<{
             )}
             title={`${value.toLocaleString(APP_LANGUAGE)} ${value > 1 ? ITEM_TYPE_LABELS_PLURAL[type] : ITEM_TYPE_LABELS[type]}`.toLowerCase()}
           >
-            {shortenNumber(value)} <Icon />
+            {shortenNumber(value)} <ItemIcon type={type} />
           </li>
         );
       })}

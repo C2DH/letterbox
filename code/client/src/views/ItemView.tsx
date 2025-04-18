@@ -1,6 +1,7 @@
 import { LoaderFill } from '@ouestware/loaders';
+import cx from 'classnames';
 import { ReactNode, useMemo, type FC } from 'react';
-import { RiFile3Line } from 'react-icons/ri';
+import { RiAddCircleLine, RiFile3Line } from 'react-icons/ri';
 import { useParams } from 'react-router-dom';
 
 import { Collapsable } from '../components/Collapsable';
@@ -8,15 +9,16 @@ import { ItemCard } from '../components/items/card/ItemCard.tsx';
 import { ListWithLoadMore, type ListWithLoadMoreProps } from '../components/ListWithLoadMore';
 import { Sidebar } from '../components/navigation/Sidebar.tsx';
 import {
-  ITEM_TYPE_ICONS,
   ITEM_TYPE_LABELS,
   ITEM_TYPE_LABELS_PLURAL,
   ITEM_TYPE_TO_COUNT_FIELD,
   ITEM_TYPE_TO_FIELD,
   ITEM_TYPES,
   ITEM_TYPES_SET,
+  ItemIcon,
   ItemType,
 } from '../core/consts.tsx';
+import { useEditionContext } from '../core/edition.ts';
 import { NodeItem } from '../core/graphql';
 import { useLoadItemData } from '../hooks/useItem.tsx';
 import { getMessageName } from '../utils/data.ts';
@@ -25,6 +27,7 @@ import { getMessageName } from '../utils/data.ts';
 type RelatedDefinition<T = any> = ListWithLoadMoreProps<T> & { title: ReactNode };
 
 export const ItemView: FC = () => {
+  const { enabled } = useEditionContext();
   const { id, type: inputType } = useParams();
   const itemType = useMemo(() => {
     if (!inputType) throw new Error(`Item type is missing.`);
@@ -33,7 +36,6 @@ export const ItemView: FC = () => {
   }, [inputType]);
   const loadItemData = useLoadItemData(itemType, id);
   const { loading, itemData, fetchRelations } = loadItemData;
-  const Icon = ITEM_TYPE_ICONS[itemType];
 
   const relatedItems = useMemo(
     () =>
@@ -41,7 +43,6 @@ export const ItemView: FC = () => {
         ? ITEM_TYPES.flatMap((type) => {
             if (type === itemType) return [];
 
-            const Icon = ITEM_TYPE_ICONS[type];
             const listKey = ITEM_TYPE_TO_FIELD[type];
             const countKey = ITEM_TYPE_TO_COUNT_FIELD[type];
 
@@ -49,8 +50,8 @@ export const ItemView: FC = () => {
               {
                 title: (
                   <>
-                    <Icon /> {ITEM_TYPE_LABELS_PLURAL[type]} ({itemData[countKey as keyof NodeItem]}
-                    )
+                    <ItemIcon type={itemType} /> {ITEM_TYPE_LABELS_PLURAL[type]} (
+                    {itemData[countKey as keyof NodeItem]})
                   </>
                 ),
                 data: itemData[listKey as keyof NodeItem],
@@ -58,7 +59,7 @@ export const ItemView: FC = () => {
                 fetch: fetchRelations.bind(null, type),
                 getItemKey: (data: NodeItem) => data.id,
                 renderItem: (data: NodeItem) => (
-                  <div className="col-2 mb-4">
+                  <div className={cx('mb-4', type === 'message' ? 'col-4' : 'col-2')}>
                     <ItemCard data={data} itemType={type} />
                   </div>
                 ),
@@ -85,13 +86,20 @@ export const ItemView: FC = () => {
         <main className="p-4 py-5">
           <section className="mb-4">
             <h1 className="with-icon">
-              <Icon /> {name}
+              <ItemIcon type={itemType} /> {name}
             </h1>
             {'year' in itemData && <div className="text-muted">Dated to: {itemData.year}</div>}
           </section>
 
           {relatedItems.map((related, index) => (
             <Collapsable key={index} title={related.title} className="mb-2" defaultOpen>
+              {enabled && (
+                <div className="mb-3">
+                  <button className="btn btn-purple-300 with-icon">
+                    <RiAddCircleLine /> Add item
+                  </button>
+                </div>
+              )}
               <ListWithLoadMore className="row" {...related} />
             </Collapsable>
           ))}

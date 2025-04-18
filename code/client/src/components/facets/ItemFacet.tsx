@@ -8,11 +8,18 @@ import {
   useFacetsContext,
   useInputKeywords,
 } from '@ouestware/facets-client';
+import { Tooltip } from '@ouestware/tooltip';
 import cx from 'classnames';
 import { keyBy, max, without } from 'lodash';
 import { FC, useMemo } from 'react';
 import { IconType } from 'react-icons';
-import { RiDownloadLine, RiFilterLine, RiFilterOffLine, RiShareBoxLine } from 'react-icons/ri';
+import {
+  RiDownloadLine,
+  RiFilterLine,
+  RiFilterOffLine,
+  RiMore2Line,
+  RiShareBoxLine,
+} from 'react-icons/ri';
 import { Link } from 'react-router-dom';
 import AsyncSelect from 'react-select/async';
 
@@ -25,16 +32,21 @@ import {
   ItemValue,
   REACT_SELECT_BASE_PROPS,
 } from '../../core/consts.tsx';
+import { useEditionContext } from '../../core/edition.ts';
+import { ItemEditionMenu } from '../edition/ItemEditionMenu.tsx';
 
 const HistogramRow: FC<
   {
+    itemType: ItemType;
     onClick: () => void;
     maxCount: number;
     index?: number;
     Icon: IconType;
     active?: boolean;
   } & ItemValue
-> = ({ onClick, label, link, maxCount, count, index, Icon, active }) => {
+> = ({ itemType, onClick, value, label, link, maxCount, count, index, Icon, active }) => {
+  const { enabled } = useEditionContext();
+
   return (
     <button
       className="btn btn-light bg-transparent w-100 border-0 p-3 position-relative"
@@ -43,8 +55,8 @@ const HistogramRow: FC<
         onClick();
       }}
     >
-      <div className="d-flex flex-row align-items-baseline">
-        <div className="position-relative flex-grow-1 text-start me-2">
+      <div className="d-flex flex-row align-items-bottom">
+        <div className="position-relative flex-grow-1 text-start">
           <span>
             {label}
             {link && (
@@ -81,16 +93,35 @@ const HistogramRow: FC<
           )}
         </div>
 
-        <Icon className="flex-shrink-0" />
+        {enabled && (
+          <Tooltip
+            className="p-0 py-1"
+            rootClassName="small d-inline-block"
+            attachment={['top', 'right']}
+            targetAttachment={['bottom', 'right']}
+          >
+            <button type="button" className="btn btn-sm btn-ico ms-2 p-1 btn-outline-purple-300">
+              <RiMore2Line />
+            </button>
+            <div className="border border-purple-300 rounded bg-white color-purple-300">
+              <ItemEditionMenu itemType={itemType} id={value} />
+            </div>
+          </Tooltip>
+        )}
+
+        <div className="d-inline-block ms-2">
+          <Icon className="flex-shrink-0" />
+        </div>
       </div>
     </button>
   );
 };
 
-const Histogram: FC<KeywordsFacetHistogramProps<ItemValue>> = ({
+const Histogram: FC<KeywordsFacetHistogramProps<ItemValue> & { itemType: ItemType }> = ({
   histogramData,
   values,
   onChange,
+  itemType,
 }) => {
   const selectedValues = useMemo(() => new Set(values || []), [values]);
   const { selected, unselected } = useMemo(() => {
@@ -129,6 +160,7 @@ const Histogram: FC<KeywordsFacetHistogramProps<ItemValue>> = ({
         {selected.map(({ label, value, count, link }, i) => (
           <li key={i} className="d-flex">
             <HistogramRow
+              itemType={itemType}
               label={label}
               value={value}
               count={count}
@@ -147,6 +179,7 @@ const Histogram: FC<KeywordsFacetHistogramProps<ItemValue>> = ({
         {unselected.map(({ label, value, count, link }, i) => (
           <li key={i} className="d-flex">
             <HistogramRow
+              itemType={itemType}
               label={label}
               value={value}
               count={count}
@@ -232,7 +265,7 @@ export const ItemFacet: FC<{ itemType: ItemType }> = ({ itemType }) => {
           )}
         </h2>
 
-        <button className="btn btn-outline-dark py-1 px-2 ms-2">
+        <button className="btn btn-outline-dark btn-ico p-2 ms-2">
           <RiDownloadLine />
         </button>
       </div>
@@ -244,7 +277,7 @@ export const ItemFacet: FC<{ itemType: ItemType }> = ({ itemType }) => {
         noOptionsMessage={() => 'Start typing'}
         placeholder={`Search for ${ITEM_TYPE_LABELS_PLURAL[itemType].toLowerCase()}`}
       />
-      {histogramProps && <Histogram {...histogramProps} />}
+      {histogramProps && <Histogram {...histogramProps} itemType={itemType} />}
     </>
   );
 };
