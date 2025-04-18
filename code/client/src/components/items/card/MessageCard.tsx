@@ -68,7 +68,7 @@ export const MessageCard: FC<{ data: MessageInlineFragment }> = ({ data }) => {
                 <div key={item.id} className="mb-1">
                   <QuickSwapTypeTooltip itemType={type} id={item.id} />
                   <span className="me-2">{item.name}</span>
-                  <EditionActionsTooltip itemType={type} id={item.id} />
+                  <EditionActionsTooltip itemType={type} id={item.id} label={item.name} />
                 </div>
               ) : (
                 <span key={item.id} className="me-2 with-icon">

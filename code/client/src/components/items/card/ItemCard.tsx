@@ -10,6 +10,7 @@ import {
   NodeItem,
   PersonInlineFragment,
 } from '../../../core/graphql';
+import { getItemName } from '../../../utils/data.ts';
 import { EditionActionsTooltip, QuickSwapTypeTooltip } from '../../edition/tooltips.tsx';
 import { AddressCard } from './AddressCard.tsx';
 import { CompanyCard } from './CompanyCard.tsx';
@@ -51,7 +52,7 @@ export const ItemCard: FC<{ itemType: ItemType; data: NodeItem }> = ({ itemType,
         {enabled && itemType !== 'message' && (
           <div className="d-flex flex-row-reverse align-items-center justify-content-between mb-2">
             {/* Edition actions */}
-            <EditionActionsTooltip itemType={itemType} id={data.id} />
+            <EditionActionsTooltip itemType={itemType} id={data.id} label={getItemName(data)} />
 
             {/* Quick-swap type */}
             <QuickSwapTypeTooltip itemType={itemType} id={data.id} />

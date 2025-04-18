@@ -1,50 +1,66 @@
 import { noop } from 'lodash';
-import { FC, ReactNode } from 'react';
-import { RiDeleteBin5Line, RiInbox2Line, RiInputField, RiScissorsCutLine } from 'react-icons/ri';
+import { FC, ReactNode, useMemo } from 'react';
+import {
+  RiDeleteBin5Line,
+  RiInbox2Line,
+  RiIndeterminateCircleLine,
+  RiInputField,
+  RiScissorsCutLine,
+} from 'react-icons/ri';
 
 import { ItemType } from '../../core/consts.tsx';
-
-const MENU: (
-  | { type: 'separator' }
-  | {
-      type: 'action';
-      markup: ReactNode;
-      action: (item: { itemType: ItemType; id: string }) => void;
-    }
-)[] = [
-  {
-    type: 'action',
-    markup: <RiInputField />,
-    action: noop,
-  },
-  {
-    type: 'action',
-    markup: <RiScissorsCutLine />,
-    action: noop,
-  },
-  {
-    type: 'action',
-    markup: <RiDeleteBin5Line />,
-    action: noop,
-  },
-  {
-    type: 'separator',
-  },
-  {
-    type: 'action',
-    markup: <RiInbox2Line />,
-    action: noop,
-  },
-];
+import { useEditionContext } from '../../core/edition.ts';
+import { isInCart } from '../../utils/edition.ts';
 
 export const ItemEditionMenu: FC<{
-  itemType: ItemType;
+  type: ItemType;
   id: string;
-}> = ({ itemType, id }) => {
+  label: string;
+}> = (item) => {
+  const { cart, addToCart, removeFromCart } = useEditionContext();
+  const inCart = useMemo(() => isInCart(cart, item), [cart, item]);
+  const menu = useMemo<
+    (
+      | { type: 'separator' }
+      | {
+          type: 'action';
+          markup: ReactNode;
+          action: () => void;
+        }
+    )[]
+  >(
+    () => [
+      {
+        type: 'action',
+        markup: <RiInputField />,
+        action: noop,
+      },
+      {
+        type: 'action',
+        markup: <RiScissorsCutLine />,
+        action: noop,
+      },
+      {
+        type: 'action',
+        markup: <RiDeleteBin5Line />,
+        action: noop,
+      },
+      {
+        type: 'separator',
+      },
+      {
+        type: 'action',
+        markup: inCart ? <RiIndeterminateCircleLine /> : <RiInbox2Line />,
+        action: () => (inCart ? removeFromCart(item) : addToCart(item)),
+      },
+    ],
+    [addToCart, inCart, item, removeFromCart],
+  );
+
   return (
     <div className="d-flex flex-row align-items-stretch">
-      {MENU.map((item, i) =>
-        item.type === 'separator' ? (
+      {menu.map((menuItem, i) =>
+        menuItem.type === 'separator' ? (
           <div key={i} className="separator mx-1 my-2 border-end border-1 border-purple-300" />
         ) : (
           <button
@@ -53,10 +69,10 @@ export const ItemEditionMenu: FC<{
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              item.action({ itemType, id });
+              menuItem.action();
             }}
           >
-            {item.markup}
+            {menuItem.markup}
           </button>
         ),
       )}

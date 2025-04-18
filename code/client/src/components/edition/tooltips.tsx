@@ -6,7 +6,11 @@ import { RiArrowDownSLine, RiMore2Line } from 'react-icons/ri';
 import { FILTERABLE_ITEM_TYPES, ItemIcon, ItemType } from '../../core/consts.tsx';
 import { ItemEditionMenu } from './ItemEditionMenu.tsx';
 
-export const EditionActionsTooltip: FC<{ itemType: ItemType; id: string }> = ({ itemType, id }) => (
+export const EditionActionsTooltip: FC<{ itemType: ItemType; id: string; label: string }> = ({
+  itemType,
+  id,
+  label,
+}) => (
   <Tooltip
     className="p-0 py-1"
     rootClassName="small d-inline-block"
@@ -17,7 +21,7 @@ export const EditionActionsTooltip: FC<{ itemType: ItemType; id: string }> = ({ 
       <RiMore2Line />
     </button>
     <div className="border border-purple-300 rounded bg-white color-purple-300 overflow-hidden">
-      <ItemEditionMenu itemType={itemType} id={id} />
+      <ItemEditionMenu type={itemType} id={id} label={label} />
     </div>
   </Tooltip>
 );

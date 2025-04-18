@@ -104,7 +104,7 @@ const HistogramRow: FC<
               <RiMore2Line />
             </button>
             <div className="border border-purple-300 rounded bg-white color-purple-300">
-              <ItemEditionMenu itemType={itemType} id={value} />
+              <ItemEditionMenu type={itemType} id={value} label={label || value} />
             </div>
           </Tooltip>
         )}

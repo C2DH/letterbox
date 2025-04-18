@@ -6,6 +6,7 @@ import {
   RiMergeCellsVertical,
   RiScissorsCutLine,
   RiSearch2Line,
+  RiSubtractLine,
 } from 'react-icons/ri';
 
 import { ITEM_TYPE_LABELS_PLURAL, ITEM_TYPES, ItemIcon } from '../../core/consts.tsx';
@@ -41,12 +42,12 @@ const ACTIONS = [
 ];
 
 export const EditionPanel: FC = () => {
-  const { enabled, cart, toggle } = useEditionContext();
+  const { enabled, cart, toggle, removeFromCart } = useEditionContext();
   const cartSize = getCartSize(cart);
 
   return (
-    <>
-      <div className="d-flex flex-row align-items-end mb-2">
+    <section className="d-flex flex-column h-100">
+      <div className="px-4 d-flex flex-row align-items-end mb-2 flex-shrink-0">
         <h3 className="fw-medium flex-grow-1 m-0 text-primary">
           Edition cart{' '}
           <span className="badge rounded-pill text-bg-primary fw-bold px-2 ms-2">
@@ -67,22 +68,28 @@ export const EditionPanel: FC = () => {
       {/* Cart */}
       {enabled &&
         (cartSize ? (
-          <section>
-            {ITEM_TYPES.map((type) =>
-              !cart[type]?.length ? null : (
-                <section key={type} className="border-bottom">
-                  <h4 className="with-icon">
-                    <ItemIcon type={type} /> {ITEM_TYPE_LABELS_PLURAL[type]}
-                  </h4>
-                  {cart[type].map(({ label, id }) => (
-                    <div key={id}>{label}</div>
-                  ))}
-                </section>
-              ),
-            )}
+          <section className="px-4 overflow-y-auto flex-shrink-1 flex-grow-0">
+            {ITEM_TYPES.filter((type) => cart[type]?.length).map((type, i) => (
+              <section key={type} className={cx('py-3', !!i && 'border-top')}>
+                <h4 className="with-icon">
+                  <ItemIcon type={type} /> {ITEM_TYPE_LABELS_PLURAL[type]}
+                </h4>
+                {cart[type]?.map(({ label, id }) => (
+                  <div className="d-flex flex-row align-items-center py-1" key={id}>
+                    <span className="flex-grow-1">{label}</span>
+                    <button
+                      className="btn btn-ico flex-shrink-0"
+                      onClick={() => removeFromCart({ id, type })}
+                    >
+                      <RiSubtractLine />
+                    </button>
+                  </div>
+                ))}
+              </section>
+            ))}
           </section>
         ) : (
-          <section className="border-primary border-1 border-dashed text-primary rounded px-4 py-3">
+          <section className="mx-4 border-primary border-1 border-dashed text-primary rounded px-4 py-3">
             <p className="m-0">
               <RiInbox2Line />
             </p>
@@ -93,7 +100,7 @@ export const EditionPanel: FC = () => {
 
       {/* Actions */}
       {enabled && (
-        <section>
+        <section className="px-4 flex-shrink-0">
           {ACTIONS.map(({ label }, i) => (
             <button
               key={i}
@@ -105,6 +112,6 @@ export const EditionPanel: FC = () => {
           ))}
         </section>
       )}
-    </>
+    </section>
   );
 };

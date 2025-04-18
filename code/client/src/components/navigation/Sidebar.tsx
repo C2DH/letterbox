@@ -29,7 +29,7 @@ export const Sidebar: FC<{ activeItemType?: ItemType }> = ({ activeItemType }) =
       <section className="flex-grow-1 flex-shrink-1" />
 
       {/* Edit controls: */}
-      <section className="flex-shrink-0 p-4">
+      <section className="flex-shrink-1 overflow-y-hidden py-4">
         <EditionPanel />
       </section>
     </aside>
