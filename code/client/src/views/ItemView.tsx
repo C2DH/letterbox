@@ -49,10 +49,10 @@ export const ItemView: FC = () => {
             return [
               {
                 title: (
-                  <>
-                    <ItemIcon type={itemType} /> {ITEM_TYPE_LABELS_PLURAL[type]} (
+                  <span className="fs-2">
+                    <ItemIcon type={type} /> {ITEM_TYPE_LABELS_PLURAL[type]} (
                     {itemData[countKey as keyof NodeItem]})
-                  </>
+                  </span>
                 ),
                 data: itemData[listKey as keyof NodeItem],
                 total: itemData[countKey as keyof NodeItem],
@@ -106,7 +106,7 @@ export const ItemView: FC = () => {
 
           {itemData.__typename === 'Message' && (
             <section>
-              <h2 className="with-icon fs-6 fw-medium">
+              <h2 className="with-icon fw-medium mb-4">
                 <RiFile3Line /> Source
               </h2>
 
