@@ -4,6 +4,7 @@ import { toNumber, toString } from '@ouestware/type-utils';
 import { parse } from 'csv-parse';
 import { fromPairs, isNil } from 'lodash';
 import hash from 'object-hash';
+import fingerprint from 'talisman/keyers/fingerprint';
 import { inject, singleton } from 'tsyringe';
 
 import config from '../../config';
@@ -128,17 +129,17 @@ export class DatasetImport {
   ): Promise<Array<DataMessage<{ id: string; name: string }>>> {
     const records: DataMessage<{ id: string; name: string }>[] = data.map((record) => ({
       ...record,
-      raw_company: { id: hash(record.raw_company), name: record.raw_company },
+      raw_company: { id: hash(fingerprint(record.raw_company)), name: record.raw_company },
       raw_address: record.raw_address
-        ? { id: hash(record.raw_address), name: record.raw_address }
+        ? { id: hash(fingerprint(record.raw_address)), name: record.raw_address }
         : undefined,
-      raw_people: (record.raw_people || []).map((p) => ({ id: hash(p), name: p })),
+      raw_people: (record.raw_people || []).map((p) => ({ id: hash(fingerprint(p)), name: p })),
       raw_countries: (record.raw_countries || []).map((c) => ({ id: hash(c), name: c })),
     }));
 
     // Import into Neo4j
     const result = await this.neo4j.getFirstResultQuery<number>(
-      `UNWIND $records as record
+      /*cypher*/ `UNWIND $records as record
         // Message creation
         MERGE (m:Message { id: record.id })
         SET m = {
@@ -161,15 +162,20 @@ export class DatasetImport {
 
         // Company creation
         MERGE (c:Company { id: record.raw_company.id })
-        SET c = {
+        ON CREATE SET c = {
           id: record.raw_company.id,
           name: record.raw_company.name,
+          otherNames: [record.raw_company.name],
           verified: false,
           tags: [],
           // times
           created: datetime(),
           updated: datetime()
         }
+        ON MATCH SET 
+          c.otherNames = c.otherNames + [alt IN [record.raw_company.name] WHERE NOT alt IN c.otherNames],
+          c.updated = datetime()
+        
         
         // Create link between message and company
         MERGE (m)-[:CONTAINS]->(c)
@@ -180,11 +186,16 @@ export class DatasetImport {
               MERGE (a:Address { id: address.id }) 
                 ON CREATE SET 
                   a.name = address.name,
+                  a.otherNames = [address.name],
                   a.verified = false,
                   a.tags = [],
                   // times
                   a.created = datetime(),
                   a.updated = datetime()
+                ON MATCH SET 
+                  a.otherNames = a.otherNames + [alt IN [address.name] WHERE NOT alt IN a.otherNames],
+                  a.updated = datetime()
+                  
               MERGE (m)-[:CONTAINS]->(a) 
           }
 
@@ -193,11 +204,16 @@ export class DatasetImport {
               MERGE (p:Person { id: person.id }) 
                 ON CREATE SET 
                   p.name = person.name,
+                  p.otherNames = [person.name],
                   p.verified = false,
                   p.tags = [],
                   // times
                   p.created = datetime(),
                   p.updated = datetime()
+                ON MATCH SET
+                  p.otherNames = p.otherNames + [alt IN [person.name] WHERE NOT alt IN p.otherNames],
+                  p.updated = datetime()
+                  
               MERGE (m)-[:CONTAINS]->(p) 
           }
 
@@ -266,7 +282,12 @@ export class DatasetImport {
                     p.tags = $record.tags,
                     p.updated = datetime()
                 RETURN 1 as result`,
-                  { record: { ...record, id: hash(record.name) } },
+                  {
+                    record: {
+                      ...record,
+                      id: hash(itemType === 'country' ? record.name : fingerprint(record.name)),
+                    },
+                  },
                 );
                 if (result) nbItems += result;
                 else throw new Error(`Could not import tags ${record}`);

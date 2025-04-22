@@ -5,6 +5,7 @@ export const getCountryById = graphql(`
     result: countries(where: { id_EQ: $id }) {
       id
       name
+      otherNames
       addressesCount
       addresses(skip: 0, limit: 20) {
         ...AddressInline

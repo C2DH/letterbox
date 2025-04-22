@@ -130,6 +130,21 @@ export const ItemView: FC = () => {
               </section>
             </section>
           )}
+          {itemData.__typename !== 'Message' &&
+            'otherNames' in itemData &&
+            itemData.otherNames &&
+            itemData.otherNames.length > 1 && (
+              <section>
+                <h2 className="with-icon fw-medium mb-4">
+                  <RiFile3Line /> Source
+                </h2>
+
+                <section className="mb-3">
+                  <h3 className="fs-6 fw-medium">Other names</h3>
+                  <article style={{ maxWidth: 580 }}>{itemData.otherNames.join(', ')}</article>
+                </section>
+              </section>
+            )}
         </main>
       )}
 

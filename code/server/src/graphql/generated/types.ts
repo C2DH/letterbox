@@ -27,6 +27,7 @@ export type Address = {
   messages: Array<Message>;
   messagesCount: Scalars['Int']['output'];
   name: Scalars['String']['output'];
+  otherNames: Array<Maybe<Scalars['String']['output']>>;
   people: Array<Person>;
   peopleCount: Scalars['Int']['output'];
   tags?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
@@ -103,6 +104,7 @@ export type Company = {
   messages: Array<Message>;
   messagesCount: Scalars['Int']['output'];
   name: Scalars['String']['output'];
+  otherNames: Array<Maybe<Scalars['String']['output']>>;
   people: Array<Person>;
   peopleCount: Scalars['Int']['output'];
   tags?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
@@ -155,6 +157,7 @@ export type Country = {
   messages: Array<Message>;
   messagesCount: Scalars['Int']['output'];
   name: Scalars['String']['output'];
+  otherNames: Array<Maybe<Scalars['String']['output']>>;
   people: Array<Person>;
   peopleCount: Scalars['Int']['output'];
   tags?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
@@ -398,6 +401,7 @@ export type Person = {
   messages: Array<Message>;
   messagesCount: Scalars['Int']['output'];
   name: Scalars['String']['output'];
+  otherNames: Array<Maybe<Scalars['String']['output']>>;
   tags?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
   verified?: Maybe<Scalars['Boolean']['output']>;
 };
@@ -654,6 +658,7 @@ export type AddressResolvers<ContextType = any, ParentType extends ResolversPare
   messages?: Resolver<Array<ResolversTypes['Message']>, ParentType, ContextType, RequireFields<AddressMessagesArgs, 'limit' | 'skip'>>;
   messagesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  otherNames?: Resolver<Array<Maybe<ResolversTypes['String']>>, ParentType, ContextType>;
   people?: Resolver<Array<ResolversTypes['Person']>, ParentType, ContextType, RequireFields<AddressPeopleArgs, 'limit' | 'skip'>>;
   peopleCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   tags?: Resolver<Maybe<Array<Maybe<ResolversTypes['String']>>>, ParentType, ContextType>;
@@ -683,6 +688,7 @@ export type CompanyResolvers<ContextType = any, ParentType extends ResolversPare
   messages?: Resolver<Array<ResolversTypes['Message']>, ParentType, ContextType, RequireFields<CompanyMessagesArgs, 'limit' | 'skip'>>;
   messagesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  otherNames?: Resolver<Array<Maybe<ResolversTypes['String']>>, ParentType, ContextType>;
   people?: Resolver<Array<ResolversTypes['Person']>, ParentType, ContextType, RequireFields<CompanyPeopleArgs, 'limit' | 'skip'>>;
   peopleCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   tags?: Resolver<Maybe<Array<Maybe<ResolversTypes['String']>>>, ParentType, ContextType>;
@@ -706,6 +712,7 @@ export type CountryResolvers<ContextType = any, ParentType extends ResolversPare
   messages?: Resolver<Array<ResolversTypes['Message']>, ParentType, ContextType, RequireFields<CountryMessagesArgs, 'limit' | 'skip'>>;
   messagesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  otherNames?: Resolver<Array<Maybe<ResolversTypes['String']>>, ParentType, ContextType>;
   people?: Resolver<Array<ResolversTypes['Person']>, ParentType, ContextType, RequireFields<CountryPeopleArgs, 'limit' | 'skip'>>;
   peopleCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   tags?: Resolver<Maybe<Array<Maybe<ResolversTypes['String']>>>, ParentType, ContextType>;
@@ -787,6 +794,7 @@ export type PersonResolvers<ContextType = any, ParentType extends ResolversParen
   messages?: Resolver<Array<ResolversTypes['Message']>, ParentType, ContextType, RequireFields<PersonMessagesArgs, 'limit' | 'skip'>>;
   messagesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  otherNames?: Resolver<Array<Maybe<ResolversTypes['String']>>, ParentType, ContextType>;
   tags?: Resolver<Maybe<Array<Maybe<ResolversTypes['String']>>>, ParentType, ContextType>;
   verified?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;

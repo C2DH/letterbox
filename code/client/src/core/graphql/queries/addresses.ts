@@ -5,6 +5,7 @@ export const getAddressById = graphql(`
     result: addresses(where: { id_EQ: $id }) {
       id
       name
+      otherNames
       companiesCount
       companies(skip: 0, limit: 20) {
         ...CompanyInline
