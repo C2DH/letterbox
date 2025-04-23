@@ -1,16 +1,10 @@
 import { noop } from 'lodash';
 import { FC, ReactNode, useMemo } from 'react';
-import {
-  RiDeleteBin5Line,
-  RiInbox2Line,
-  RiIndeterminateCircleLine,
-  RiInputField,
-  RiScissorsCutLine,
-} from 'react-icons/ri';
 
 import { ItemType } from '../../core/consts.tsx';
 import { useEditionContext } from '../../core/edition.ts';
 import { isInCart } from '../../utils/edition.ts';
+import { EditionIcons } from './EditionIcons.tsx';
 
 export const ItemEditionMenu: FC<{
   type: ItemType;
@@ -32,17 +26,17 @@ export const ItemEditionMenu: FC<{
     () => [
       {
         type: 'action',
-        markup: <RiInputField />,
+        markup: EditionIcons.rename,
         action: noop,
       },
       {
         type: 'action',
-        markup: <RiScissorsCutLine />,
+        markup: EditionIcons.split,
         action: noop,
       },
       {
         type: 'action',
-        markup: <RiDeleteBin5Line />,
+        markup: EditionIcons.delete,
         action: noop,
       },
       {
@@ -50,7 +44,7 @@ export const ItemEditionMenu: FC<{
       },
       {
         type: 'action',
-        markup: inCart ? <RiIndeterminateCircleLine /> : <RiInbox2Line />,
+        markup: inCart ? EditionIcons.removeFromCart : EditionIcons.addToCart,
         action: () => (inCart ? removeFromCart(item) : addToCart(item)),
       },
     ],

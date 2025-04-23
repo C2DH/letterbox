@@ -1,5 +1,6 @@
 import Boom from '@hapi/boom';
 import { getLogger } from '@ouestware/node-logger';
+import { flatten, uniq } from 'lodash';
 import type { Transaction } from 'neo4j-driver';
 import { inject, singleton } from 'tsyringe';
 import { v4 as uuid } from 'uuid';
@@ -187,8 +188,12 @@ export class DatasetEdition {
       const targetId = uuid();
       const targetElementId = await this.neo4j.getTxFirstResultQuery<string>(
         tx,
-        /*cypher*/ `CREATE (n:${Neo4jLabels[targetType]}:${Neo4jLabelsPendingModificationsLabels.ToReIndexFlag} { id: $id, name: $name, created: datetime(), updated: datetime() }) RETURN elementId(n) AS result`,
-        { id: targetId, name: targetName },
+        /*cypher*/ `CREATE (n:${Neo4jLabels[targetType]}:${Neo4jLabelsPendingModificationsLabels.ToReIndexFlag} { id: $id, name: $name, otherNames: $otherNames, created: datetime(), updated: datetime() }) RETURN elementId(n) AS result`,
+        {
+          id: targetId,
+          name: targetName,
+          otherNames: uniq(flatten(mergeData.map((n) => n.otherNames))),
+        },
       );
 
       // Merge the nodes into the target one
@@ -467,6 +472,7 @@ export class DatasetEdition {
     // Check that the node exists
     const data = await this.neo4j.getTxFirstResultQuery<{
       elementId: string;
+      otherNames: string[];
       inEdges: Array<{ elementId: string; type: string }>;
       outEdges: Array<{ elementId: string; type: string }>;
       impactedMessages: string[];
@@ -475,6 +481,7 @@ export class DatasetEdition {
       /* cypher */ ` MATCH (n:${Neo4jLabels[type]} { id: $id }) 
         RETURN {
           elementId: elementId(n),
+          otherNames: n.otherNames,
           inEdges: [(n)<-[r]-(m) WHERE NOT coalesce(r.deleted, false) | { elementId: elementId(m), type: type(r) }],
           outEdges: [(n)-[r]->(m) WHERE NOT coalesce(r.deleted, false) | { elementId: elementId(m), type: type(r) }],
           impactedMessages: collect { MATCH (n)<-[r:CONTAINS]-(msg:Message) WHERE NOT coalesce(r.deleted, false) RETURN msg.id }

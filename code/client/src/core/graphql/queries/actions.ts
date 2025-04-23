@@ -62,3 +62,22 @@ export const splitByTypeId = graphql(`
     }
   }
 `);
+
+export const merge = graphql(`
+  mutation Merge($type: DataItemType!, $name: String!, $items: [NodeIdentification!]!) {
+    result: mergeNodes(type: $type, name: $name, nodes: $items) {
+      ... on Address {
+        ...AddressInline
+      }
+      ... on Company {
+        ...CompanyInline
+      }
+      ... on Country {
+        ...CountryInline
+      }
+      ... on Person {
+        ...PersonInline
+      }
+    }
+  }
+`);

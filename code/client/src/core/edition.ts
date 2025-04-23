@@ -5,9 +5,11 @@ import { ItemType } from './consts.tsx';
 
 export type EditionItem = { id: string; label: string; type: ItemType };
 
+export type ItemCart = Partial<Record<ItemType, Omit<EditionItem, 'type'>[]>>;
+
 export type EditionContextType = {
   enabled: boolean;
-  cart: Partial<Record<ItemType, Omit<EditionItem, 'type'>[]>>;
+  cart: ItemCart;
   toggle: (value?: boolean) => void;
   addToCart: (item: EditionItem) => void;
   removeFromCart: (item: Omit<EditionItem, 'label'>) => void;

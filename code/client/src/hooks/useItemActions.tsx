@@ -5,6 +5,7 @@ import type { DataItemType } from '../core/graphql';
 import {
   changeTypeByTypeId,
   deleteNodeByTypeId,
+  merge,
   renameByTypeId,
 } from '../core/graphql/queries/actions';
 
@@ -38,9 +39,20 @@ export const useItemActions = () => {
     [deleteMutation],
   );
 
+  // merge nodes
+  const [mergeMutation] = useMutation(merge, {});
+  const mergeItems = useCallback(
+    async (type: DataItemType, name: string, items: { type: DataItemType; id: string }[]) => {
+      const response = await mergeMutation({ variables: { type, name, items } });
+      return response.data?.result;
+    },
+    [mergeMutation],
+  );
+
   return {
     changeItemType,
     renameItem,
     deleteItem,
+    mergeItems,
   };
 };

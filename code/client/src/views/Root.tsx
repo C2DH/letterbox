@@ -37,7 +37,7 @@ export const Root: FC = () => {
     [],
   );
   const removeFromCart = useCallback(
-    ({ type, id }: Omit<EditionItem, 'label'>) =>
+    ({ type, id }: Pick<EditionItem, 'type' | 'id'>) =>
       setEditionState((state) => {
         const cart = cloneDeep(state.cart);
         cart[type] = (cart[type] || []).filter((item) => id !== item.id);
@@ -58,19 +58,19 @@ export const Root: FC = () => {
     <ErrorBoundary FallbackComponent={Error}>
       <ApolloProvider>
         <NotificationProvider>
-          <ModalProvider>
-            <EditionContext.Provider
-              value={{ ...editionState, toggle: toggleEdition, addToCart, removeFromCart }}
-            >
-              <BrowserRouter>
+          <EditionContext.Provider
+            value={{ ...editionState, toggle: toggleEdition, addToCart, removeFromCart }}
+          >
+            <BrowserRouter>
+              <ModalProvider>
                 <Routes>
                   <Route path="/explore/:type" element={<Explore />} />
                   <Route path="/:type/:id" element={<ItemView />} />
                   <Route path="/" element={<Navigate to="/explore/company" replace />} />
                 </Routes>
-              </BrowserRouter>
-            </EditionContext.Provider>
-          </ModalProvider>
+              </ModalProvider>
+            </BrowserRouter>
+          </EditionContext.Provider>
         </NotificationProvider>
       </ApolloProvider>
     </ErrorBoundary>
