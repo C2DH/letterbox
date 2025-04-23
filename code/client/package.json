@@ -6,10 +6,11 @@
   "scripts": {
     "clean": "rimraf dist .eslintcache",
     "generate": "graphql-codegen",
-    "build": "tsc && vite build",
+    "build": "tsc -b && vite build",
     "dev": "concurrently -n dev,generate \"vite --host\" \"npm run generate -- --watch\"",
     "start": "npm run build && vite preview --host",
-    "lint": "eslint 'src/**/*.{ts,tsx}' --cache"
+    "lint": "eslint 'src/**/*.{ts,tsx}' --cache",
+    "compile": "tsc -b"
   },
   "dependencies": {
     "@apollo/client": "^3.13.4",
