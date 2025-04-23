@@ -1,19 +1,22 @@
 import { stateToSearch } from '@ouestware/facets-client';
 import { useModal } from '@ouestware/modals';
+import { useNotifications } from '@ouestware/notifications';
 import cx from 'classnames';
-import { mapValues } from 'lodash';
+import { flatten, mapValues, toPairs } from 'lodash';
 import { FC } from 'react';
 import { RiInbox2Line, RiSearch2Line, RiSubtractLine } from 'react-icons/ri';
 
-import { ITEM_TYPE_LABELS_PLURAL, ITEM_TYPES, ItemIcon } from '../../core/consts.tsx';
+import { ITEM_TYPE_LABELS_PLURAL, ITEM_TYPES, ItemIcon, ItemType } from '../../core/consts.tsx';
 import { useEditionContext } from '../../core/edition.ts';
 import { getCartSize } from '../../utils/edition.ts';
 import { shortenNumber } from '../../utils/number.ts';
+import { DeleteModal } from '../items/actions/DeleteModal.tsx';
 import { EditionIcons } from './EditionIcons.tsx';
 import { MergeModal } from './MergeModal.tsx';
 
 export const EditionPanel: FC = () => {
   const { enabled, cart, toggle, removeFromCart } = useEditionContext();
+  const { notify } = useNotifications();
   const cartSize = getCartSize(cart);
   const { openModal } = useModal();
 
@@ -103,10 +106,29 @@ export const EditionPanel: FC = () => {
             {EditionIcons.merge} Merge Items
           </button>
 
-          {/* // TODO */}
           <button
             type="button"
             className="btn d-block w-100 btn-link p-0 text-decoration-none text-purple-300 text-start mt-2 with-icon"
+            onClick={() =>
+              openModal(
+                <DeleteModal
+                  items={flatten(
+                    toPairs(cart).map(([type, items]) =>
+                      items.map((i) => ({ type: type as ItemType, ...i })),
+                    ),
+                  )}
+                  onSuccess={() => {
+                    notify({
+                      type: 'success',
+                      text: `${cartSize} items have been deleted.`,
+                    });
+                    toPairs(cart).forEach(([type, items]) =>
+                      items.forEach((item) => removeFromCart({ type: type as ItemType, ...item })),
+                    );
+                  }}
+                />,
+              )
+            }
           >
             {EditionIcons.delete} Delete Items
           </button>

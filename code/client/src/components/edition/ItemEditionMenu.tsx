@@ -1,9 +1,13 @@
+import { useModal } from '@ouestware/modals';
+import { useNotifications } from '@ouestware/notifications';
 import { noop } from 'lodash';
 import { FC, ReactNode, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import { ItemType } from '../../core/consts.tsx';
 import { useEditionContext } from '../../core/edition.ts';
 import { isInCart } from '../../utils/edition.ts';
+import { DeleteModal } from '../items/actions/DeleteModal.tsx';
 import { EditionIcons } from './EditionIcons.tsx';
 
 export const ItemEditionMenu: FC<{
@@ -12,6 +16,9 @@ export const ItemEditionMenu: FC<{
   label: string;
 }> = (item) => {
   const { cart, addToCart, removeFromCart } = useEditionContext();
+  const { notify } = useNotifications();
+  const { openModal } = useModal();
+  const navigate = useNavigate();
   const inCart = useMemo(() => isInCart(cart, item), [cart, item]);
   const menu = useMemo<
     (
@@ -37,7 +44,22 @@ export const ItemEditionMenu: FC<{
       {
         type: 'action',
         markup: EditionIcons.delete,
-        action: noop,
+        action: () => {
+          openModal(
+            <DeleteModal
+              items={[item]}
+              onSuccess={() => {
+                // TODO: refacto reload with cleverer refetch: add a refetch method in edition context?
+                // reload the page but after 1s to let notification appear...
+                setTimeout(() => navigate(0), 1000);
+                notify({
+                  type: 'success',
+                  text: `The ${item.type} "${item.label}" has been deleted. Reloading the page...`,
+                });
+              }}
+            />,
+          );
+        },
       },
       {
         type: 'separator',
@@ -48,7 +70,7 @@ export const ItemEditionMenu: FC<{
         action: () => (inCart ? removeFromCart(item) : addToCart(item)),
       },
     ],
-    [addToCart, inCart, item, removeFromCart],
+    [addToCart, inCart, item, removeFromCart, notify, openModal, navigate],
   );
 
   return (
