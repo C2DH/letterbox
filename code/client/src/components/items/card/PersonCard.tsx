@@ -13,7 +13,7 @@ export const PersonCard: FC<{ data: PersonInlineFragment }> = ({ data }) => {
   return (
     <>
       <h5 className="card-title">
-        <Link className="text-dark" to={`/people/${data.id}`}>
+        <Link className="text-dark" to={`/person/${data.id}`}>
           {data.name}
         </Link>
       </h5>
