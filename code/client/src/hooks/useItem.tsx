@@ -37,7 +37,7 @@ const QUERIES = {
     relations: {
       address: getCompanyAddresses,
       country: getCompanyCountries,
-      people: getCompanyPeople,
+      person: getCompanyPeople,
       message: getCompanyMessages,
     },
   },
@@ -46,7 +46,7 @@ const QUERIES = {
     relations: {
       company: getAddressCompanies,
       country: getAddressCountries,
-      people: getAddressPeople,
+      person: getAddressPeople,
       message: getAddressMessages,
     },
   },
@@ -55,7 +55,7 @@ const QUERIES = {
     relations: {
       company: getCountryCompanies,
       address: getCountryAddresses,
-      people: getCountryPeople,
+      person: getCountryPeople,
       message: getCountryMessages,
     },
   },
@@ -74,7 +74,7 @@ const QUERIES = {
       company: getMessageCompanies,
       address: getMessageAddresses,
       country: getMessageCountries,
-      people: getMessagePeople,
+      person: getMessagePeople,
     },
   },
 } as const;
