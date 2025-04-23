@@ -1,7 +1,6 @@
+import { FaBookmark, FaRegBookmark } from 'react-icons/fa';
 import {
   RiDeleteBin5Line,
-  RiInbox2Line,
-  RiIndeterminateCircleLine,
   RiInputField,
   RiMergeCellsVertical,
   RiScissorsCutLine,
@@ -12,6 +11,6 @@ export const EditionIcons = {
   split: <RiScissorsCutLine />,
   delete: <RiDeleteBin5Line />,
   merge: <RiMergeCellsVertical />,
-  addToCart: <RiInbox2Line />,
-  removeFromCart: <RiIndeterminateCircleLine />,
+  addToCart: <FaRegBookmark />,
+  removeFromCart: <FaBookmark />,
 };

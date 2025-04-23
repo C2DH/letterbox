@@ -5,6 +5,7 @@ import { RiAddCircleLine, RiFile3Line } from 'react-icons/ri';
 import { useParams } from 'react-router-dom';
 
 import { Collapsable } from '../components/Collapsable';
+import { InCartButton } from '../components/edition/InCartButton.tsx';
 import { EditionActionsTooltip } from '../components/edition/tooltips.tsx';
 import { ItemCard } from '../components/items/card/ItemCard.tsx';
 import { ListWithLoadMore, type ListWithLoadMoreProps } from '../components/ListWithLoadMore';
@@ -91,7 +92,10 @@ export const ItemView: FC = () => {
                 <ItemIcon type={itemType} /> {name}
               </span>
               {enabled && (
-                <EditionActionsTooltip itemType={itemType} id={itemData.id} label={name} />
+                <>
+                  <InCartButton type={itemType} id={itemData.id} label={name} />
+                  <EditionActionsTooltip itemType={itemType} id={itemData.id} label={name} />
+                </>
               )}
             </h1>
             {'year' in itemData && <div className="text-muted">Dated to: {itemData.year}</div>}

@@ -103,7 +103,7 @@ const HistogramRow: FC<
             <button type="button" className="btn btn-sm btn-ico ms-2 p-1 btn-outline-purple-300">
               <RiMore2Line />
             </button>
-            <div className="border border-purple-300 rounded bg-white color-purple-300">
+            <div className="border border-light-gray-300 p-2 rounded bg-white color-purple-300">
               <ItemEditionMenu type={itemType} id={value} label={label || value} />
             </div>
           </Tooltip>

@@ -4,15 +4,18 @@ import { useNotifications } from '@ouestware/notifications';
 import cx from 'classnames';
 import { flatten, mapValues, toPairs } from 'lodash';
 import { FC } from 'react';
-import { RiInbox2Line, RiSearch2Line, RiSubtractLine } from 'react-icons/ri';
+import { RiInbox2Line, RiSearch2Line } from 'react-icons/ri';
+import { Link } from 'react-router-dom';
 
 import { ITEM_TYPE_LABELS_PLURAL, ITEM_TYPES, ItemIcon, ItemType } from '../../core/consts.tsx';
 import { useEditionContext } from '../../core/edition.ts';
 import { getCartSize } from '../../utils/edition.ts';
 import { shortenNumber } from '../../utils/number.ts';
 import { EditionIcons } from './EditionIcons.tsx';
+import { InCartButton } from './InCartButton.tsx';
 import { DeleteModal } from './modals/DeleteModal.tsx';
 import { MergeModal } from './modals/MergeModal.tsx';
+import { EditionActionsTooltip } from './tooltips.tsx';
 
 export const EditionPanel: FC = () => {
   const { enabled, cart, toggle, removeFromCart } = useEditionContext();
@@ -63,14 +66,12 @@ export const EditionPanel: FC = () => {
                   <ItemIcon type={type} /> {ITEM_TYPE_LABELS_PLURAL[type]}
                 </h4>
                 {cart[type]?.map(({ label, id }) => (
-                  <div className="d-flex flex-row align-items-center py-1" key={id}>
-                    <span className="flex-grow-1">{label}</span>
-                    <button
-                      className="btn btn-ico flex-shrink-0"
-                      onClick={() => removeFromCart({ id, type })}
-                    >
-                      <RiSubtractLine />
-                    </button>
+                  <div className="d-flex flex-row align-items-center py-1 gap-1" key={id}>
+                    <Link to={`/${type}/${id}`} className="flex-grow-1">
+                      {label}
+                    </Link>
+                    <InCartButton type={type} id={id} label={label} />
+                    <EditionActionsTooltip itemType={type} id={id} label={label} />
                   </div>
                 ))}
               </section>

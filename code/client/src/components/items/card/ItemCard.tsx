@@ -11,7 +11,8 @@ import {
   PersonInlineFragment,
 } from '../../../core/graphql';
 import { getItemName } from '../../../utils/data.ts';
-import { EditionActionsTooltip, QuickSwapTypeTooltip } from '../../edition/tooltips.tsx';
+import { InCartButton } from '../../edition/InCartButton.tsx';
+import { EditionActionsTooltip } from '../../edition/tooltips.tsx';
 import { AddressCard } from './AddressCard.tsx';
 import { CompanyCard } from './CompanyCard.tsx';
 import { CountryCard } from './CountryCard.tsx';
@@ -49,13 +50,12 @@ export const ItemCard: FC<{ itemType: ItemType; data: NodeItem }> = ({ itemType,
     <article className="card">
       <div className="card-body">
         {/* Edition UI for non-message items */}
-        {enabled && itemType !== 'message' && (
-          <div className="d-flex flex-row-reverse align-items-center justify-content-between mb-2">
+        {enabled && itemType !== 'message' && 'name' in data && (
+          <div className="d-flex  align-items-center justify-content-end mb-2 w-100 gap-1">
+            {/* cart action */}
+            <InCartButton label={getItemName(data)} type={itemType} id={data.id} />
             {/* Edition actions */}
             <EditionActionsTooltip itemType={itemType} id={data.id} label={getItemName(data)} />
-
-            {/* Quick-swap type */}
-            <QuickSwapTypeTooltip itemType={itemType} id={data.id} />
           </div>
         )}
 

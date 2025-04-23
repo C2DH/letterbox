@@ -4,8 +4,6 @@ import { FC, ReactNode, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { ItemType } from '../../core/consts.tsx';
-import { useEditionContext } from '../../core/edition.ts';
-import { isInCart } from '../../utils/edition.ts';
 import { EditionIcons } from './EditionIcons.tsx';
 import { DeleteModal } from './modals/DeleteModal.tsx';
 import { RenameModal } from './modals/RenameModal.tsx';
@@ -16,11 +14,10 @@ export const ItemEditionMenu: FC<{
   id: string;
   label: string;
 }> = (item) => {
-  const { cart, addToCart, removeFromCart } = useEditionContext();
   const { notify } = useNotifications();
   const { openModal } = useModal();
   const navigate = useNavigate();
-  const inCart = useMemo(() => isInCart(cart, item), [cart, item]);
+
   const menu = useMemo<
     (
       | { type: 'separator' }
@@ -79,27 +76,19 @@ export const ItemEditionMenu: FC<{
           );
         },
       },
-      {
-        type: 'separator',
-      },
-      {
-        type: 'action',
-        markup: inCart ? EditionIcons.removeFromCart : EditionIcons.addToCart,
-        action: () => (inCart ? removeFromCart(item) : addToCart(item)),
-      },
     ],
-    [addToCart, inCart, item, removeFromCart, notify, openModal, navigate],
+    [item, notify, openModal, navigate],
   );
 
   return (
-    <div className="d-flex flex-row align-items-stretch">
+    <div className="d-flex flex-row align-items-stretch gap-2">
       {menu.map((menuItem, i) =>
         menuItem.type === 'separator' ? (
           <div key={i} className="separator mx-1 my-2 border-end border-1 border-purple-300" />
         ) : (
           <button
             key={i}
-            className="btn btn-outline-purple-300 btn-ico p-2 border-0 rounded-0"
+            className="btn btn-outline-purple-300 btn-ico p-2"
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();

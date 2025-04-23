@@ -17,7 +17,7 @@ import { useEditionContext } from '../../../core/edition.ts';
 import { type MessageInlineFragment } from '../../../core/graphql';
 import { getMessageName } from '../../../utils/data.ts';
 import { Collapsable } from '../../Collapsable';
-import { EditionActionsTooltip, QuickSwapTypeTooltip } from '../../edition/tooltips.tsx';
+import { InCartButton } from '../../edition/InCartButton.tsx';
 import { ItemsCounts } from '../ItemsCounts';
 
 const TYPES = FILTERABLE_ITEM_TYPES as Exclude<ItemType, 'message'>[];
@@ -65,10 +65,9 @@ export const MessageCard: FC<{ data: MessageInlineFragment }> = ({ data }) => {
           <section key={type}>
             {list.map((item) =>
               enabled ? (
-                <div key={item.id} className="mb-1">
-                  <QuickSwapTypeTooltip itemType={type} id={item.id} />
+                <div key={item.id} className="mb-1 d-flex align-items-center">
                   <span className="me-2">{item.name}</span>
-                  <EditionActionsTooltip itemType={type} id={item.id} label={item.name} />
+                  <InCartButton type={type} id={item.id} label={item.name} />
                 </div>
               ) : (
                 <span key={item.id} className="me-2 with-icon">
