@@ -27,7 +27,7 @@ export const ItemsCounts: FC<{
         [
           { field: 'companiesCount', type: 'company' },
           { field: 'addressesCount', type: 'address' },
-          { field: 'peopleCount', type: 'people' },
+          { field: 'peopleCount', type: 'person' },
           { field: 'countriesCount', type: 'country' },
           { field: 'messagesCount', type: 'message' },
         ] as const

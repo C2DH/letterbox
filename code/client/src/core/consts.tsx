@@ -16,7 +16,7 @@ import { AggregationFields, DataItemType } from './graphql';
 
 export const APP_LANGUAGE = 'en-US';
 
-export const ITEM_TYPES = ['company', 'address', 'people', 'country', 'message'] as const;
+export const ITEM_TYPES = ['company', 'address', 'person', 'country', 'message'] as const;
 export const ITEM_TYPES_SET = new Set<string>(ITEM_TYPES);
 export type ItemType = (typeof ITEM_TYPES)[number];
 
@@ -26,14 +26,14 @@ export const FILTERABLE_ITEM_TYPES_SET = new Set(FILTERABLE_ITEM_TYPES);
 export const CompanyIcon = RiBuildingLine;
 export const AddressIcon = RiMapPin2Line;
 export const CountryIcon = RiFlagLine;
-export const PeopleIcon = RiUser2Line;
+export const PersonIcon = RiUser2Line;
 export const MessageIcon = RiArticleLine;
 
 export const ITEM_TYPE_ICONS: Record<ItemType, IconType> = {
   company: CompanyIcon,
   address: AddressIcon,
   country: CountryIcon,
-  people: PeopleIcon,
+  person: PersonIcon,
   message: MessageIcon,
 };
 
@@ -55,23 +55,23 @@ export const ITEM_TYPE_LABELS: Record<ItemType, string> = {
   company: 'Company',
   address: 'Address',
   country: 'Country',
-  people: 'Person',
+  person: 'Person',
   message: 'Message',
 };
 
 export const ITEM_TYPES_AFFINITIES: Record<ItemType, Set<ItemType>> = {
-  company: new Set(['address', 'people']),
-  address: new Set(['people', 'company']),
-  country: new Set(['address', 'people', 'company', 'country']),
-  people: new Set(['people', 'company']),
-  message: new Set(['address', 'people', 'company', 'country']),
+  company: new Set(['address', 'person']),
+  address: new Set(['person', 'company']),
+  country: new Set(['address', 'person', 'company', 'country']),
+  person: new Set(['person', 'company']),
+  message: new Set(['address', 'person', 'company', 'country']),
 };
 
 export const ITEM_TYPE_TO_FIELD = {
   company: AggregationFields.Companies,
   address: AggregationFields.Addresses,
   country: AggregationFields.Countries,
-  people: AggregationFields.People,
+  person: AggregationFields.People,
   tags: AggregationFields.Tags,
   message: 'messages',
 } as const;
@@ -80,15 +80,15 @@ export const ITEM_TYPE_TO_COUNT_FIELD = {
   company: 'companiesCount',
   address: 'addressesCount',
   country: 'countriesCount',
-  people: 'peopleCount',
+  person: 'peopleCount',
   message: 'messagesCount',
 } as const;
 
-export const ITEM_TYPE_TO_DATA_TYPE = {
+export const ITEM_TYPE_TO_DATA_TYPE: Record<ItemType, DataItemType> = {
   company: DataItemType.Company,
   address: DataItemType.Address,
   country: DataItemType.Country,
-  people: DataItemType.Person,
+  person: DataItemType.Person,
   message: DataItemType.Message,
 } as const;
 
@@ -96,7 +96,7 @@ export const ITEM_TYPE_LABELS_PLURAL: Record<ItemType, string> = {
   company: 'Companies',
   address: 'Addresses',
   country: 'Countries',
-  people: 'People',
+  person: 'People',
   message: 'Messages',
 };
 

@@ -59,7 +59,7 @@ const QUERIES = {
       message: getCountryMessages,
     },
   },
-  people: {
+  person: {
     getItemById: getPersonById,
     relations: {
       company: getPersonCompanies,

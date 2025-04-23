@@ -18,7 +18,7 @@ export const PersonCard: FC<{ data: PersonInlineFragment }> = ({ data }) => {
         </Link>
       </h5>
 
-      <ItemsCounts itemType="people" data={data} />
+      <ItemsCounts itemType="person" data={data} />
 
       {!!cleanedTags.length && (
         <section>

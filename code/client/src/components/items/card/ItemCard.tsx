@@ -37,7 +37,7 @@ export const ItemCard: FC<{ itemType: ItemType; data: NodeItem }> = ({ itemType,
     case 'country':
       content = <CountryCard data={data as CountryInlineFragment} />;
       break;
-    case 'people':
+    case 'person':
       content = <PersonCard data={data as PersonInlineFragment} />;
       break;
     case 'message':
