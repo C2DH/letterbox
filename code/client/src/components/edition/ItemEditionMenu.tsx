@@ -1,14 +1,15 @@
 import { useModal } from '@ouestware/modals';
 import { useNotifications } from '@ouestware/notifications';
-import { noop } from 'lodash';
 import { FC, ReactNode, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { ItemType } from '../../core/consts.tsx';
 import { useEditionContext } from '../../core/edition.ts';
 import { isInCart } from '../../utils/edition.ts';
-import { DeleteModal } from '../items/actions/DeleteModal.tsx';
 import { EditionIcons } from './EditionIcons.tsx';
+import { DeleteModal } from './modals/DeleteModal.tsx';
+import { RenameModal } from './modals/RenameModal.tsx';
+import { SplitModal } from './modals/SplitModal.tsx';
 
 export const ItemEditionMenu: FC<{
   type: ItemType;
@@ -34,12 +35,29 @@ export const ItemEditionMenu: FC<{
       {
         type: 'action',
         markup: EditionIcons.rename,
-        action: noop,
+        action: () => {
+          openModal(
+            <RenameModal
+              type={item.type}
+              id={item.id}
+              label={item.label}
+              onSuccess={() => {
+                setTimeout(() => navigate(0), 1000);
+                notify({
+                  type: 'success',
+                  text: `The ${item.type} "${item.label}" has been renamed. Reloading the page...`,
+                });
+              }}
+            />,
+          );
+        },
       },
       {
         type: 'action',
         markup: EditionIcons.split,
-        action: noop,
+        action: () => {
+          openModal(<SplitModal item={item} />, '640px');
+        },
       },
       {
         type: 'action',

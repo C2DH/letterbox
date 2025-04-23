@@ -7,6 +7,7 @@ import {
   deleteNodeByTypeId,
   merge,
   renameByTypeId,
+  splitByTypeId,
 } from '../core/graphql/queries/actions';
 
 export const useItemActions = () => {
@@ -49,10 +50,21 @@ export const useItemActions = () => {
     [mergeMutation],
   );
 
+  // split node
+  const [splitMutation] = useMutation(splitByTypeId, {});
+  const splitItem = useCallback(
+    async (type: DataItemType, id: string, names: string[]) => {
+      const response = await splitMutation({ variables: { type, id, values: names } });
+      return response.data?.result;
+    },
+    [splitMutation],
+  );
+
   return {
     changeItemType,
     renameItem,
     deleteItem,
     mergeItems,
+    splitItem,
   };
 };

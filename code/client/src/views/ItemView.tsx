@@ -5,6 +5,7 @@ import { RiAddCircleLine, RiFile3Line } from 'react-icons/ri';
 import { useParams } from 'react-router-dom';
 
 import { Collapsable } from '../components/Collapsable';
+import { EditionActionsTooltip } from '../components/edition/tooltips.tsx';
 import { ItemCard } from '../components/items/card/ItemCard.tsx';
 import { ListWithLoadMore, type ListWithLoadMoreProps } from '../components/ListWithLoadMore';
 import { Sidebar } from '../components/navigation/Sidebar.tsx';
@@ -85,8 +86,13 @@ export const ItemView: FC = () => {
       {itemData && (
         <main className="p-4 py-5">
           <section className="mb-4">
-            <h1 className="with-icon">
-              <ItemIcon type={itemType} /> {name}
+            <h1 className="d-flex align-items-center gap-2">
+              <span className="with-icon">
+                <ItemIcon type={itemType} /> {name}
+              </span>
+              {enabled && (
+                <EditionActionsTooltip itemType={itemType} id={itemData.id} label={name} />
+              )}
             </h1>
             {'year' in itemData && <div className="text-muted">Dated to: {itemData.year}</div>}
           </section>

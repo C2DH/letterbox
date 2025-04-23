@@ -249,7 +249,7 @@ export class DatasetEdition {
       await this.neo4j.getTxFirstResultQuery(
         tx,
         /* cypher */ ` UNWIND $newNodes AS newNode
-            CREATE (n:${Neo4jLabels[type]}:${Neo4jLabelsPendingModificationsLabels.ToReIndexFlag} { id: newNode.id, name: newNode.name, created: datetime(), updated: datetime() })
+            CREATE (n:${Neo4jLabels[type]}:${Neo4jLabelsPendingModificationsLabels.ToReIndexFlag} { id: newNode.id, name: newNode.name, otherNames: $otherNames, created: datetime(), updated: datetime() })
             WITH n 
               CALL(n) {
                 UNWIND $inEdges as edge

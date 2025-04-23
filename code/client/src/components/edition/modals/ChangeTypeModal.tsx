@@ -15,10 +15,12 @@ const TYPE_OPTIONS = [
 type ChangeTypeModalProps = {
   type: DataItemType;
   id: string;
-  name: string;
+  label: string;
   onSuccess?: () => Promise<void> | void;
 };
-export const ChangeTypeModal: FC<ChangeTypeModalProps> = ({ type, id, name, onSuccess }) => {
+
+// This modal is not used anymore for now as types are changed directly without modal.
+export const ChangeTypeModal: FC<ChangeTypeModalProps> = ({ type, id, label, onSuccess }) => {
   const { closeModal } = useModal();
   const { changeItemType } = useItemActions();
   const [loading, setLoading] = useState(false);
@@ -41,7 +43,7 @@ export const ChangeTypeModal: FC<ChangeTypeModalProps> = ({ type, id, name, onSu
   );
 
   return (
-    <Modal title={`Change type for '${name}'`} withCloseButton={!loading}>
+    <Modal title={`Change type for '${label}'`} withCloseButton={!loading}>
       <form
         id="changeTypeForm"
         onSubmit={(e) => {

@@ -5,12 +5,12 @@ import { FC, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Select from 'react-select';
 
-import { ItemIcon, ItemType } from '../../core/consts';
-import { ItemCart, useEditionContext } from '../../core/edition';
-import { DataItemType } from '../../core/graphql';
-import { useItemActions } from '../../hooks/useItemActions';
-import { Collapsable } from '../Collapsable';
-import { EditionIcons } from './EditionIcons';
+import { ItemIcon, ItemType } from '../../../core/consts';
+import { ItemCart, useEditionContext } from '../../../core/edition';
+import { DataItemType } from '../../../core/graphql';
+import { useItemActions } from '../../../hooks/useItemActions';
+import { Collapsable } from '../../Collapsable';
+import { EditionIcons } from '../EditionIcons';
 
 interface MergeModalProps {
   itemsByType: ItemCart;

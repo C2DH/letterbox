@@ -10,9 +10,9 @@ import { ITEM_TYPE_LABELS_PLURAL, ITEM_TYPES, ItemIcon, ItemType } from '../../c
 import { useEditionContext } from '../../core/edition.ts';
 import { getCartSize } from '../../utils/edition.ts';
 import { shortenNumber } from '../../utils/number.ts';
-import { DeleteModal } from '../items/actions/DeleteModal.tsx';
 import { EditionIcons } from './EditionIcons.tsx';
-import { MergeModal } from './MergeModal.tsx';
+import { DeleteModal } from './modals/DeleteModal.tsx';
+import { MergeModal } from './modals/MergeModal.tsx';
 
 export const EditionPanel: FC = () => {
   const { enabled, cart, toggle, removeFromCart } = useEditionContext();
