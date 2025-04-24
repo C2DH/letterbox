@@ -70,7 +70,7 @@ export const EditionPanel: FC = () => {
                     <Link to={`/${type}/${id}`} className="flex-grow-1">
                       {label}
                     </Link>
-                    <InCartButton type={type} id={id} label={label} />
+                    <InCartButton type={type} id={id} label={label} fromCart />
                     <EditionActionsTooltip itemType={type} id={id} label={label} />
                   </div>
                 ))}
