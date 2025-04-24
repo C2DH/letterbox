@@ -33,7 +33,11 @@ export const SplitModal: FC<SplitModalProps> = ({ item }) => {
 
   return (
     <Modal
-      title={<h2 className="with-icon">{EditionIcons.split} Split</h2>}
+      title={
+        <h2 className="with-icon">
+          <EditionIcons.split /> Split
+        </h2>
+      }
       withCloseButton={!loading}
     >
       <form
