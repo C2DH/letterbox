@@ -1,10 +1,9 @@
 import { stateToSearch } from '@ouestware/facets-client';
 import { useModal } from '@ouestware/modals';
 import { useNotifications } from '@ouestware/notifications';
-import cx from 'classnames';
+import classNames, { default as cx } from 'classnames';
 import { flatten, mapValues, toPairs } from 'lodash';
 import { FC } from 'react';
-import { RiInbox2Line, RiSearch2Line } from 'react-icons/ri';
 import { Link } from 'react-router-dom';
 
 import { ITEM_TYPE_LABELS_PLURAL, ITEM_TYPES, ItemIcon, ItemType } from '../../core/consts.tsx';
@@ -37,12 +36,17 @@ export const EditionPanel: FC = () => {
   const searchMentionsURL = `/explore/message?${params?.toString()}`;
 
   return (
-    <section className="d-flex flex-column h-100">
+    <section
+      className={classNames(
+        'd-flex flex-column h-100',
+        enabled ? 'justify-content-between' : 'justify-content-end',
+      )}
+    >
       <div className="px-4 d-flex flex-row align-items-end mb-2 flex-shrink-0">
         <h3 className="fw-medium flex-grow-1 m-0 text-primary">
-          Edition cart{' '}
+          Edition mode{' '}
           <span className="badge rounded-pill text-bg-primary fw-bold px-2 ms-2">
-            {shortenNumber(cartSize)}
+            {shortenNumber(cartSize)} <EditionIcons.toggleCartIn className="align-bottom" />
           </span>
         </h3>
         <div className="form-check form-switch m-0 p-0">
@@ -59,7 +63,7 @@ export const EditionPanel: FC = () => {
       {/* Cart */}
       {enabled &&
         (cartSize ? (
-          <section className="px-4 overflow-y-auto flex-shrink-1 flex-grow-0">
+          <section className="px-4 overflow-y-auto flex-shrink-0 flex-grow-1">
             {ITEM_TYPES.filter((type) => cart[type]?.length).map((type, i) => (
               <section key={type} className={cx('py-3', !!i && 'border-top')}>
                 <h4 className="with-icon">
@@ -80,36 +84,31 @@ export const EditionPanel: FC = () => {
         ) : (
           <section className="mx-4 border-primary border-1 border-dashed text-primary rounded px-4 py-3">
             <p className="m-0">
-              <RiInbox2Line />
+              <EditionIcons.toggleCartIn />
             </p>
-            <p className="m-0">Cart empty...</p>
-            <p className="m-0">Select an item to edit it!</p>
+            <p className="m-0">No items bookmarked...</p>
+            <p className="m-0">Bookmark items here to edit them later!</p>
           </section>
         ))}
 
       {/* Actions */}
       {enabled && (
         <section className="px-4 flex-shrink-0">
-          <a
-            href={searchMentionsURL}
-            className="d-block w-100 p-0 text-decoration-none text-purple-300 text-start mt-2 with-icon"
-          >
-            <RiSearch2Line /> Search Mentions
-          </a>
-
           <button
             type="button"
-            className="btn d-block w-100 btn-link p-0 text-decoration-none text-purple-300 text-start mt-2 with-icon"
+            className="btn mt-2 with-icon py-1 btn-purple-300"
+            disabled={cartSize === 0}
             onClick={() => {
               openModal(<MergeModal itemsByType={cart} />);
             }}
           >
-            {EditionIcons.merge} Merge Items
+            <EditionIcons.merge /> Merge Selection
           </button>
 
           <button
             type="button"
-            className="btn d-block w-100 btn-link p-0 text-decoration-none text-purple-300 text-start mt-2 with-icon"
+            className="btn mt-2 with-icon py-1 btn-purple-300"
+            disabled={cartSize === 0}
             onClick={() =>
               openModal(
                 <DeleteModal
@@ -131,8 +130,11 @@ export const EditionPanel: FC = () => {
               )
             }
           >
-            {EditionIcons.delete} Delete Items
+            <EditionIcons.delete /> Delete Selection
           </button>
+          <a href={searchMentionsURL} className="mt-2 d-block w-100 btn-purple-300 text-start">
+            Explore messages for this selection
+          </a>
         </section>
       )}
     </section>

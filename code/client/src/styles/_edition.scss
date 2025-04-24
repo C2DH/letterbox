@@ -2,3 +2,24 @@
 .tag-select {
     max-width: 35rem;
 }
+
+#indexation-progress-bar,
+#indexation-progress-bar[value]::-webkit-progress-bar{
+    -webkit-appearance: none;
+     -moz-appearance: none;
+          appearance: none;
+          border: none;
+    border-radius: 0;
+    background-color: $light-gray;
+    height: 4px;
+    width: 100%;
+    color: $secondary;
+    margin: 0
+}
+#indexation-progress-bar[value]::-moz-progress-bar{
+    background-color:  $secondary;    
+}
+
+#indexation-progress-bar[value]::-webkit-progress-value {
+    background-color:  $secondary;    
+}

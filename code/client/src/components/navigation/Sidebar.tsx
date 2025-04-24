@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 
 import { ITEM_TYPE_LABELS_PLURAL, ITEM_TYPES, ItemIcon, ItemType } from '../../core/consts.tsx';
 import { EditionPanel } from '../edition/EditionPanel.tsx';
+import { IndexationManagement } from '../edition/IndexationManagement.tsx';
 
 export const Sidebar: FC<{ activeItemType?: ItemType }> = ({ activeItemType }) => {
   return (
@@ -29,8 +30,12 @@ export const Sidebar: FC<{ activeItemType?: ItemType }> = ({ activeItemType }) =
       <section className="flex-grow-1 flex-shrink-1" />
 
       {/* Edit controls: */}
-      <section className="flex-shrink-1 overflow-y-hidden py-4">
+      <section className="flex-shrink-1 overflow-y-hidden py-4 h-100 border-bottom">
         <EditionPanel />
+      </section>
+
+      <section className="flex-shrink-0 p-4">
+        <IndexationManagement />
       </section>
     </aside>
   );

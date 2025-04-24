@@ -31,7 +31,7 @@ export const ItemEditionMenu: FC<{
     () => [
       {
         type: 'action',
-        markup: EditionIcons.rename,
+        markup: <EditionIcons.rename />,
         action: () => {
           openModal(
             <RenameModal
@@ -51,14 +51,14 @@ export const ItemEditionMenu: FC<{
       },
       {
         type: 'action',
-        markup: EditionIcons.split,
+        markup: <EditionIcons.split />,
         action: () => {
           openModal(<SplitModal item={item} />, '640px');
         },
       },
       {
         type: 'action',
-        markup: EditionIcons.delete,
+        markup: <EditionIcons.delete />,
         action: () => {
           openModal(
             <DeleteModal

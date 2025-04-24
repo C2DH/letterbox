@@ -22,8 +22,8 @@ export const InCartButton: FC<{ type: ItemType; id: string; label: string; fromC
         else addToCart(item);
       }}
     >
-      {!item.fromCart && (inCart ? EditionIcons.toggleCartOut : EditionIcons.toggleCartIn)}
-      {item.fromCart && EditionIcons.removeFromCart}
+      {!item.fromCart && (inCart ? <EditionIcons.toggleCartOut /> : <EditionIcons.toggleCartIn />)}
+      {item.fromCart && <EditionIcons.removeFromCart />}
     </button>
   );
 };

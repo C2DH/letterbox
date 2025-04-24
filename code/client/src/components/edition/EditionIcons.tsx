@@ -9,11 +9,11 @@ import {
 } from 'react-icons/ri';
 
 export const EditionIcons = {
-  rename: <RiInputField />,
-  split: <RiScissorsCutLine />,
-  delete: <RiDeleteBin5Line />,
-  merge: <RiMergeCellsVertical />,
-  toggleCartIn: <RiBookmarkLine />,
-  toggleCartOut: <RiBookmarkFill />,
-  removeFromCart: <RiSubtractLine />,
+  rename: RiInputField,
+  split: RiScissorsCutLine,
+  delete: RiDeleteBin5Line,
+  merge: RiMergeCellsVertical,
+  toggleCartIn: RiBookmarkLine,
+  toggleCartOut: RiBookmarkFill,
+  removeFromCart: RiSubtractLine,
 };

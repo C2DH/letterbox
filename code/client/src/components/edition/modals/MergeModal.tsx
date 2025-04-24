@@ -34,7 +34,7 @@ export const MergeModal: FC<MergeModalProps> = ({ itemsByType }) => {
 
   return (
     <Modal
-      title={<h2 className="with-icon">{EditionIcons.merge} Merging</h2>}
+      title={<h2 className="with-icon">{<EditionIcons.merge />} Merging</h2>}
       withCloseButton={!loading}
     >
       <form
