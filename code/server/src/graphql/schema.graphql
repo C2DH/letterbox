@@ -32,7 +32,7 @@ type Address
   @subscription(events: []) {
   id: ID! @unique
   name: String!
-  otherNames: [String]!
+  otherNames: [String]
   tags: [String]
   verified: Boolean
 
@@ -148,7 +148,7 @@ type Company
   @subscription(events: []) {
   id: ID! @unique
   name: String!
-  otherNames: [String]!
+  otherNames: [String]
   tags: [String]
   verified: Boolean
 
@@ -278,7 +278,7 @@ type Country
   @subscription(events: []) {
   id: ID! @unique
   name: String!
-  otherNames: [String]!
+  otherNames: [String]
   tags: [String]
   verified: Boolean
 
@@ -519,7 +519,7 @@ type Person
   @subscription(events: []) {
   id: ID! @unique
   name: String!
-  otherNames: [String]!
+  otherNames: [String]
   tags: [String]
   verified: Boolean
 
