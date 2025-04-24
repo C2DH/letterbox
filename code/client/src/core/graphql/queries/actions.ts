@@ -81,3 +81,41 @@ export const merge = graphql(`
     }
   }
 `);
+
+export const setTagsMutation = graphql(`
+  mutation SetNodeTags($type: DataItemType!, $id: ID!, $tags: [String]!) {
+    result: setNodeTags(type: $type, id: $id, tags: $tags) {
+      ... on Address {
+        ...AddressInline
+      }
+      ... on Company {
+        ...CompanyInline
+      }
+      ... on Country {
+        ...CountryInline
+      }
+      ... on Person {
+        ...PersonInline
+      }
+    }
+  }
+`);
+
+export const setVerifiedMutation = graphql(`
+  mutation SetNodeVerified($type: DataItemType!, $id: ID!, $verified: Boolean!) {
+    result: setNodeVerified(type: $type, id: $id, verified: $verified) {
+      ... on Address {
+        ...AddressInline
+      }
+      ... on Company {
+        ...CompanyInline
+      }
+      ... on Country {
+        ...CountryInline
+      }
+      ... on Person {
+        ...PersonInline
+      }
+    }
+  }
+`);

@@ -6,6 +6,8 @@ export const getPersonById = graphql(`
       id
       name
       otherNames
+      tags
+      verified
 
       addressesCount
       addresses(skip: 0, limit: 20) {

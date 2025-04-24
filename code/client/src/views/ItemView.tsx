@@ -1,11 +1,13 @@
 import { LoaderFill } from '@ouestware/loaders';
 import cx from 'classnames';
 import { ReactNode, useMemo, type FC } from 'react';
-import { RiAddCircleLine, RiFile3Line } from 'react-icons/ri';
+import { RiAddCircleLine, RiFile3Line, RiPriceTag3Line } from 'react-icons/ri';
 import { useParams } from 'react-router-dom';
 
 import { Collapsable } from '../components/Collapsable';
 import { InCartButton } from '../components/edition/InCartButton.tsx';
+import { TagsSelect } from '../components/edition/TagsSelect.tsx';
+import { ToggleVerified } from '../components/edition/ToggleVerified.tsx';
 import { EditionActionsTooltip } from '../components/edition/tooltips.tsx';
 import { ItemCard } from '../components/items/card/ItemCard.tsx';
 import { ListWithLoadMore, type ListWithLoadMoreProps } from '../components/ListWithLoadMore';
@@ -99,6 +101,14 @@ export const ItemView: FC = () => {
               )}
             </h1>
             {'year' in itemData && <div className="text-muted">Dated to: {itemData.year}</div>}
+            <ToggleVerified item={{ ...itemData, type: itemType }} />
+          </section>
+
+          <section className="mb-4">
+            <h2 className="with-icon fw-medium mb-4">
+              <RiPriceTag3Line /> Tags
+            </h2>
+            <TagsSelect item={{ ...itemData, type: itemType }} />
           </section>
 
           {relatedItems.map((related, index) => (

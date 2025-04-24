@@ -6,6 +6,8 @@ export const getAddressById = graphql(`
       id
       name
       otherNames
+      tags
+      verified
       companiesCount
       companies(skip: 0, limit: 20) {
         ...CompanyInline
