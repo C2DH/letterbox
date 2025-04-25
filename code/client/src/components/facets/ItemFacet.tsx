@@ -49,7 +49,7 @@ const HistogramRow: FC<
 
   return (
     <button
-      className="btn btn-light bg-transparent w-100 border-0 p-3 position-relative"
+      className="btn btn-light bg-transparent w-100 border-0 py-3 ps-4 pe-3 position-relative"
       onClick={(e) => {
         e.preventDefault();
         onClick();
@@ -89,7 +89,12 @@ const HistogramRow: FC<
           </div>
 
           {typeof index === 'number' && (index === 0 || !((index + 1) % 5)) && (
-            <span className="text-muted position-absolute end-100 pe-2 top-0">{index + 1}</span>
+            <span
+              className="text-muted position-absolute end-100 ps-2 top-0 text-start small"
+              style={{ width: '40px', marginTop: '2px' }}
+            >
+              {index + 1}
+            </span>
           )}
         </div>
 
@@ -195,9 +200,9 @@ const Histogram: FC<KeywordsFacetHistogramProps<ItemValue> & { itemType: ItemTyp
         ))}
       </ul>
       <div className="d-flex align-items-baseline flex-row small">
-        <button type="button" className="btn btn-sm btn-outline-dark" disabled>
+        {/* <button type="button" className="btn btn-sm btn-outline-dark" disabled>
           TODO: Load more
-        </button>
+        </button> */}
         {!!histogramData.total && (
           <>
             {' '}

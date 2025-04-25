@@ -56,7 +56,7 @@ export const Explore: FC = () => {
         variables: {
           itemType: ITEM_TYPE_TO_DATA_TYPE[selectedType],
           field,
-          limit: 10,
+          limit: 500,
           filters: filtersStateToSearchFilters(filters),
           includes: input,
         },
