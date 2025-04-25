@@ -12,6 +12,7 @@ node_modules
 docker/neo4j/data/*
 docker/elasticsearch/data/*
 docker/project/data/*
+docker/nginx/data/*
 
 # testing
 /coverage

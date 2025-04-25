@@ -58,3 +58,4 @@ services:
       - project
     volumes:
       - ${PROJECT_PATH}/docker/nginx.site.conf:/etc/nginx/conf.d/default.conf
+      - ${PROJECT_PATH}/docker/nginx/data/pdf:/var/www/pdf

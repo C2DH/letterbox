@@ -12,6 +12,7 @@ import { EditionActionsTooltip } from '../components/edition/tooltips.tsx';
 import { ItemCard } from '../components/items/card/ItemCard.tsx';
 import { ListWithLoadMore, type ListWithLoadMoreProps } from '../components/ListWithLoadMore';
 import { Sidebar } from '../components/navigation/Sidebar.tsx';
+import { PdfViewer } from '../components/pdfViewer.tsx';
 import {
   ITEM_TYPE_LABELS,
   ITEM_TYPE_LABELS_PLURAL,
@@ -132,7 +133,11 @@ export const ItemView: FC = () => {
 
               <section className="mb-3">
                 <h3 className="fs-6 fw-medium">Original document</h3>
-                <article>TODO</article>
+                <PdfViewer
+                  className="w-100"
+                  filename={itemData.filename}
+                  pageNumber={itemData.pageNumber}
+                />
               </section>
 
               <section className="mb-3">
