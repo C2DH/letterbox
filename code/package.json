@@ -21,7 +21,7 @@
     "lint": "npm run lint --workspaces --if-present",
     "test": "npm run test --workspaces --if-present",
     "dev": "concurrently -n client,server \"npm run dev --workspace=@letterbox/client\" \"npm run start --workspace=@letterbox/server\"",
-    "start": "concurrently -n client,server \"npm run start --workspace=@letterbox/client\" \"npm run start --workspace=@letterbox/server\""
+    "prod": "concurrently -n client,server \"npm run build --workspace=@letterbox/client\" \"npm run start --workspace=@letterbox/server\""
   },
   "devDependencies": {
     "@babel/core": "^7.26.10",

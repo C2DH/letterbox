@@ -17,9 +17,6 @@ services:
   elasticsearch:
     ports:
       - ${ELASTICSEARCH_PORT}:9200
-  kibana:
-    ports:
-        - ${KIBANA_PORT}:5601
   project:
     ports:
       - ${CLIENT_PORT}:5173

@@ -35,5 +35,5 @@ else
   echo " ~ Start prod mod"
   echo " ~"
   echo
-  npm run start
+  npm run prod
 fi
