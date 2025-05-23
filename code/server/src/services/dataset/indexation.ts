@@ -53,11 +53,11 @@ export class DatasetIndexation {
     await this.createIndices(resetIndices);
 
     const results = await Promise.all([
-      this.indexMessages(),
-      this.indexPeople(),
-      this.indexCompanies(),
-      this.indexAddresses(),
-      this.indexCountries(),
+      this.indexMessages(undefined, undefined, undefined, 5000),
+      this.indexPeople(undefined, undefined, undefined, 100),
+      this.indexCompanies(undefined, undefined, undefined, 1000),
+      this.indexAddresses(undefined, undefined, undefined, 1000),
+      this.indexCountries(undefined, undefined, undefined, 5),
     ]);
 
     return results.reduce(
