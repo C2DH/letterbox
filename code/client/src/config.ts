@@ -1,3 +1,3 @@
 export default {
-  pdfURLPrefix: process.env.VITE_PDF_URL || 'http://localhost/pdf/',
+  pdfURLPrefix: import.meta.env.VITE_PDF_URL || 'http://localhost/pdf/',
 };
