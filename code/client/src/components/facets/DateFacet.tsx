@@ -2,6 +2,8 @@ import { DateFilter } from '@ouestware/facets';
 import { useFacetsContext } from '@ouestware/facets-client';
 import { FC, useEffect, useMemo, useState } from 'react';
 
+import config from '../../config.ts';
+
 export const DateFacet: FC = () => {
   const {
     state: { filters },
@@ -36,10 +38,10 @@ export const DateFacet: FC = () => {
       <section className="d-flex flex-row align-items-end">
         {(
           [
-            { key: 'min', label: 'Start' },
-            { key: 'max', label: 'End' },
+            { key: 'min', label: 'Start', placeholder: config.minYear },
+            { key: 'max', label: 'End', placeholder: config.maxYear },
           ] as const
-        ).map(({ key, label }) => (
+        ).map(({ key, label, placeholder }) => (
           <div key={key} className="ms-2">
             <label htmlFor={`date-${key}`} className="form-label">
               {label}
@@ -50,6 +52,7 @@ export const DateFacet: FC = () => {
               style={{ width: 120 }}
               id={`date-${key}`}
               value={state[key] || ''}
+              placeholder={placeholder + ''}
               onChange={(e) =>
                 setState({ ...state, [key]: e.target.value ? +e.target.value : undefined })
               }
