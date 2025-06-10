@@ -415,11 +415,8 @@ export class DatasetEdition {
     } finally {
       // make sure to delete lock node
       // TODO: should we keep this node for log?
-      console.debug(`indexation ${idLock} task done`);
-      await this.neo4j.getFirstResultQuery(
-        `MATCH (n:${Neo4jLabelsPendingModificationsLabels.IndexingPendingModification}) DELETE n RETURN 1 AS result`,
-        {},
-      );
+      this.log.debug(`indexation ${idLock} task done`);
+      await this.releaseIndexingPendingModificationLockNode();
     }
     // return number of impacted items by itemType
     return reports;
@@ -439,6 +436,13 @@ export class DatasetEdition {
   getIndexingPendingModificationLockNode() {
     return this.neo4j.getFirstResultQuery<{ startTime: string }>(
       `MATCH (n:${Neo4jLabelsPendingModificationsLabels.IndexingPendingModification}) return n as result`,
+      {},
+    );
+  }
+
+  async releaseIndexingPendingModificationLockNode() {
+    await this.neo4j.getFirstResultQuery(
+      `MATCH (n:${Neo4jLabelsPendingModificationsLabels.IndexingPendingModification}) DELETE n RETURN 1 AS result`,
       {},
     );
   }
