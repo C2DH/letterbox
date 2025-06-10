@@ -224,6 +224,7 @@ export class DatasetEdition {
       await tx.rollback();
       throw e;
     } finally {
+      await tx.close();
       await session.close();
     }
   }
@@ -277,6 +278,7 @@ export class DatasetEdition {
       await tx.rollback();
       throw e;
     } finally {
+      await tx.close();
       await session.close();
     }
   }
@@ -301,15 +303,21 @@ export class DatasetEdition {
       );
     }
     const nbItems = await this.countItemsWithPendingModifications();
-    console.debug(`start indexation task for ${nbItems}`);
+    this.log.debug(`start indexation task for ${nbItems}`);
     // create a indexation status node
     const idLock = await this.neo4j.getFirstResultQuery(
-      /* cypher */ `CREATE (n:${Neo4jLabelsPendingModificationsLabels.IndexingPendingModification}) SET n= {startTime: $startTime, nbItems: $nbItems} RETURN id(n) as result`,
+      `
+      CREATE (n:${Neo4jLabelsPendingModificationsLabels.IndexingPendingModification}) 
+      SET n = {
+        startTime: $startTime, 
+        nbItems: $nbItems
+      } 
+      RETURN id(n) as result`,
       { startTime: new Date().toISOString(), nbItems },
     );
     const removeToBeIndexFlag = (itemType: ItemType) => async (ids: string[]) => {
       await this.neo4j.getFirstResultQuery<void>(
-        /* cypher */ `
+        `
         MATCH (item:${Neo4jLabels[itemType]}:${Neo4jLabelsPendingModificationsLabels.ToReIndexFlag})
         WHERE  item.id IN $ids
         WITH item

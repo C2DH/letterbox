@@ -124,6 +124,7 @@ export class Neo4j {
       await tx.rollback();
       throw e;
     } finally {
+      await tx.close();
       await session.close();
     }
   }
@@ -151,6 +152,7 @@ export class Neo4j {
       await tx.rollback();
       throw e;
     } finally {
+      await tx.close();
       await session.close();
     }
   }

@@ -259,15 +259,15 @@ export class DatasetImport {
             const session = this.neo4j.getWriteSession();
             const tx = await session.beginTransaction();
 
-            const stream = this.fs.streamFile(tagsPath).pipe(
-              parse({
-                delimiter: ',',
-                encoding: 'utf8',
-                columns: ['name', 'tags'],
-                cast: (value, ctx) => (ctx.column === 'tags' ? value.split('|') : value),
-              }),
-            );
             try {
+              const stream = this.fs.streamFile(tagsPath).pipe(
+                parse({
+                  delimiter: ',',
+                  encoding: 'utf8',
+                  columns: ['name', 'tags'],
+                  cast: (value, ctx) => (ctx.column === 'tags' ? value.split('|') : value),
+                }),
+              );
               for await (const record of stream) {
                 const result = await this.neo4j.getTxFirstResultQuery<number>(
                   tx,
@@ -322,12 +322,13 @@ export class DatasetImport {
       throw new Error(
         `Could not parse message to find filename and page number: ${fileGroup ? fileGroup[1] : message}`,
       );
-    } else
-      return {
-        filename: group[1],
-        pageNumber: toNumber(group[2]) || 1,
-        message: group[3],
-      };
+    }
+
+    return {
+      filename: group[1],
+      pageNumber: toNumber(group[2]) || 1,
+      message: group[3],
+    };
   }
 
   /**
