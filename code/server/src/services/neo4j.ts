@@ -115,7 +115,7 @@ export class Neo4j {
     field = 'result',
   ): Promise<Array<T>> {
     const session = this.driver.session({ database: this.database });
-    const tx = session.beginTransaction();
+    const tx = await session.beginTransaction();
     try {
       const result = await this.getTxResultQuery<T>(tx, query, params, field);
       await tx.commit();
@@ -143,7 +143,7 @@ export class Neo4j {
     field = 'result',
   ): Promise<T | null> {
     const session = this.driver.session({ database: this.database });
-    const tx = session.beginTransaction();
+    const tx = await session.beginTransaction();
     try {
       const result = await this.getTxFirstResultQuery<T>(tx, query, params, field);
       await tx.commit();

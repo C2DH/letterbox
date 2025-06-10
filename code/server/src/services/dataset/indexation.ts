@@ -128,36 +128,29 @@ export class DatasetIndexation {
     onBatchDone?: (ids: string[]) => Promise<void>,
     batchSize?: number,
   ): Promise<ImportReport> {
-    return new Promise((resolve, reject) => {
-      let batchNumber = 0;
-      const result: ImportReport = { count: 0, errors: [] };
+    let batchNumber = 0;
+    const result: ImportReport = { count: 0, errors: [] };
 
-      this.neo4j
-        .streamReadQuery<{ id: string; name: string }>(
-          this.getIndexPeopleQuery(ids, withPendingModifications),
-          { ids },
-        )
-        .map((doc) => {
-          return { ...doc, fingerprint: fingerprint(doc.name) };
-        })
-        .transform(batcher(batchSize || config.elastic.importBatchSize))
-        .forEach(
-          async (batch) => {
-            batchNumber++;
-            this.log.info('People exec batch', batchNumber);
-            const report = await this.es.bulkImport(EsIndices['person'], batch);
-            if (onBatchDone) await onBatchDone(batch.map((b) => b.id));
-            result.count += batch.length;
-            result.errors.push(...report.map((e) => e.error));
-            this.log.info('People batch finished', batchNumber);
-          },
-          (error) => {
-            if (error) reject(error);
-            this.log.info('People indexation finished', result);
-            resolve(result);
-          },
-        );
-    });
+    await this.neo4j
+      .streamReadQuery<{ id: string; name: string }>(
+        this.getIndexPeopleQuery(ids, withPendingModifications),
+        { ids },
+      )
+      .map((doc) => {
+        return { ...doc, fingerprint: fingerprint(doc.name) };
+      })
+      .transform(batcher(batchSize || config.elastic.importBatchSize))
+      .forEach(async (batch) => {
+        batchNumber++;
+        this.log.info('People exec batch', batchNumber);
+        const report = await this.es.bulkImport(EsIndices['person'], batch);
+        if (onBatchDone) await onBatchDone(batch.map((b) => b.id));
+        result.count += batch.length;
+        result.errors.push(...report.map((e) => e.error));
+        this.log.info('People batch finished', batchNumber);
+      });
+
+    return result;
   }
 
   /**
@@ -170,39 +163,29 @@ export class DatasetIndexation {
     onBatchDone?: (ids: string[]) => Promise<void>,
     batchSize?: number,
   ): Promise<ImportReport> {
-    return new Promise((resolve, reject) => {
-      let batchNumber = 0;
-      const result: ImportReport = { count: 0, errors: [] };
+    let batchNumber = 0;
+    const result: ImportReport = { count: 0, errors: [] };
 
-      this.neo4j
-        .streamReadQuery<{ id: string; name: string }>(
-          this.getIndexCompaniesQuery(ids, withPendingModifications),
-          { ids },
-        )
-        .map((doc) => {
-          return { ...doc, fingerprint: fingerprint(doc.name) };
-        })
-        .transform(batcher(batchSize || config.elastic.importBatchSize))
-        .forEach(
-          async (batch) => {
-            batchNumber++;
-            this.log.info('Company exec batch', batchNumber);
-            const report = await this.es.bulkImport(EsIndices['company'], batch);
-            if (onBatchDone) await onBatchDone(batch.map((b) => b.id));
-            result.count += batch.length;
-            result.errors.push(...report.map((e) => e.error));
-            this.log.info('Company batch finished', batchNumber);
-          },
-          (error) => {
-            if (error) {
-              reject(error);
-              return;
-            }
-            this.log.info('Company indexation finished', result);
-            resolve(result);
-          },
-        );
-    });
+    await this.neo4j
+      .streamReadQuery<{ id: string; name: string }>(
+        this.getIndexCompaniesQuery(ids, withPendingModifications),
+        { ids },
+      )
+      .map((doc) => {
+        return { ...doc, fingerprint: fingerprint(doc.name) };
+      })
+      .transform(batcher(batchSize || config.elastic.importBatchSize))
+      .forEach(async (batch) => {
+        batchNumber++;
+        this.log.info('Company exec batch', batchNumber);
+        const report = await this.es.bulkImport(EsIndices['company'], batch);
+        if (onBatchDone) await onBatchDone(batch.map((b) => b.id));
+        result.count += batch.length;
+        result.errors.push(...report.map((e) => e.error));
+        this.log.info('Company batch finished', batchNumber);
+      });
+
+    return result;
   }
 
   /**
@@ -215,36 +198,29 @@ export class DatasetIndexation {
     onBatchDone?: (ids: string[]) => Promise<void>,
     batchSize?: number,
   ): Promise<ImportReport> {
-    return new Promise((resolve, reject) => {
-      let batchNumber = 0;
-      const result: ImportReport = { count: 0, errors: [] };
+    let batchNumber = 0;
+    const result: ImportReport = { count: 0, errors: [] };
 
-      this.neo4j
-        .streamReadQuery<{ id: string; name: string }>(
-          this.getIndexAddressesQuery(ids, withPendingModifications),
-          { ids },
-        )
-        .map((doc) => {
-          return { ...doc, fingerprint: fingerprint(doc.name) };
-        })
-        .transform(batcher(batchSize || config.elastic.importBatchSize))
-        .forEach(
-          async (batch) => {
-            batchNumber++;
-            this.log.info('Address exec batch', batchNumber);
-            const report = await this.es.bulkImport(EsIndices['address'], batch);
-            if (onBatchDone) await onBatchDone(batch.map((b) => b.id));
-            result.count += batch.length;
-            result.errors.push(...report.map((e) => e.error));
-            this.log.info('Address batch finished', batchNumber);
-          },
-          (error) => {
-            if (error) reject(error);
-            this.log.info('Address indexation finished', result);
-            resolve(result);
-          },
-        );
-    });
+    await this.neo4j
+      .streamReadQuery<{ id: string; name: string }>(
+        this.getIndexAddressesQuery(ids, withPendingModifications),
+        { ids },
+      )
+      .map((doc) => {
+        return { ...doc, fingerprint: fingerprint(doc.name) };
+      })
+      .transform(batcher(batchSize || config.elastic.importBatchSize))
+      .forEach(async (batch) => {
+        batchNumber++;
+        this.log.info('Address exec batch', batchNumber);
+        const report = await this.es.bulkImport(EsIndices['address'], batch);
+        if (onBatchDone) await onBatchDone(batch.map((b) => b.id));
+        result.count += batch.length;
+        result.errors.push(...report.map((e) => e.error));
+        this.log.info('Address batch finished', batchNumber);
+      });
+
+    return result;
   }
 
   /**
@@ -257,33 +233,25 @@ export class DatasetIndexation {
     onBatchDone?: (ids: string[]) => Promise<void>,
     batchSize?: number,
   ): Promise<ImportReport> {
-    return new Promise((resolve, reject) => {
-      let batchNumber = 0;
-      const result: ImportReport = { count: 0, errors: [] };
+    let batchNumber = 0;
+    const result: ImportReport = { count: 0, errors: [] };
 
-      this.neo4j
-        .streamReadQuery<{ id: string }>(
-          this.getIndexCountriesQuery(ids, withPendingModifications),
-          { ids },
-        )
-        .transform(batcher(batchSize || config.elastic.importBatchSize))
-        .forEach(
-          async (batch) => {
-            batchNumber++;
-            this.log.info('Country exec batch', batchNumber);
-            const report = await this.es.bulkImport(EsIndices['country'], batch);
-            if (onBatchDone) await onBatchDone(batch.map((b) => b.id));
-            result.count += batch.length;
-            result.errors.push(...report.map((e) => e.error));
-            this.log.info('Country batch finished', batchNumber);
-          },
-          (error) => {
-            if (error) reject(error);
-            this.log.info('Country indexation finished', result);
-            resolve(result);
-          },
-        );
-    });
+    await this.neo4j
+      .streamReadQuery<{ id: string }>(this.getIndexCountriesQuery(ids, withPendingModifications), {
+        ids,
+      })
+      .transform(batcher(batchSize || config.elastic.importBatchSize))
+      .forEach(async (batch) => {
+        batchNumber++;
+        this.log.info('Country exec batch', batchNumber);
+        const report = await this.es.bulkImport(EsIndices['country'], batch);
+        if (onBatchDone) await onBatchDone(batch.map((b) => b.id));
+        result.count += batch.length;
+        result.errors.push(...report.map((e) => e.error));
+        this.log.info('Country batch finished', batchNumber);
+      });
+
+    return result;
   }
 
   /**
