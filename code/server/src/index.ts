@@ -5,9 +5,12 @@ import express, { json, urlencoded } from 'express';
 import config from './config';
 import { errorFilter } from './error';
 import { initGraphql } from './graphql';
+import { Services } from './services';
+import { DatasetEdition } from './services/dataset/edition';
 
 async function initServer() {
   const log = getLogger('Server');
+  const dataset = Services.get(DatasetEdition);
   try {
     log.info('Init Express');
     const app = express();
@@ -22,6 +25,8 @@ async function initServer() {
 
     // Register GraphQL
     await initGraphql(app, server);
+    // Reset db state (ie release all locks)
+    await dataset.releaseIndexingPendingModificationLockNode();
 
     // Start the server
     server.listen(config.server.port, () =>

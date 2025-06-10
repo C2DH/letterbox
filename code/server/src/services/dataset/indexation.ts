@@ -194,7 +194,10 @@ export class DatasetIndexation {
             this.log.info('Company batch finished', batchNumber);
           },
           (error) => {
-            if (error) reject(error);
+            if (error) {
+              reject(error);
+              return;
+            }
             this.log.info('Company indexation finished', result);
             resolve(result);
           },
