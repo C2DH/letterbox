@@ -145,7 +145,7 @@ export class Neo4j {
     const session = this.driver.session({ database: this.database });
     const tx = session.beginTransaction();
     try {
-      const result = this.getTxFirstResultQuery<T>(tx, query, params, field);
+      const result = await this.getTxFirstResultQuery<T>(tx, query, params, field);
       await tx.commit();
       return result;
     } catch (e) {
