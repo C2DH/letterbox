@@ -1,7 +1,7 @@
 import { Spinner } from '@ouestware/loaders';
 import { Modal, useModal } from '@ouestware/modals';
 import { FC, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 import { ItemIcon, ItemType } from '../../../core/consts';
 import { useEditionContext } from '../../../core/edition';
@@ -70,9 +70,9 @@ export const SplitModal: FC<SplitModalProps> = ({ item }) => {
           is will be linked to the new created items.
         </p>
         <div className="row mb-3">
-          <a href={`/${item.type}/${item.id}`} key={item.id} className="with-icon">
+          <Link to={`/${item.type}/${item.id}`} key={item.id} className="with-icon">
             <ItemIcon type={item.type as ItemType} /> {item.label}
-          </a>
+          </Link>
         </div>
         <h3>
           New Items <span className="badge rounded-pill bg-dark">{newNames.length}</span>

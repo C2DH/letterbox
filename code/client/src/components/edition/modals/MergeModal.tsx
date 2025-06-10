@@ -2,7 +2,7 @@ import { Spinner } from '@ouestware/loaders';
 import { Modal, useModal } from '@ouestware/modals';
 import { flatten, reverse, sortBy, sum, toPairs } from 'lodash';
 import { FC, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Select from 'react-select';
 
 import { ItemIcon, ItemType } from '../../../core/consts';
@@ -74,9 +74,9 @@ export const MergeModal: FC<MergeModalProps> = ({ itemsByType }) => {
           <div className="ms-3 d-flex flex-column">
             {toPairs(itemsByType).map(([type, items]) =>
               items.map((item) => (
-                <a href={`/${type}/${item.id}`} key={item.id} className="with-icon">
+                <Link to={`/${type}/${item.id}`} key={item.id} className="with-icon">
                   <ItemIcon type={type as ItemType} /> {item.label}
-                </a>
+                </Link>
               )),
             )}
           </div>
