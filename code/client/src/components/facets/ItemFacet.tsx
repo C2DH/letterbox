@@ -98,7 +98,7 @@ const HistogramRow: FC<
           )}
         </div>
 
-        {enabled && (
+        {enabled && itemType !== 'message' && (
           <Tooltip
             className="p-0 py-1"
             rootClassName="small d-inline-block"

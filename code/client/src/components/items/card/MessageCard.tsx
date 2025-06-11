@@ -1,6 +1,5 @@
 import { filter, isNil } from 'lodash';
 import { useMemo, type FC } from 'react';
-import { RiDeleteBin5Line } from 'react-icons/ri';
 import { Link } from 'react-router-dom';
 
 import { Badge } from '../../../Badge.tsx';
@@ -37,14 +36,6 @@ export const MessageCard: FC<{ data: MessageInlineFragment }> = ({ data }) => {
           {name}
           {data.companiesCount > 3 && ` and ${data.companiesCount - 3} more`}
         </Link>
-        {enabled && (
-          <button
-            type="button"
-            className="btn btn-sm btn-ico p-1 btn-outline-purple-300 flex-shrink-0"
-          >
-            <RiDeleteBin5Line />
-          </button>
-        )}
       </h5>
       <ItemsCounts itemType="message" data={data} />
       {!!cleanedTags.length && (
