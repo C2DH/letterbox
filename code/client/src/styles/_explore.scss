@@ -18,3 +18,8 @@ main {
 .timeline {
   height: 48px;
 }
+
+.histogram-row:hover {
+  background-color: $yellow-250 !important;
+  border-radius: $spacer * 0.25;
+}

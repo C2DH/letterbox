@@ -49,7 +49,7 @@ const HistogramRow: FC<
 
   return (
     <button
-      className="btn btn-light bg-transparent w-100 border-0 py-3 ps-4 pe-3 position-relative"
+      className="histogram-row btn btn-light bg-transparent w-100 border-0 py-3 ps-4 pe-3 position-relative"
       onClick={(e) => {
         e.preventDefault();
         onClick();
