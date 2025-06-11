@@ -207,7 +207,10 @@ export class DatasetEdition {
     try {
       const result = await this.neo4j.getTxFirstResultQuery<string[]>(currentTx, query, { id });
       if (result) await this.markMessagesForReIndexing(currentTx, result);
-      if (!tx) await currentTx.commit();
+      if (!tx) {
+        await currentTx.commit();
+        await this.updateNodesInIndex([{ type, id }]);
+      }
     } catch (e) {
       if (!tx) currentTx.rollback();
       throw Boom.internal(`Failed to delete ${type}/${id}`, e);
@@ -306,6 +309,9 @@ export class DatasetEdition {
 
       await tx.commit();
 
+      this.log.debug('Update the deleted nodes in the index');
+      await this.updateNodesInIndex(nodes);
+
       // Returned the created merged node
       return { type: targetType, id: targetId };
     } catch (e) {
@@ -367,6 +373,9 @@ export class DatasetEdition {
 
       // Commit
       await tx.commit();
+
+      this.log.debug('Update the deleted node in the index');
+      await this.updateNodesInIndex([{ type, id }]);
 
       // return the list of node created
       return { nodes: newNodes.map((n) => ({ type, id: n.id })) };
@@ -548,6 +557,7 @@ export class DatasetEdition {
       `,
       { id, props },
     );
+
     // update ES index
     await this.indexation.updateNode(type, id, props);
   }
@@ -558,6 +568,35 @@ export class DatasetEdition {
         RETURN n as result`,
       {},
     );
+  }
+
+  /**
+   * Given a list of nodes (ie. type+id), query the database to retrieve the latest value and then index them.
+   */
+  private async updateNodesInIndex(nodes: Array<{ type: ItemType; id: string }>) {
+    this.log.debug(`Indexing ${nodes.length} nodes`);
+    const nodesByTypes = nodes.reduce(
+      (acc, node) => {
+        if (!acc[node.type]) {
+          acc[node.type] = [];
+        }
+        acc[node.type].push(node.id);
+        return acc;
+      },
+      {} as Record<ItemType, string[]>,
+    );
+    if (nodesByTypes['address']?.length > 0) {
+      await this.indexation.indexAddresses(nodesByTypes['address']);
+    }
+    if (nodesByTypes['company']?.length > 0) {
+      await this.indexation.indexCompanies(nodesByTypes['company']);
+    }
+    if (nodesByTypes['country']?.length > 0) {
+      await this.indexation.indexCountries(nodesByTypes['country']);
+    }
+    if (nodesByTypes['person']?.length > 0) {
+      await this.indexation.indexPeople(nodesByTypes['person']);
+    }
   }
 
   /**

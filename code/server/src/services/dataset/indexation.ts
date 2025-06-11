@@ -267,6 +267,7 @@ export class DatasetIndexation {
         year: n.year,
         tags: n.tags,
         verified: n.verified,
+        deleted: coalesce(n.deleted),
         people:    collect { MATCH (n)-[r:CONTAINS]->(m:Person)  WHERE NOT coalesce(r.deleted, false) AND NOT coalesce(m.deleted, false) RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name  },
         addresses: collect { MATCH (n)-[r:CONTAINS]->(m:Address) WHERE NOT coalesce(r.deleted, false) AND NOT coalesce(m.deleted, false) RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name  },
         companies: collect { MATCH (n)-[r:CONTAINS]->(m:Company) WHERE NOT coalesce(r.deleted, false) AND NOT coalesce(m.deleted, false) RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name  },
@@ -286,6 +287,7 @@ export class DatasetIndexation {
         name: n.name,
         tags: n.tags,
         verified: n.verified,
+        deleted: coalesce(n.deleted),
         addresses: collect { MATCH (n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Address) WHERE NOT coalesce(r1.deleted, false) AND  NOT coalesce(r2.deleted, false) AND NOT coalesce(m.deleted, false) RETURN DISTINCT  m.id + "${config.elastic.idValueSeparator}" + m.name  },
         companies: collect { MATCH (n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Company) WHERE NOT coalesce(r1.deleted, false) AND  NOT coalesce(r2.deleted, false) AND NOT coalesce(m.deleted, false) RETURN DISTINCT  m.id + "${config.elastic.idValueSeparator}" + m.name  },
         countries: collect { MATCH (n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Country) WHERE NOT coalesce(r1.deleted, false) AND  NOT coalesce(r2.deleted, false) AND NOT coalesce(m.deleted, false) RETURN DISTINCT  m.id + "${config.elastic.idValueSeparator}" + m.name  },
@@ -305,6 +307,7 @@ export class DatasetIndexation {
         name: n.name,
         tags: n.tags,
         verified: n.verified,
+        deleted: coalesce(n.deleted),
         people:    collect { MATCH (n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Person)  WHERE NOT coalesce(r1.deleted, false) AND  NOT coalesce(r2.deleted, false) AND NOT coalesce(m.deleted, false) RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name  },
         addresses: collect { MATCH (n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Address) WHERE NOT coalesce(r1.deleted, false) AND  NOT coalesce(r2.deleted, false) AND NOT coalesce(m.deleted, false) RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name  },
         countries: collect { MATCH (n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Country) WHERE NOT coalesce(r1.deleted, false) AND  NOT coalesce(r2.deleted, false) AND NOT coalesce(m.deleted, false) RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name  },
@@ -324,6 +327,7 @@ export class DatasetIndexation {
         name: n.name,
         tags: n.tags,
         verified: n.verified,
+        deleted: coalesce(n.deleted),
         people:    collect { MATCH(n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Person)  WHERE NOT coalesce(r1.deleted, false) AND  NOT coalesce(r2.deleted, false) AND NOT coalesce(m.deleted, false) RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name  },
         companies: collect { MATCH(n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Company) WHERE NOT coalesce(r1.deleted, false) AND  NOT coalesce(r2.deleted, false) AND NOT coalesce(m.deleted, false) RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name  },
         countries: collect { MATCH(n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Country) WHERE NOT coalesce(r1.deleted, false) AND  NOT coalesce(r2.deleted, false) AND NOT coalesce(m.deleted, false) RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name  },
@@ -343,6 +347,7 @@ export class DatasetIndexation {
         name: n.name,
         tags: n.tags,
         verified: n.verified,
+        deleted: coalesce(n.deleted),
         people:    collect { MATCH (n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Person)  WHERE NOT coalesce(r1.deleted, false) AND  NOT coalesce(r2.deleted, false) AND NOT coalesce(m.deleted, false) RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name  LIMIT ${config.elastic.nested_objects_limit}},
         companies: collect { MATCH (n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Company) WHERE NOT coalesce(r1.deleted, false) AND  NOT coalesce(r2.deleted, false) AND NOT coalesce(m.deleted, false) RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name LIMIT ${config.elastic.nested_objects_limit} },
         addresses: collect { MATCH (n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Address) WHERE NOT coalesce(r1.deleted, false) AND  NOT coalesce(r2.deleted, false) AND NOT coalesce(m.deleted, false) RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name LIMIT ${config.elastic.nested_objects_limit} },
@@ -351,12 +356,12 @@ export class DatasetIndexation {
   }
 
   /**
-   * update tags
+   * Update node
    */
   async updateNode(
     itemType: ItemType,
     id: string,
-    nodeUpdate: Partial<Pick<NodeItem, 'tags' | 'verified'>>,
+    nodeUpdate: Partial<Pick<NodeItem, 'tags' | 'verified' | 'deleted'>>,
   ) {
     const result = await this.es.client.update({
       index: EsIndices[itemType],
@@ -366,7 +371,7 @@ export class DatasetIndexation {
     this.log.info(JSON.stringify(result, undefined, 2));
     if (result.result === 'not_found')
       throw new Error(
-        `Node could not be updated in ES for ${itemType} ${id} update: ${JSON.stringify(this.updateNode, undefined, 2)}`,
+        `Node could not be updated in ES for ${itemType} ${id} update: ${JSON.stringify(nodeUpdate, undefined, 2)}`,
       );
   }
 
@@ -454,6 +459,8 @@ export class DatasetIndexation {
         }),
       ),
     );
+
+    transformedFilters.deleted = false;
     return transformedFilters;
   }
 
