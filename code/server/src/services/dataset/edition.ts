@@ -185,7 +185,7 @@ export class DatasetEdition {
     this.log.debug('Deleting node', { type, id });
 
     // Some checks
-    if (type === 'message') throw Boom.badRequest(`Cannot change type of a message node`);
+    if (type === 'message') throw Boom.badRequest(`Deleting a message node is not allowed`);
     await this.checkItemExists(type, id);
 
     // Delete the node
