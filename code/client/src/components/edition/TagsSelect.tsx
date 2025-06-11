@@ -21,7 +21,6 @@ export const TagsSelect: FC<{ item: Pick<NodeItem, 'id' | 'tags'> & { type: Item
   const [tags, setTags] = useState<{ label: string; value: string }[]>(
     item.tags?.map((t) => ({ label: t as string, value: t as string })) || [],
   );
-  console.log(tags);
   const updateTags = useCallback(
     (tags: string[]) => {
       return _setTags({

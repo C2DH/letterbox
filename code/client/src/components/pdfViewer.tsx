@@ -39,7 +39,6 @@ export const PdfViewer: FC<{ className?: string; filename: string; pageNumber: n
     [setCurrentPage, setLoadingPage],
   );
 
-  console.log(scale);
   return (
     <div
       className="w-100 bg-high-gray d-flex justify-content-center py-4 position-relative"

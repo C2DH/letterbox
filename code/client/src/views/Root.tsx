@@ -50,7 +50,6 @@ export const Root: FC = () => {
   );
 
   useEffect(() => {
-    console.log('SAVING', editionState);
     saveEditionState(editionState);
   }, [editionState]);
 
