@@ -6,6 +6,8 @@ import { Link } from 'react-router-dom';
 import { ItemIcon, ItemType } from '../../../core/consts';
 import { DataItemType } from '../../../core/graphql';
 import { useItemActions } from '../../../hooks/useItemActions';
+import type { AsyncStatus } from '../../../types';
+import { getErrorData } from '../../../utils/error';
 
 type DeleteModalProps = {
   items: {
@@ -18,24 +20,26 @@ type DeleteModalProps = {
 export const DeleteModal: FC<DeleteModalProps> = ({ items, onSuccess }) => {
   const { closeModal } = useModal();
   const { deleteItem } = useItemActions();
-  const [loading, setLoading] = useState(false);
+  // async status of the form
+  const [status, setStatus] = useState<AsyncStatus>({ type: 'idle' });
 
   const submit = useCallback(async () => {
-    setLoading(true);
+    setStatus({ type: 'loading' });
     try {
       await Promise.all(items.map((item) => deleteItem(item.type as DataItemType, item.id)));
-    } finally {
-      setLoading(false);
+      await onSuccess?.();
+      closeModal();
+      setStatus({ type: 'success' });
+    } catch (error) {
+      console.error('Error while deleting item:', error);
+      setStatus({ type: 'error', message: getErrorData(error).message || 'An error occurred' });
     }
-    await onSuccess?.();
-    closeModal();
   }, [items, closeModal, deleteItem, onSuccess]);
-  console.log(items);
 
   return (
     <Modal
       title={`Delete '${items.length > 1 ? `${items.length} items` : items[0].label}' ?`}
-      withCloseButton={!loading}
+      withCloseButton={status.type !== 'loading'}
     >
       <form
         id="deleteForm"
@@ -44,6 +48,11 @@ export const DeleteModal: FC<DeleteModalProps> = ({ items, onSuccess }) => {
           submit();
         }}
       >
+        {/* Displaying error message if needed*/}
+        {status.type === 'error' && (
+          <p className="text-danger text-center my-3">{status.message}</p>
+        )}
+
         {items.length === 1 ? (
           <p>
             Are you sure you want to delete the {items[0].type} with name &apos;{items[0].label}
@@ -61,13 +70,20 @@ export const DeleteModal: FC<DeleteModalProps> = ({ items, onSuccess }) => {
             </div>
           </p>
         )}
-        {loading && <LoaderFill />}
+
+        {/* Displaying the loader if needed*/}
+        {status.type === 'loading' && <LoaderFill />}
       </form>
+
       <div className="col d-flex justify-content-between">
-        <button className="btn btn-danger" onClick={closeModal} disabled={loading}>
+        <button
+          className="btn btn-danger"
+          onClick={closeModal}
+          disabled={status.type === 'loading'}
+        >
           No
         </button>
-        <button className="btn btn-success" form="deleteForm" disabled={loading}>
+        <button className="btn btn-success" form="deleteForm" disabled={status.type === 'loading'}>
           Yes
         </button>
       </div>

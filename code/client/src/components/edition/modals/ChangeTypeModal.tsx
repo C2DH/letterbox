@@ -4,6 +4,8 @@ import { useCallback, useState, type FC } from 'react';
 
 import { DataItemType } from '../../../core/graphql';
 import { useItemActions } from '../../../hooks/useItemActions';
+import type { AsyncStatus } from '../../../types';
+import { getErrorData } from '../../../utils/error';
 
 const TYPE_OPTIONS = [
   DataItemType.Address,
@@ -23,27 +25,33 @@ type ChangeTypeModalProps = {
 export const ChangeTypeModal: FC<ChangeTypeModalProps> = ({ type, id, label, onSuccess }) => {
   const { closeModal } = useModal();
   const { changeItemType } = useItemActions();
-  const [loading, setLoading] = useState(false);
   const [newType, SetNewType] = useState<DataItemType>(type);
+  // async status of the form
+  const [status, setStatus] = useState<AsyncStatus>({ type: 'idle' });
 
   const submit = useCallback(
     async (newType: DataItemType) => {
       if (newType !== type) {
-        setLoading(true);
+        setStatus({ type: 'loading' });
         try {
           await changeItemType(type, id, newType);
-        } finally {
-          setLoading(false);
+          await onSuccess?.();
+          closeModal();
+          setStatus({ type: 'success' });
+        } catch (error) {
+          console.error('Error while changing item type:', error);
+          setStatus({
+            type: 'error',
+            message: getErrorData(error).message || 'An error occurred',
+          });
         }
       }
-      await onSuccess?.();
-      closeModal();
     },
     [type, id, closeModal, changeItemType, onSuccess],
   );
 
   return (
-    <Modal title={`Change type for '${label}'`} withCloseButton={!loading}>
+    <Modal title={`Change type for '${label}'`} withCloseButton={status.type !== 'loading'}>
       <form
         id="changeTypeForm"
         onSubmit={(e) => {
@@ -51,6 +59,11 @@ export const ChangeTypeModal: FC<ChangeTypeModalProps> = ({ type, id, label, onS
           submit(newType);
         }}
       >
+        {/* Displaying error message if needed*/}
+        {status.type === 'error' && (
+          <p className="text-danger text-center my-3">{status.message}</p>
+        )}
+
         <div className="mb-3">
           <label htmlFor="type" className="form-label">
             New type
@@ -67,13 +80,23 @@ export const ChangeTypeModal: FC<ChangeTypeModalProps> = ({ type, id, label, onS
             ))}
           </select>
         </div>
-        {loading && <LoaderFill />}
+
+        {/* Displaying the loader if needed*/}
+        {status.type === 'loading' && <LoaderFill />}
       </form>
       <div className="col d-flex justify-content-between">
-        <button className="btn btn-outline-danger" onClick={closeModal} disabled={loading}>
+        <button
+          className="btn btn-outline-danger"
+          onClick={closeModal}
+          disabled={status.type === 'loading'}
+        >
           Cancel
         </button>
-        <button className="btn btn-success" form="changeTypeForm" disabled={loading}>
+        <button
+          className="btn btn-success"
+          form="changeTypeForm"
+          disabled={status.type === 'loading'}
+        >
           Submit
         </button>
       </div>

@@ -1,4 +1,4 @@
-import { Spinner } from '@ouestware/loaders';
+import { LoaderFill } from '@ouestware/loaders';
 import { Modal, useModal } from '@ouestware/modals';
 import { FC, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
@@ -7,7 +7,9 @@ import { ItemIcon, ItemType } from '../../../core/consts';
 import { useEditionContext } from '../../../core/edition';
 import { DataItemType } from '../../../core/graphql';
 import { useItemActions } from '../../../hooks/useItemActions';
+import type { AsyncStatus } from '../../../types';
 import { isInCart } from '../../../utils/edition';
+import { getErrorData } from '../../../utils/error';
 import { EditionIcons } from '../EditionIcons';
 
 interface SplitModalProps {
@@ -22,11 +24,10 @@ export const SplitModal: FC<SplitModalProps> = ({ item }) => {
   const { closeModal } = useModal();
   const { splitItem } = useItemActions();
   const { cart, removeFromCart } = useEditionContext();
-
   const navigate = useNavigate();
   const location = useLocation();
-
-  const [loading, setLoading] = useState<boolean>(false);
+  // async status of the form
+  const [status, setStatus] = useState<AsyncStatus>({ type: 'idle' });
 
   const [newNames, setNewNames] = useState<string[]>([`${item.label} 1`, `${item.label} 2`]);
   const [newName, setNewName] = useState<string>('');
@@ -38,14 +39,14 @@ export const SplitModal: FC<SplitModalProps> = ({ item }) => {
           <EditionIcons.split /> Split
         </h2>
       }
-      withCloseButton={!loading}
+      withCloseButton={status.type !== 'loading'}
     >
       <form
         id="mergeItemsForm"
         onSubmit={async (e) => {
           e.preventDefault();
           if (newNames.length > 1) {
-            setLoading(true);
+            setStatus({ type: 'loading' });
             try {
               const createdItems = await splitItem(item.type as DataItemType, item.id, newNames);
               if (isInCart(cart, item)) {
@@ -59,12 +60,22 @@ export const SplitModal: FC<SplitModalProps> = ({ item }) => {
               // else let's refresh the page
               else navigate(0);
               closeModal();
-            } finally {
-              setLoading(false);
+              setStatus({ type: 'success' });
+            } catch (error) {
+              console.error('Error while splitting item:', error);
+              setStatus({
+                type: 'error',
+                message: getErrorData(error).message || 'An error occurred',
+              });
             }
           }
         }}
       >
+        {/* Displaying error message if needed*/}
+        {status.type === 'error' && (
+          <p className="text-danger text-center my-3">{status.message}</p>
+        )}
+
         <p className="mb-1">
           You are about to split the ${item.type} &quot;{item.label}&quot;. All messages mentioning
           is will be linked to the new created items.
@@ -143,18 +154,26 @@ export const SplitModal: FC<SplitModalProps> = ({ item }) => {
             </div>
           </div>
         </div> */}
+
+        {/* Displaying the loader if needed*/}
+        {status.type === 'loading' && <LoaderFill />}
       </form>
       <div className="col d-flex justify-content-between">
         <button
           className="btn btn-outline-danger"
           type="button"
           onClick={closeModal}
-          disabled={loading}
+          disabled={status.type === 'loading'}
         >
           Cancel
         </button>
-        <button className="btn btn-success" type="submit" form="mergeItemsForm" disabled={loading}>
-          {loading && <Spinner />} Split
+        <button
+          className="btn btn-success"
+          type="submit"
+          form="mergeItemsForm"
+          disabled={status.type === 'loading'}
+        >
+          Split
         </button>
       </div>
     </Modal>
