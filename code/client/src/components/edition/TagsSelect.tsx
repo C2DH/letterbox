@@ -1,4 +1,5 @@
 import { useLazyQuery, useMutation } from '@apollo/client';
+import { isNil } from 'lodash';
 import { FC, useCallback, useState } from 'react';
 import { Props } from 'react-select';
 import Select from 'react-select/async-creatable';
@@ -13,9 +14,9 @@ import { NodeItem } from '../../core/graphql';
 import { setTagsMutation } from '../../core/graphql/queries/actions';
 import { aggregateItems } from '../../core/graphql/queries/search';
 
-export const TagsSelect: FC<{ item: Pick<NodeItem, 'id' | 'tags'> & { type: ItemType } }> = ({
-  item,
-}) => {
+export const TagsSelect: FC<{
+  item: Pick<NodeItem, 'id' | 'tags' | 'deleted'> & { type: ItemType };
+}> = ({ item }) => {
   const [_setTags] = useMutation(setTagsMutation);
   const [autocompleteTags] = useLazyQuery(aggregateItems);
   const [tags, setTags] = useState<{ label: string; value: string }[]>(
@@ -52,6 +53,7 @@ export const TagsSelect: FC<{ item: Pick<NodeItem, 'id' | 'tags'> & { type: Item
         updateTags(values.map((v) => v.label));
       }}
       isMulti
+      isDisabled={!isNil(item.deleted) ? item.deleted : false}
     />
   );
 };

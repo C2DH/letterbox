@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 
 import { Badge } from '../../../Badge.tsx';
 import { type CountryInlineFragment } from '../../../core/graphql';
+import { ItemDeleted } from '../ItemDeleted.tsx';
 import { ItemsCounts } from '../ItemsCounts';
 
 export const CountryCard: FC<{ data: CountryInlineFragment }> = ({ data }) => {
@@ -16,6 +17,7 @@ export const CountryCard: FC<{ data: CountryInlineFragment }> = ({ data }) => {
         <Link className="text-dark" to={`/country/${data.id}`}>
           {data.name}
         </Link>
+        <ItemDeleted item={data} />
       </h5>
 
       <ItemsCounts itemType="country" data={data} />

@@ -10,6 +10,7 @@ import { TagsSelect } from '../components/edition/TagsSelect.tsx';
 import { ToggleVerified } from '../components/edition/ToggleVerified.tsx';
 import { EditionActionsTooltip } from '../components/edition/tooltips.tsx';
 import { ItemCard } from '../components/items/card/ItemCard.tsx';
+import { ItemDeleted } from '../components/items/ItemDeleted.tsx';
 import { ListWithLoadMore, type ListWithLoadMoreProps } from '../components/ListWithLoadMore';
 import { Sidebar } from '../components/navigation/Sidebar.tsx';
 import { PdfViewer } from '../components/pdfViewer.tsx';
@@ -41,6 +42,10 @@ export const ItemView: FC = () => {
   }, [inputType]);
   const loadItemData = useLoadItemData(itemType, id);
   const { loading, itemData, fetchRelations } = loadItemData;
+
+  const editionEnabled = useMemo(() => {
+    return enabled && itemData && !itemData.deleted;
+  }, [enabled, itemData]);
 
   const relatedItems = useMemo(
     () =>
@@ -82,7 +87,7 @@ export const ItemView: FC = () => {
       : 'name' in itemData
         ? itemData.name
         : itemData.id;
-
+  console.log(itemData?.deleted);
   return (
     <>
       <Sidebar />
@@ -94,12 +99,13 @@ export const ItemView: FC = () => {
               <span className="with-icon">
                 <ItemIcon type={itemType} /> {name}
               </span>
-              {enabled && (
+              {editionEnabled && (
                 <>
                   <InCartButton type={itemType} id={itemData.id} label={name} />
                   <EditionActionsTooltip itemType={itemType} id={itemData.id} label={name} />
                 </>
               )}
+              <ItemDeleted item={itemData} />
             </h1>
             {'year' in itemData && <div className="text-muted">Dated to: {itemData.year}</div>}
             <ToggleVerified item={{ ...itemData, type: itemType }} />
@@ -114,7 +120,7 @@ export const ItemView: FC = () => {
 
           {relatedItems.map((related, index) => (
             <Collapsable key={index} title={related.title} className="mb-2" defaultOpen>
-              {enabled && (
+              {editionEnabled && (
                 <div className="mb-3">
                   <button className="btn btn-purple-300 with-icon">
                     <RiAddCircleLine /> Add item

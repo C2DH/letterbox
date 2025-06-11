@@ -23,6 +23,7 @@ export type Address = {
   companiesCount: Scalars['Int']['output'];
   countries: Array<Country>;
   countriesCount: Scalars['Int']['output'];
+  deleted?: Maybe<Scalars['Boolean']['output']>;
   id: Scalars['ID']['output'];
   messages: Array<Message>;
   messagesCount: Scalars['Int']['output'];
@@ -100,6 +101,7 @@ export type Company = {
   addressesCount: Scalars['Int']['output'];
   countries: Array<Country>;
   countriesCount: Scalars['Int']['output'];
+  deleted?: Maybe<Scalars['Boolean']['output']>;
   id: Scalars['ID']['output'];
   messages: Array<Message>;
   messagesCount: Scalars['Int']['output'];
@@ -153,6 +155,7 @@ export type Country = {
   addressesCount: Scalars['Int']['output'];
   companies: Array<Company>;
   companiesCount: Scalars['Int']['output'];
+  deleted?: Maybe<Scalars['Boolean']['output']>;
   id: Scalars['ID']['output'];
   messages: Array<Message>;
   messagesCount: Scalars['Int']['output'];
@@ -241,6 +244,7 @@ export type Message = {
   companiesCount: Scalars['Int']['output'];
   countries: Array<Country>;
   countriesCount: Scalars['Int']['output'];
+  deleted?: Maybe<Scalars['Boolean']['output']>;
   filename: Scalars['String']['output'];
   id: Scalars['ID']['output'];
   message: Scalars['String']['output'];
@@ -397,6 +401,7 @@ export type Person = {
   companiesCount: Scalars['Int']['output'];
   countries: Array<Country>;
   countriesCount: Scalars['Int']['output'];
+  deleted?: Maybe<Scalars['Boolean']['output']>;
   id: Scalars['ID']['output'];
   messages: Array<Message>;
   messagesCount: Scalars['Int']['output'];
@@ -654,6 +659,7 @@ export type AddressResolvers<ContextType = any, ParentType extends ResolversPare
   companiesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   countries?: Resolver<Array<ResolversTypes['Country']>, ParentType, ContextType, RequireFields<AddressCountriesArgs, 'limit' | 'skip'>>;
   countriesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  deleted?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   messages?: Resolver<Array<ResolversTypes['Message']>, ParentType, ContextType, RequireFields<AddressMessagesArgs, 'limit' | 'skip'>>;
   messagesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
@@ -684,6 +690,7 @@ export type CompanyResolvers<ContextType = any, ParentType extends ResolversPare
   addressesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   countries?: Resolver<Array<ResolversTypes['Country']>, ParentType, ContextType, RequireFields<CompanyCountriesArgs, 'limit' | 'skip'>>;
   countriesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  deleted?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   messages?: Resolver<Array<ResolversTypes['Message']>, ParentType, ContextType, RequireFields<CompanyMessagesArgs, 'limit' | 'skip'>>;
   messagesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
@@ -708,6 +715,7 @@ export type CountryResolvers<ContextType = any, ParentType extends ResolversPare
   addressesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   companies?: Resolver<Array<ResolversTypes['Company']>, ParentType, ContextType, RequireFields<CountryCompaniesArgs, 'limit' | 'skip'>>;
   companiesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  deleted?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   messages?: Resolver<Array<ResolversTypes['Message']>, ParentType, ContextType, RequireFields<CountryMessagesArgs, 'limit' | 'skip'>>;
   messagesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
@@ -739,6 +747,7 @@ export type MessageResolvers<ContextType = any, ParentType extends ResolversPare
   companiesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   countries?: Resolver<Array<ResolversTypes['Country']>, ParentType, ContextType, RequireFields<MessageCountriesArgs, 'limit' | 'skip'>>;
   countriesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  deleted?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   filename?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   message?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -790,6 +799,7 @@ export type PersonResolvers<ContextType = any, ParentType extends ResolversParen
   companiesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   countries?: Resolver<Array<ResolversTypes['Country']>, ParentType, ContextType, RequireFields<PersonCountriesArgs, 'limit' | 'skip'>>;
   countriesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  deleted?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   messages?: Resolver<Array<ResolversTypes['Message']>, ParentType, ContextType, RequireFields<PersonMessagesArgs, 'limit' | 'skip'>>;
   messagesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;

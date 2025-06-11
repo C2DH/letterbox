@@ -8,6 +8,7 @@ export const getMessageById = graphql(`
       message
       filename
       pageNumber
+      deleted
 
       addressesCount
       addresses(skip: 0, limit: 20) {

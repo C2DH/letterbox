@@ -35,6 +35,7 @@ type Address
   otherNames: [String]
   tags: [String]
   verified: Boolean
+  deleted: Boolean
 
   #
   # Message relationships
@@ -151,6 +152,7 @@ type Company
   otherNames: [String]
   tags: [String]
   verified: Boolean
+  deleted: Boolean
 
   #
   # Message relationships
@@ -281,6 +283,7 @@ type Country
   otherNames: [String]
   tags: [String]
   verified: Boolean
+  deleted: Boolean
 
   #
   # Message relationships
@@ -399,6 +402,7 @@ type Message
   message: String!
   tags: [String]
   verified: Boolean
+  deleted: Boolean
 
   # saving raw data of the CSV
   raw_company: String!
@@ -522,6 +526,7 @@ type Person
   otherNames: [String]
   tags: [String]
   verified: Boolean
+  deleted: Boolean
 
   #
   # Message relationships
