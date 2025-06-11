@@ -130,6 +130,7 @@ export class DatasetEdition {
       );
       if (result) await this.markMessagesForReIndexing(tx, result);
       await tx.commit();
+      await this.updateNodesInMainIndex([{ type, id }]);
     } catch (e) {
       tx.rollback();
       throw Boom.internal(`Failed to renameNode ${type}/${id} with name ${name}`, e);
@@ -209,7 +210,7 @@ export class DatasetEdition {
       if (result) await this.markMessagesForReIndexing(currentTx, result);
       if (!tx) {
         await currentTx.commit();
-        await this.updateNodesInIndex([{ type, id }]);
+        await this.updateNodesInMainIndex([{ type, id }]);
       }
     } catch (e) {
       if (!tx) currentTx.rollback();
@@ -308,9 +309,7 @@ export class DatasetEdition {
       this.log.debug(`Links created`);
 
       await tx.commit();
-
-      this.log.debug('Update the deleted nodes in the index');
-      await this.updateNodesInIndex(nodes);
+      await this.updateNodesInMainIndex([...nodes, { type: targetType, id: targetId }]);
 
       // Returned the created merged node
       return { type: targetType, id: targetId };
@@ -373,9 +372,10 @@ export class DatasetEdition {
 
       // Commit
       await tx.commit();
-
-      this.log.debug('Update the deleted node in the index');
-      await this.updateNodesInIndex([{ type, id }]);
+      await this.updateNodesInMainIndex([
+        { type, id },
+        ...newNodes.map((n) => ({ type, id: n.id })),
+      ]);
 
       // return the list of node created
       return { nodes: newNodes.map((n) => ({ type, id: n.id })) };
@@ -573,7 +573,7 @@ export class DatasetEdition {
   /**
    * Given a list of nodes (ie. type+id), query the database to retrieve the latest value and then index them.
    */
-  private async updateNodesInIndex(nodes: Array<{ type: ItemType; id: string }>) {
+  private async updateNodesInMainIndex(nodes: Array<{ type: ItemType; id: string }>) {
     this.log.debug(`Indexing ${nodes.length} nodes`);
     const nodesByTypes = nodes.reduce(
       (acc, node) => {
