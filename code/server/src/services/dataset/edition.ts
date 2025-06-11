@@ -229,7 +229,7 @@ export class DatasetEdition {
 
     // Some checks
     if (nodes.some((n) => n.type === 'message'))
-      throw Boom.badRequest(`Cannot do merge on message nodes`);
+      throw Boom.badRequest(`Merging message node is not allowed`);
 
     const session = this.neo4j.getWriteSession();
     const tx = session.beginTransaction();
@@ -328,7 +328,7 @@ export class DatasetEdition {
     this.log.debug('Split node', { type, id, newNames });
 
     // Some checks
-    if (type === 'message') throw Boom.badRequest(`Cannot change type of a message node`);
+    if (type === 'message') throw Boom.badRequest(`Splitting a message node is not allowed`);
     const session = this.neo4j.getWriteSession();
     const tx = session.beginTransaction();
     try {
