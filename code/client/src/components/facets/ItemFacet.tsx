@@ -58,7 +58,7 @@ const HistogramRow: FC<
       <div className="d-flex flex-row align-items-bottom">
         <div className="position-relative flex-grow-1 text-start">
           <span>
-            {label}
+            {label || <span className="muted fst-italic">No value</span>}
             {link && (
               <>
                 {' '}
