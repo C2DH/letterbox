@@ -132,7 +132,13 @@ export const EditionPanel: FC = () => {
           >
             <EditionIcons.delete /> Delete Selection
           </button>
-          <Link to={searchMentionsURL} className="mt-2 d-block w-100 btn-purple-300 text-start">
+          <Link
+            to={searchMentionsURL}
+            className={cx(
+              'my-2 d-block w-100 btn-purple-300 text-start',
+              !params && 'pe-none opacity-75',
+            )}
+          >
             Explore messages for this selection
           </Link>
         </section>
