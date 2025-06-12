@@ -1,8 +1,7 @@
-import { KeywordsFilter } from '@ouestware/facets';
+import { KeywordsFacet, KeywordsFilter } from '@ouestware/facets';
 import {
   AutocompleteData,
   InputKeywordsProps,
-  KeywordsFacet,
   useFacetsContext,
   useInputKeywords,
 } from '@ouestware/facets-client';
