@@ -3,14 +3,15 @@ import {
   AutocompleteData,
   HistogramData,
   InputKeywordsProps,
-  KeywordsFacetHistogramProps,
+  KeywordsFacetSimpleHistogramProps,
   useFacet,
   useFacetsContext,
   useInputKeywords,
+  useKeywordsFacetSimpleHistogram,
 } from '@ouestware/facets-client';
 import { Tooltip } from '@ouestware/tooltip';
 import cx from 'classnames';
-import { keyBy, max, without } from 'lodash';
+import { keyBy, pick, without } from 'lodash';
 import { FC, useMemo } from 'react';
 import { IconType } from 'react-icons';
 import {
@@ -122,15 +123,18 @@ const HistogramRow: FC<
   );
 };
 
-const Histogram: FC<KeywordsFacetHistogramProps<ItemValue> & { itemType: ItemType }> = ({
-  histogramData,
-  values,
-  onChange,
-  itemType,
-}) => {
+const Histogram: FC<
+  {
+    total: number;
+    maxCount: number;
+    histogramValues?: HistogramData<ItemValue>['values'];
+    loading: boolean;
+    itemType: ItemType;
+  } & KeywordsFacetSimpleHistogramProps
+> = ({ loading, histogramValues = [], total, maxCount, itemType, onChange, values }) => {
   const selectedValues = useMemo(() => new Set(values || []), [values]);
   const { selected, unselected } = useMemo(() => {
-    const valuesDict = keyBy(histogramData?.values || [], 'value');
+    const valuesDict = keyBy(histogramValues || [], 'value');
     const missingSelectedValues = values?.filter((v) => valuesDict[v]) || [];
     const presentSelectedValues = values?.filter((v) => !valuesDict[v]) || [];
 
@@ -142,15 +146,11 @@ const Histogram: FC<KeywordsFacetHistogramProps<ItemValue> & { itemType: ItemTyp
             count: 0,
           },
       ),
-      unselected: (histogramData?.values || []).filter(({ value }) => !selectedValues.has(value)),
+      unselected: histogramValues.filter(({ value }) => !selectedValues.has(value)),
     };
-  }, [histogramData?.values, selectedValues, values]);
-  const maxCount = useMemo<number>(
-    () => histogramData?.maxCount || max(histogramData?.values.map((v) => v.count)) || 1,
-    [histogramData],
-  );
+  }, [histogramValues, selectedValues, values]);
 
-  if (!histogramData)
+  if (loading)
     return (
       <div className="text-center pt-3">
         <div className="spinner-border" role="status">
@@ -203,14 +203,12 @@ const Histogram: FC<KeywordsFacetHistogramProps<ItemValue> & { itemType: ItemTyp
         {/* <button type="button" className="btn btn-sm btn-outline-dark" disabled>
           TODO: Load more
         </button> */}
-        {!!histogramData.total && (
+        {!!total && (
           <>
             {' '}
             <span className="text-muted ms-2">
-              {(histogramData.values.filter((v) => !!v.count).length || 0).toLocaleString(
-                APP_LANGUAGE,
-              )}{' '}
-              of {histogramData.total.toLocaleString(APP_LANGUAGE)}
+              {(histogramValues.filter((v) => !!v.count).length || 0).toLocaleString(APP_LANGUAGE)}{' '}
+              of {total.toLocaleString(APP_LANGUAGE)}
             </span>
           </>
         )}
@@ -253,19 +251,24 @@ export const ItemFacet: FC<{ itemType: ItemType }> = ({ itemType }) => {
     }),
     [filter, fnAutocomplete, fnLoadHistogram, onChange],
   );
-  const { selectProps, histogramProps } = useInputKeywords<ItemValue>(inputKeywordsProps);
+  const { selectProps } = useInputKeywords<ItemValue>(inputKeywordsProps);
+  const histogramProps = pick(inputKeywordsProps, [
+    'loadHistogramData',
+    'values',
+    'onChange',
+    'paginate',
+  ]) as KeywordsFacetSimpleHistogramProps<ItemValue>;
+  const histogramData = useKeywordsFacetSimpleHistogram(histogramProps);
 
   return (
     <>
       <div className="card-title d-flex flex-row align-items-baseline">
         <h2 className="with-icon fw-semibold flex-grow-1 m-0">
           <ItemIcon type={itemType} /> {ITEM_TYPE_LABELS_PLURAL[itemType]}
-          {!!histogramProps?.histogramData?.total && (
+          {!!histogramData.total && (
             <>
               {' '}
-              <span className="text-muted">
-                {histogramProps.histogramData.total.toLocaleString(APP_LANGUAGE)}
-              </span>
+              <span className="text-muted">{histogramData.total.toLocaleString(APP_LANGUAGE)}</span>
             </>
           )}
         </h2>
@@ -282,7 +285,7 @@ export const ItemFacet: FC<{ itemType: ItemType }> = ({ itemType }) => {
         noOptionsMessage={() => 'Start typing'}
         placeholder={`Search for ${ITEM_TYPE_LABELS_PLURAL[itemType].toLowerCase()}`}
       />
-      {histogramProps && <Histogram {...histogramProps} itemType={itemType} />}
+      <Histogram {...histogramProps} {...histogramData} itemType={itemType} />
     </>
   );
 };

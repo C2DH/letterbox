@@ -1,4 +1,4 @@
-import { stateToSearch } from '@ouestware/facets-client';
+import { stateToSearch } from '@ouestware/facets';
 import { useModal } from '@ouestware/modals';
 import { useNotifications } from '@ouestware/notifications';
 import classNames, { default as cx } from 'classnames';

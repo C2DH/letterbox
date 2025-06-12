@@ -1,6 +1,6 @@
 import { useApolloClient } from '@apollo/client';
-import { FiltersState } from '@ouestware/facets';
-import { FacetsRoot, KeywordsFacet, searchToState, stateToSearch } from '@ouestware/facets-client';
+import { FiltersState, KeywordsFacet, searchToState, stateToSearch } from '@ouestware/facets';
+import { FacetsRoot } from '@ouestware/facets-client';
 import cx from 'classnames';
 import { without } from 'lodash';
 import { FC, useCallback, useEffect, useMemo, useState } from 'react';
@@ -98,7 +98,7 @@ export const Explore: FC = () => {
       onFiltersStateChange={setState}
       portalId="portal-root"
       autocomplete={fetchItems}
-      loadHistogram={fetchItems}
+      loadHistogram={(facet, filters) => fetchItems(facet, filters)}
     >
       {/* SIDEBAR */}
       <Sidebar activeItemType={selectedType} />

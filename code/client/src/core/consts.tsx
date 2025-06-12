@@ -1,4 +1,5 @@
-import { Facet, ValueWithCount } from '@ouestware/facets-client';
+import { Facet } from '@ouestware/facets';
+import { ValueWithCount } from '@ouestware/facets-client';
 import { keyBy, without } from 'lodash';
 import { FC, ReactNode, SVGAttributes } from 'react';
 import type { IconType } from 'react-icons';
@@ -127,7 +128,6 @@ export const FACETS = FILTERABLE_ITEM_TYPES.map(
       label: ITEM_TYPE_LABELS_PLURAL[itemType],
       isMulti: true,
       histogram: true,
-      placeholder: true,
       autocomplete: true,
     }) as Facet,
 ).concat([DATE_FACET as Facet, VERIFIED_FACET as Facet, TAGS_FACET as Facet]);
