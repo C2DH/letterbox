@@ -9,6 +9,7 @@ import {
   useInputKeywords,
   useKeywordsFacetSimpleHistogram,
 } from '@ouestware/facets-client';
+import { Spinner } from '@ouestware/loaders';
 import cx from 'classnames';
 import { keyBy, pick, without } from 'lodash';
 import { FC, useCallback, useMemo } from 'react';
@@ -21,6 +22,7 @@ import streamSaver from 'streamsaver';
 import {
   APP_LANGUAGE,
   FACETS_DICT,
+  ITEM_TYPE_LABELS,
   ITEM_TYPE_LABELS_PLURAL,
   ItemIcon,
   ItemType,
@@ -34,18 +36,32 @@ import { EditionActionsTooltip } from '../edition/tooltips.tsx';
 const HistogramRow: FC<
   {
     itemType: ItemType;
+    selectedType: ItemType;
     onClick: () => void;
     maxCount: number;
     index?: number;
     Icon: IconType;
     active?: boolean;
   } & ItemValue
-> = ({ itemType, onClick, value, label, link, maxCount, count, index, Icon, active }) => {
+> = ({
+  itemType,
+  selectedType,
+  onClick,
+  value,
+  label,
+  link,
+  maxCount,
+  count,
+  index,
+  Icon,
+  active,
+}) => {
   const { enabled } = useEditionContext();
 
   return (
-    <button
+    <div
       className="histogram-row btn btn-light bg-transparent w-100 border-0 py-3 ps-4 pe-3 position-relative"
+      title={`${label || 'No value'} (linked to ${count.toLocaleString(APP_LANGUAGE)} ${(count > 1 ? ITEM_TYPE_LABELS_PLURAL[selectedType] : ITEM_TYPE_LABELS[selectedType]).toLowerCase()})`}
       onClick={(e) => {
         e.preventDefault();
         onClick();
@@ -105,7 +121,7 @@ const HistogramRow: FC<
           )}
         </div>
       </div>
-    </button>
+    </div>
   );
 };
 
@@ -116,8 +132,18 @@ const Histogram: FC<
     histogramValues?: HistogramData<ItemValue>['values'];
     loading: boolean;
     itemType: ItemType;
+    selectedType: ItemType;
   } & KeywordsFacetSimpleHistogramProps
-> = ({ loading, histogramValues = [], total, maxCount, itemType, onChange, values }) => {
+> = ({
+  loading,
+  histogramValues = [],
+  total,
+  maxCount,
+  itemType,
+  selectedType,
+  onChange,
+  values,
+}) => {
   const selectedValues = useMemo(() => new Set(values || []), [values]);
   const { selected, unselected } = useMemo(() => {
     const valuesDict = keyBy(histogramValues || [], 'value');
@@ -139,9 +165,7 @@ const Histogram: FC<
   if (loading)
     return (
       <div className="text-center pt-3">
-        <div className="spinner-border" role="status">
-          <span className="visually-hidden">Loading...</span>
-        </div>
+        <Spinner />
       </div>
     );
 
@@ -152,6 +176,7 @@ const Histogram: FC<
           <li key={i} className="d-flex">
             <HistogramRow
               itemType={itemType}
+              selectedType={selectedType}
               label={label}
               value={value}
               count={count}
@@ -171,6 +196,7 @@ const Histogram: FC<
           <li key={i} className="d-flex">
             <HistogramRow
               itemType={itemType}
+              selectedType={selectedType}
               label={label}
               value={value}
               count={count}
@@ -203,7 +229,10 @@ const Histogram: FC<
   );
 };
 
-export const ItemFacet: FC<{ itemType: ItemType }> = ({ itemType }) => {
+export const ItemFacet: FC<{ itemType: ItemType; selectedType: ItemType }> = ({
+  itemType,
+  selectedType,
+}) => {
   const { state, loadHistogram, autocomplete } = useFacetsContext();
   const facet = useMemo(() => FACETS_DICT[itemType], [itemType]);
   const { filter, onChange } = useFacet(facet);
@@ -296,7 +325,12 @@ export const ItemFacet: FC<{ itemType: ItemType }> = ({ itemType }) => {
         noOptionsMessage={() => 'Start typing'}
         placeholder={`Search for ${ITEM_TYPE_LABELS_PLURAL[itemType].toLowerCase()}`}
       />
-      <Histogram {...histogramProps} {...histogramData} itemType={itemType} />
+      <Histogram
+        {...histogramProps}
+        {...histogramData}
+        itemType={itemType}
+        selectedType={selectedType}
+      />
     </>
   );
 };

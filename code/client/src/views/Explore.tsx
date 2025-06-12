@@ -124,7 +124,7 @@ export const Explore: FC = () => {
                 style={{ height: listBlocks.length === 3 ? 800 : 400 }}
               >
                 <div className="card-body">
-                  <ItemFacet itemType={itemType} />
+                  <ItemFacet itemType={itemType} selectedType={selectedType} />
                 </div>
               </div>
             </div>
