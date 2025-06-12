@@ -181,7 +181,6 @@ export const resolvers: Resolvers<unknown> = {
         includesValues: fieldFilter?.values,
         filters: formattedFilters,
       });
-      if (fieldFilter?.values?.length) console.log(JSON.stringify(results, null, '  '));
 
       return datasetIndexation.formatAggregationResults(field, results);
     },
