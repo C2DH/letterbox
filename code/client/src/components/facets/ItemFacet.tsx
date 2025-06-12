@@ -12,7 +12,7 @@ import {
 import { Tooltip } from '@ouestware/tooltip';
 import cx from 'classnames';
 import { keyBy, pick, without } from 'lodash';
-import { FC, useMemo } from 'react';
+import { FC, useCallback, useMemo } from 'react';
 import { IconType } from 'react-icons';
 import {
   RiDownloadLine,
@@ -23,6 +23,7 @@ import {
 } from 'react-icons/ri';
 import { Link } from 'react-router-dom';
 import AsyncSelect from 'react-select/async';
+import streamSaver from 'streamsaver';
 
 import {
   APP_LANGUAGE,
@@ -221,6 +222,7 @@ export const ItemFacet: FC<{ itemType: ItemType }> = ({ itemType }) => {
   const { state, loadHistogram, autocomplete } = useFacetsContext();
   const facet = useMemo(() => FACETS_DICT[itemType], [itemType]);
   const { filter, onChange } = useFacet(facet);
+
   const fnAutocomplete = useMemo(() => {
     return facet.type === 'keywords' && facet.autocomplete && autocomplete
       ? (inputValue: string) =>
@@ -233,6 +235,7 @@ export const ItemFacet: FC<{ itemType: ItemType }> = ({ itemType }) => {
       ? () => loadHistogram(facet, state) as Promise<HistogramData<ItemValue>>
       : undefined;
   }, [facet, loadHistogram, state]);
+
   const inputKeywordsProps = useMemo<InputKeywordsProps<ItemValue>>(
     () => ({
       isMulti: true,
@@ -260,6 +263,25 @@ export const ItemFacet: FC<{ itemType: ItemType }> = ({ itemType }) => {
   ]) as KeywordsFacetSimpleHistogramProps<ItemValue>;
   const histogramData = useKeywordsFacetSimpleHistogram(histogramProps);
 
+  /**
+   * Download function to create a CSV file.
+   * It takes the histogramData that we already have, and generate a CSV of it.
+   */
+  const download = useCallback(() => {
+    const fileStream = streamSaver.createWriteStream(
+      `${ITEM_TYPE_LABELS_PLURAL[itemType].toLowerCase()}-top500.csv`,
+    );
+    const writer = fileStream.getWriter();
+    // Header
+    writer.write(new TextEncoder().encode('Label,Count,ID\n'));
+    histogramData.histogramValues?.forEach(({ value, label, count }) => {
+      writer.write(
+        new TextEncoder().encode(`"${label?.split(`"`).join(`""`)}",${count},${value},\n`),
+      );
+    });
+    writer.close();
+  }, [itemType, histogramData]);
+
   return (
     <>
       <div className="card-title d-flex flex-row align-items-baseline">
@@ -273,7 +295,11 @@ export const ItemFacet: FC<{ itemType: ItemType }> = ({ itemType }) => {
           )}
         </h2>
 
-        <button className="btn btn-outline-dark btn-ico p-2 ms-2">
+        <button
+          className="btn btn-outline-dark btn-ico p-2 ms-2"
+          title={`Download top 500 ${ITEM_TYPE_LABELS_PLURAL[itemType].toLowerCase()}`}
+          onClick={download}
+        >
           <RiDownloadLine />
         </button>
       </div>

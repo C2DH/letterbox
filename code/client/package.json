@@ -32,11 +32,13 @@
     "react-pdf": "^9.2.1",
     "react-router-dom": "7.3.0",
     "react-router-typesafe": "^1.5.0",
-    "react-select": "^5.10.1"
+    "react-select": "^5.10.1",
+    "streamsaver": "^2.0.6"
   },
   "devDependencies": {
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
+    "@types/streamsaver": "^2.0.5",
     "@vitejs/plugin-react": "^4.3.1",
     "globals": "^15.9.0",
     "sass": "^1.79.4",
