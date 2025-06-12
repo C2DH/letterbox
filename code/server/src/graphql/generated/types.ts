@@ -309,6 +309,8 @@ export type Mutation = {
   setNodeVerified: NodeItem;
   /** Split a node */
   splitNode: Array<NodeItem>;
+  /** Unlink a node */
+  unlinkNode: Scalars['Boolean']['output'];
 };
 
 
@@ -369,6 +371,13 @@ export type MutationSplitNodeArgs = {
   id: Scalars['ID']['input'];
   type: DataItemType;
   values: Array<Scalars['String']['input']>;
+};
+
+
+export type MutationUnlinkNodeArgs = {
+  id: Scalars['ID']['input'];
+  messageId: Scalars['ID']['input'];
+  type: DataItemType;
 };
 
 export type NodeIdentification = {
@@ -777,6 +786,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   setNodeTags?: Resolver<ResolversTypes['NodeItem'], ParentType, ContextType, RequireFields<MutationSetNodeTagsArgs, 'id' | 'tags' | 'type'>>;
   setNodeVerified?: Resolver<ResolversTypes['NodeItem'], ParentType, ContextType, RequireFields<MutationSetNodeVerifiedArgs, 'id' | 'type' | 'verified'>>;
   splitNode?: Resolver<Array<ResolversTypes['NodeItem']>, ParentType, ContextType, RequireFields<MutationSplitNodeArgs, 'id' | 'type' | 'values'>>;
+  unlinkNode?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationUnlinkNodeArgs, 'id' | 'messageId' | 'type'>>;
 };
 
 export type NodeItemResolvers<ContextType = any, ParentType extends ResolversParentTypes['NodeItem'] = ResolversParentTypes['NodeItem']> = {

@@ -230,6 +230,14 @@ export const resolvers: Resolvers<unknown> = {
     },
 
     /**
+     * Delete a node
+     */
+    unlinkNode: async (_root, { type, id, messageId }) => {
+      await datasetEdition.unlinkNode(type, id, messageId);
+      return true;
+    },
+
+    /**
      * Change node's type
      */
     changeType: async (_root, { type, id, newType }, context, info) => {

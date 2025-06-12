@@ -8,6 +8,7 @@ import {
   merge,
   renameByTypeId,
   splitByTypeId,
+  unlinkNodeByTypeId,
 } from '../core/graphql/queries/actions';
 
 export const useItemActions = () => {
@@ -40,6 +41,15 @@ export const useItemActions = () => {
     [deleteMutation],
   );
 
+  // Unlink a node
+  const [unlinkMutation] = useMutation(unlinkNodeByTypeId, {});
+  const unlinkItem = useCallback(
+    async (type: DataItemType, id: string, messageId: string) => {
+      await unlinkMutation({ variables: { type, id, messageId } });
+    },
+    [unlinkMutation],
+  );
+
   // merge nodes
   const [mergeMutation] = useMutation(merge, {});
   const mergeItems = useCallback(
@@ -66,5 +76,6 @@ export const useItemActions = () => {
     deleteItem,
     mergeItems,
     splitItem,
+    unlinkItem,
   };
 };

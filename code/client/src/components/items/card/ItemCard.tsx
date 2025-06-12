@@ -19,7 +19,11 @@ import { CountryCard } from './CountryCard.tsx';
 import { MessageCard } from './MessageCard.tsx';
 import { PersonCard } from './PersonCard.tsx';
 
-export const ItemCard: FC<{ itemType: ItemType; data: NodeItem }> = ({ itemType, data }) => {
+export const ItemCard: FC<{ itemType: ItemType; data: NodeItem; fromMessageId?: string }> = ({
+  itemType,
+  data,
+  fromMessageId,
+}) => {
   const { enabled } = useEditionContext();
 
   if (data.__typename !== ITEM_TYPE_LABELS[itemType])
@@ -55,7 +59,12 @@ export const ItemCard: FC<{ itemType: ItemType; data: NodeItem }> = ({ itemType,
             {/* cart action */}
             <InCartButton label={getItemName(data)} type={itemType} id={data.id} />
             {/* Edition actions */}
-            <EditionActionsTooltip itemType={itemType} id={data.id} label={getItemName(data)} />
+            <EditionActionsTooltip
+              itemType={itemType}
+              id={data.id}
+              label={getItemName(data)}
+              fromMessageId={fromMessageId}
+            />
           </div>
         )}
 

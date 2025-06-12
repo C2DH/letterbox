@@ -47,6 +47,8 @@ export const ItemView: FC = () => {
     return enabled && itemData && !itemData.deleted;
   }, [enabled, itemData]);
 
+  const fromMessageId = useMemo(() => (itemType === 'message' ? id : undefined), [itemType, id]);
+
   const relatedItems = useMemo(
     () =>
       itemData
@@ -70,14 +72,14 @@ export const ItemView: FC = () => {
                 getItemKey: (data: NodeItem) => data.id,
                 renderItem: (data: NodeItem) => (
                   <div className={cx('mb-4', type === 'message' ? 'col-4' : 'col-2')}>
-                    <ItemCard data={data} itemType={type} />
+                    <ItemCard data={data} itemType={type} fromMessageId={fromMessageId} />
                   </div>
                 ),
               } as RelatedDefinition,
             ];
           })
         : [],
-    [itemData, itemType, fetchRelations],
+    [itemData, itemType, fetchRelations, fromMessageId],
   );
 
   const name = !itemData
@@ -87,7 +89,7 @@ export const ItemView: FC = () => {
       : 'name' in itemData
         ? itemData.name
         : itemData.id;
-  console.log(itemData?.deleted);
+
   return (
     <>
       <Sidebar />

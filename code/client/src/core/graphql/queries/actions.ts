@@ -6,6 +6,12 @@ export const deleteNodeByTypeId = graphql(`
   }
 `);
 
+export const unlinkNodeByTypeId = graphql(`
+  mutation UnLinkNodeByTypeId($type: DataItemType!, $id: ID!, $messageId: ID!) {
+    result: unlinkNode(type: $type, id: $id, messageId: $messageId)
+  }
+`);
+
 export const changeTypeByTypeId = graphql(`
   mutation ChangeTypeByTypeId($type: DataItemType!, $id: ID!, $newType: DataItemType!) {
     result: changeType(type: $type, id: $id, newType: $newType) {

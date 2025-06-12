@@ -21,11 +21,12 @@ export const QuickSwapTypeMenu: FC<{ type: ItemType; id: string }> = ({ type: it
   const inCart = useMemo(() => isInCart(cart, { type: itemType, id }), [cart, itemType, id]);
 
   return (
-    <div className="border border-purple-300 rounded bg-white color-purple-300 overflow-hidden">
+    <div className="border border-purple-300 rounded bg-white color-purple-300 overflow-hidden w-fit-content">
       <div className="d-flex flex-row align-items-stretch">
         {FILTERABLE_ITEM_TYPES.map((type, i) => (
           <button
             key={type}
+            title={`Change item type to "${type}"`}
             className={cx(
               'btn btn-ico p-2 rounded-0',
               type === itemType
@@ -48,7 +49,7 @@ export const QuickSwapTypeMenu: FC<{ type: ItemType; id: string }> = ({ type: it
                 // TODO: refacto reload with cleverer refetch: add a refetch method in edition context?
                 // reload the page but after 1s to let notification appear...
                 setTimeout(() => navigate(0), 1500);
-                notify({ type: 'success', text: `Item type changed to ${type}` });
+                notify({ type: 'success', text: `Item type changed to "${type}"` });
               } finally {
                 setLoading(undefined);
               }

@@ -899,6 +899,11 @@ type Mutation {
   deleteNode(type: DataItemType!, id: ID!): Boolean!
 
   """
+  Unlink a node
+  """
+  unlinkNode(type: DataItemType!, id: ID!, messageId: ID!): Boolean!
+
+  """
   Change node's type
   """
   changeType(type: DataItemType!, id: ID!, newType: DataItemType!): NodeItem!

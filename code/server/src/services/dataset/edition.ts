@@ -180,6 +180,44 @@ export class DatasetEdition {
   }
 
   /**
+   * Unlink a node from a message.
+   */
+  async unlinkNode(type: ItemType, id: string, messageId: string): Promise<void> {
+    this.log.debug('Unlik  node from message', { type, id, messageId });
+
+    // Some checks
+    if (type === 'message') throw Boom.badRequest(`Deleting a message node is not allowed`);
+    await this.checkItemExists(type, id);
+    await this.checkItemExists('message', messageId);
+
+    const session = this.neo4j.getWriteSession();
+    const tx = session.beginTransaction();
+    try {
+      // Unlink the node
+      await this.neo4j.getTxFirstResultQuery(
+        tx,
+        ` MATCH (n:${Neo4jLabels[type]} { id: $id })<-[r:CONTAINS]-(m:Message { id: $messageId }) 
+          SET r.deleted = true, 
+            r.updated = datetime()
+          RETURN 1 as result`,
+        { id, messageId },
+      );
+      await this.markMessagesForReIndexing(tx, [messageId]);
+      await tx.commit();
+      await this.updateNodesInMainIndex([
+        { type, id },
+        { type: 'message', id: messageId },
+      ]);
+    } catch (e) {
+      await tx.rollback();
+      throw e;
+    } finally {
+      await tx.close();
+      await session.close();
+    }
+  }
+
+  /**
    * Delete a node.
    */
   async deleteNode(type: ItemType, id: string, tx?: Transaction): Promise<void> {
