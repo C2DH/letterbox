@@ -7,6 +7,7 @@ export const searchItems = graphql(`
     $includes: String = ""
     $from: Int = 0
     $limit: Int = 10
+    $sortBy: [SortBy!] = []
   ) {
     search(
       itemType: $itemType
@@ -14,6 +15,7 @@ export const searchItems = graphql(`
       limit: $limit
       includes: $includes
       from: $from
+      sortBy: $sortBy
     ) {
       total
       results {

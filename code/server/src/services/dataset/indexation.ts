@@ -261,17 +261,43 @@ export class DatasetIndexation {
     return `
       MATCH (n:Message${withPendingModifications ? `:${Neo4jLabelsPendingModificationsLabels.ToReIndexFlag}` : ''})
       ${ids && ids.length ? `WHERE n.id IN $ids` : ''}
+      WITH 
+        n,
+        collect { 
+          MATCH (n)-[r:CONTAINS]->(m:Person)  
+          WHERE NOT coalesce(r.deleted, false) AND NOT coalesce(m.deleted, false) 
+          RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name  
+        } AS people,
+        collect { 
+          MATCH (n)-[r:CONTAINS]->(m:Address) 
+          WHERE NOT coalesce(r.deleted, false) AND NOT coalesce(m.deleted, false) 
+          RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name  
+        } AS addresses,
+        collect { 
+          MATCH (n)-[r:CONTAINS]->(m:Company) 
+          WHERE NOT coalesce(r.deleted, false) AND NOT coalesce(m.deleted, false) 
+          RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name  
+        } AS companies,
+        collect { 
+          MATCH (n)-[r:CONTAINS]->(m:Country) 
+          WHERE NOT coalesce(r.deleted, false) AND NOT coalesce(m.deleted, false) 
+          RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name  
+        } AS countries
       RETURN  {
         id: n.id,
         message: n.message,
         year: n.year,
         tags: n.tags,
         verified: n.verified,
-        deleted: coalesce(n.deleted),
-        people:    collect { MATCH (n)-[r:CONTAINS]->(m:Person)  WHERE NOT coalesce(r.deleted, false) AND NOT coalesce(m.deleted, false) RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name  },
-        addresses: collect { MATCH (n)-[r:CONTAINS]->(m:Address) WHERE NOT coalesce(r.deleted, false) AND NOT coalesce(m.deleted, false) RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name  },
-        companies: collect { MATCH (n)-[r:CONTAINS]->(m:Company) WHERE NOT coalesce(r.deleted, false) AND NOT coalesce(m.deleted, false) RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name  },
-        countries: collect { MATCH (n)-[r:CONTAINS]->(m:Country) WHERE NOT coalesce(r.deleted, false) AND NOT coalesce(m.deleted, false) RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name  }
+        deleted: coalesce(n.deleted, false),
+        people:people,
+        peopleCount: size(people),
+        addresses: addresses,
+        addressesCount: size(addresses),
+        companies: companies,
+        companiesCount: size(companies),  
+        countries: countries,
+        countriesCount: size(countries)
       } as result`;
   }
 
@@ -282,16 +308,47 @@ export class DatasetIndexation {
     return `
       MATCH (n:Person${withPendingModifications ? `:${Neo4jLabelsPendingModificationsLabels.ToReIndexFlag}` : ''})
       ${ids && ids.length ? `WHERE n.id IN $ids` : ''}
+      WITH 
+        n,
+        count { 
+          MATCH (n)<-[r1:CONTAINS]-(m:Message) 
+          WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(m.deleted, false) 
+          RETURN DISTINCT m.id
+        } AS messagesCount,
+        collect { 
+          MATCH (n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Address) 
+          WHERE NOT coalesce(r1.deleted, false) AND  NOT coalesce(r2.deleted, false) AND NOT coalesce(m.deleted, false) 
+          RETURN DISTINCT  m.id + "${config.elastic.idValueSeparator}" + m.name  
+        } AS addresses,
+        collect { 
+          MATCH (n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Company) 
+          WHERE NOT coalesce(r1.deleted, false) AND  NOT coalesce(r2.deleted, false) AND NOT coalesce(m.deleted, false) 
+          RETURN DISTINCT  m.id + "${config.elastic.idValueSeparator}" + m.name  
+        } AS companies,
+        collect { 
+          MATCH (n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Country) 
+          WHERE NOT coalesce(r1.deleted, false) AND  NOT coalesce(r2.deleted, false) AND NOT coalesce(m.deleted, false) 
+          RETURN DISTINCT  m.id + "${config.elastic.idValueSeparator}" + m.name  
+        } AS countries,
+        collect { 
+          MATCH (n)<-[r1:CONTAINS]-(m:Message) 
+          WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(m.deleted, false) 
+          RETURN DISTINCT m.year 
+        } AS years
       RETURN  {
         id: n.id,
         name: n.name,
         tags: n.tags,
         verified: n.verified,
-        deleted: coalesce(n.deleted),
-        addresses: collect { MATCH (n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Address) WHERE NOT coalesce(r1.deleted, false) AND  NOT coalesce(r2.deleted, false) AND NOT coalesce(m.deleted, false) RETURN DISTINCT  m.id + "${config.elastic.idValueSeparator}" + m.name  },
-        companies: collect { MATCH (n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Company) WHERE NOT coalesce(r1.deleted, false) AND  NOT coalesce(r2.deleted, false) AND NOT coalesce(m.deleted, false) RETURN DISTINCT  m.id + "${config.elastic.idValueSeparator}" + m.name  },
-        countries: collect { MATCH (n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Country) WHERE NOT coalesce(r1.deleted, false) AND  NOT coalesce(r2.deleted, false) AND NOT coalesce(m.deleted, false) RETURN DISTINCT  m.id + "${config.elastic.idValueSeparator}" + m.name  },
-        years:     collect { MATCH (n)<-[r1:CONTAINS]-(m:Message) WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(m.deleted, false) RETURN DISTINCT m.year  }
+        deleted: coalesce(n.deleted, false),
+        messagesCount: messagesCount,
+        addresses: addresses,
+        addressesCount: size(addresses),
+        companies: companies,
+        companiesCount: size(companies),  
+        countries: countries,
+        countriesCount: size(countries),
+        years: years
       } as result`;
   }
 
@@ -302,16 +359,47 @@ export class DatasetIndexation {
     return `
       MATCH (n:Company${withPendingModifications ? `:${Neo4jLabelsPendingModificationsLabels.ToReIndexFlag}` : ''})
       ${ids && ids.length ? `WHERE n.id IN $ids` : ''}
+      WITH 
+        n,
+        count { 
+          MATCH (n)<-[r1:CONTAINS]-(m:Message) 
+          WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(m.deleted, false) 
+          RETURN DISTINCT m.id
+        } AS messagesCount,
+        collect { 
+          MATCH (n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Address) 
+          WHERE NOT coalesce(r1.deleted, false) AND  NOT coalesce(r2.deleted, false) AND NOT coalesce(m.deleted, false) 
+          RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name  
+        } AS addresses,
+        collect { 
+          MATCH (n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Country) 
+          WHERE NOT coalesce(r1.deleted, false) AND  NOT coalesce(r2.deleted, false) AND NOT coalesce(m.deleted, false) 
+          RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name  
+        } AS countries,
+        collect { 
+          MATCH (n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Person)  
+          WHERE NOT coalesce(r1.deleted, false) AND  NOT coalesce(r2.deleted, false) AND NOT coalesce(m.deleted, false) 
+          RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name  
+        } AS people,
+        collect { 
+          MATCH (n)<-[r1:CONTAINS]-(m:Message) 
+          WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(m.deleted, false) 
+          RETURN DISTINCT m.year  
+        } AS years
       RETURN  {
         id: n.id,
         name: n.name,
         tags: n.tags,
         verified: n.verified,
-        deleted: coalesce(n.deleted),
-        people:    collect { MATCH (n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Person)  WHERE NOT coalesce(r1.deleted, false) AND  NOT coalesce(r2.deleted, false) AND NOT coalesce(m.deleted, false) RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name  },
-        addresses: collect { MATCH (n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Address) WHERE NOT coalesce(r1.deleted, false) AND  NOT coalesce(r2.deleted, false) AND NOT coalesce(m.deleted, false) RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name  },
-        countries: collect { MATCH (n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Country) WHERE NOT coalesce(r1.deleted, false) AND  NOT coalesce(r2.deleted, false) AND NOT coalesce(m.deleted, false) RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name  },
-        years:     collect { MATCH (n)<-[r1:CONTAINS]-(m:Message) WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(m.deleted, false) RETURN DISTINCT m.year  }
+        deleted: coalesce(n.deleted, false),
+        messagesCount: messagesCount,
+        addresses: addresses,
+        addressesCount: size(addresses),
+        countries: countries,
+        countriesCount: size(countries),
+        people: people,
+        peopleCount: size(people),
+        years: years
       } as result`;
   }
 
@@ -322,16 +410,47 @@ export class DatasetIndexation {
     return `
       MATCH (n:Address${withPendingModifications ? `:${Neo4jLabelsPendingModificationsLabels.ToReIndexFlag}` : ''})
       ${ids && ids.length ? `WHERE n.id IN $ids` : ''}
+      WITH 
+        n,
+        count { 
+          MATCH (n)<-[r1:CONTAINS]-(m:Message) 
+          WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(m.deleted, false) 
+          RETURN DISTINCT m.id
+        } AS messagesCount,
+        collect { 
+          MATCH(n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Company)
+          WHERE NOT coalesce(r1.deleted, false) AND  NOT coalesce(r2.deleted, false) AND NOT coalesce(m.deleted, false) 
+          RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name 
+        } AS companies,
+        collect { 
+          MATCH(n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Country) 
+          WHERE NOT coalesce(r1.deleted, false) AND  NOT coalesce(r2.deleted, false) AND NOT coalesce(m.deleted, false) 
+          RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name 
+        } AS countries,
+        collect { 
+          MATCH(n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Person)  
+          WHERE NOT coalesce(r1.deleted, false) AND  NOT coalesce(r2.deleted, false) AND NOT coalesce(m.deleted, false) 
+          RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name 
+        } AS people,
+        collect { 
+          MATCH(n)<-[r1:CONTAINS]-(m:Message) 
+          WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(m.deleted, false) 
+          RETURN DISTINCT m.year  
+        } AS years
       RETURN  {
         id: n.id,
         name: n.name,
         tags: n.tags,
         verified: n.verified,
-        deleted: coalesce(n.deleted),
-        people:    collect { MATCH(n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Person)  WHERE NOT coalesce(r1.deleted, false) AND  NOT coalesce(r2.deleted, false) AND NOT coalesce(m.deleted, false) RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name  },
-        companies: collect { MATCH(n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Company) WHERE NOT coalesce(r1.deleted, false) AND  NOT coalesce(r2.deleted, false) AND NOT coalesce(m.deleted, false) RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name  },
-        countries: collect { MATCH(n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Country) WHERE NOT coalesce(r1.deleted, false) AND  NOT coalesce(r2.deleted, false) AND NOT coalesce(m.deleted, false) RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name  },
-        years:     collect { MATCH(n)<-[r1:CONTAINS]-(m:Message) WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(m.deleted, false) RETURN DISTINCT m.year  }
+        deleted: coalesce(n.deleted, false),
+        messagesCount: messagesCount,
+        companies: companies,
+        companiesCount: size(companies),
+        countries: countries,
+        countriesCount: size(countries),
+        people: people,
+        peopleCount: size(people),
+        years: years
       } as result`;
   }
 
@@ -342,16 +461,47 @@ export class DatasetIndexation {
     return `
       MATCH (n:Country${withPendingModifications ? `:${Neo4jLabelsPendingModificationsLabels.ToReIndexFlag}` : ''})
       ${ids && ids.length ? `WHERE n.id IN $ids` : ''}
+      WITH 
+        n,
+        count { 
+          MATCH (n)<-[r1:CONTAINS]-(m:Message) 
+          WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(m.deleted, false) 
+          RETURN DISTINCT m.id
+        } AS messagesCount,
+        collect { 
+          MATCH (n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Address) 
+          WHERE NOT coalesce(r1.deleted, false) AND  NOT coalesce(r2.deleted, false) AND NOT coalesce(m.deleted, false) 
+          RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name LIMIT ${config.elastic.nested_objects_limit} 
+        } AS addresses,
+        collect { 
+          MATCH (n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Company) 
+          WHERE NOT coalesce(r1.deleted, false) AND  NOT coalesce(r2.deleted, false) AND NOT coalesce(m.deleted, false) 
+          RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name LIMIT ${config.elastic.nested_objects_limit} 
+        } AS companies,
+        collect { 
+          MATCH (n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Person)  
+          WHERE NOT coalesce(r1.deleted, false) AND  NOT coalesce(r2.deleted, false) AND NOT coalesce(m.deleted, false) 
+          RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name  LIMIT ${config.elastic.nested_objects_limit}
+        } AS people,
+        collect { 
+          MATCH (n)<-[r1:CONTAINS]-(m:Message) 
+          WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(m.deleted, false) 
+          RETURN DISTINCT m.year 
+        } AS years
       RETURN  {
         id: n.id,
         name: n.name,
         tags: n.tags,
         verified: n.verified,
-        deleted: coalesce(n.deleted),
-        people:    collect { MATCH (n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Person)  WHERE NOT coalesce(r1.deleted, false) AND  NOT coalesce(r2.deleted, false) AND NOT coalesce(m.deleted, false) RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name  LIMIT ${config.elastic.nested_objects_limit}},
-        companies: collect { MATCH (n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Company) WHERE NOT coalesce(r1.deleted, false) AND  NOT coalesce(r2.deleted, false) AND NOT coalesce(m.deleted, false) RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name LIMIT ${config.elastic.nested_objects_limit} },
-        addresses: collect { MATCH (n)<-[r1:CONTAINS]-(:Message)-[r2:CONTAINS]->(m:Address) WHERE NOT coalesce(r1.deleted, false) AND  NOT coalesce(r2.deleted, false) AND NOT coalesce(m.deleted, false) RETURN DISTINCT m.id + "${config.elastic.idValueSeparator}" + m.name LIMIT ${config.elastic.nested_objects_limit} },
-        years:     collect { MATCH (n)<-[r1:CONTAINS]-(m:Message) WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(m.deleted, false) RETURN DISTINCT m.year  }
+        deleted: coalesce(n.deleted, false),
+        messagesCount: messagesCount,
+        addresses: addresses,
+        addressesCount: size(addresses),
+        companies: companies,
+        companiesCount: size(companies),
+        people: people,
+        peopleCount: size(people),
+        years: years
       } as result`;
   }
 
@@ -518,10 +668,18 @@ export class DatasetIndexation {
                 },
               }
             : {}),
-          ...(item !== 'person' ? { people: { type: 'keyword' } } : {}),
-          ...(item !== 'address' ? { addresses: { type: 'keyword' } } : {}),
-          ...(item !== 'company' ? { companies: { type: 'keyword' } } : {}),
-          ...(item !== 'country' ? { countries: { type: 'keyword' } } : {}),
+          ...(item !== 'person'
+            ? { people: { type: 'keyword' }, peopleCount: { type: 'integer' } }
+            : {}),
+          ...(item !== 'address'
+            ? { addresses: { type: 'keyword' }, addressesCount: { type: 'integer' } }
+            : {}),
+          ...(item !== 'company'
+            ? { companies: { type: 'keyword' }, companiesCount: { type: 'integer' } }
+            : {}),
+          ...(item !== 'country'
+            ? { countries: { type: 'keyword' }, countriesCount: { type: 'integer' } }
+            : {}),
           ...(item !== 'message'
             ? {
                 name: {
@@ -534,6 +692,7 @@ export class DatasetIndexation {
                     },
                   },
                 },
+                messagesCount: { type: 'integer' },
                 years: { type: 'integer' },
                 fingerprint: { type: 'keyword' },
                 content: {

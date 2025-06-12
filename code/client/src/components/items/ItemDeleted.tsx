@@ -7,7 +7,7 @@ export const ItemDeleted: FC<{
 }> = ({ item }) => {
   if (!item.deleted) return null;
   return (
-    <span style={{ fontSize: '0.7em' }} className="badge rounded-pill text-bg-purple-300">
+    <span style={{ fontSize: '0.7em' }} className="badge rounded-pill text-bg-purple-300 ms-1">
       Deleted
     </span>
   );

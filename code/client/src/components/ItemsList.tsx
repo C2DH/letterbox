@@ -12,7 +12,7 @@ import {
   ItemIcon,
   ItemType,
 } from '../core/consts';
-import { NodeItem } from '../core/graphql';
+import { EsSortDirection, NodeItem } from '../core/graphql';
 import { searchItems } from '../core/graphql/queries/search';
 import { filtersStateToSearchFilters } from '../utils/filters';
 import { QueryForm } from './facets/QueryForm.tsx';
@@ -34,6 +34,15 @@ export const ItemsList: FC<{ itemType: ItemType }> = ({ itemType }) => {
   const client = useApolloClient();
   const loadData = useCallback(
     async (from: number) => {
+      const sortBy = [{ direction: EsSortDirection.Desc, field: '_score' }];
+      switch (itemType) {
+        case 'company':
+          sortBy.push({ direction: EsSortDirection.Desc, field: 'peopleCount' });
+          break;
+        default:
+          sortBy.push({ direction: EsSortDirection.Desc, field: 'companiesCount' });
+          break;
+      }
       const {
         data: { search },
         error,
@@ -44,6 +53,7 @@ export const ItemsList: FC<{ itemType: ItemType }> = ({ itemType }) => {
           limit: 30,
           filters: filtersStateToSearchFilters(state),
           from,
+          sortBy,
         },
         fetchPolicy: 'no-cache',
       });
