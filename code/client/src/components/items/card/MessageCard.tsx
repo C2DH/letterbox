@@ -18,6 +18,7 @@ import { getMessageName } from '../../../utils/data.ts';
 import { Collapsable } from '../../Collapsable';
 import { InCartButton } from '../../edition/InCartButton.tsx';
 import { ItemsCounts } from '../ItemsCounts';
+import { ItemVerified } from '../ItemVerified.tsx';
 
 const TYPES = FILTERABLE_ITEM_TYPES as Exclude<ItemType, 'message'>[];
 
@@ -36,6 +37,7 @@ export const MessageCard: FC<{ data: MessageInlineFragment }> = ({ data }) => {
           {name}
           {data.companiesCount > 3 && ` and ${data.companiesCount - 3} more`}
         </Link>
+        <ItemVerified item={data} />
       </h5>
       <ItemsCounts itemType="message" data={data} />
       {!!cleanedTags.length && (

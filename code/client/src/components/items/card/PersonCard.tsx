@@ -6,6 +6,7 @@ import { Badge } from '../../../Badge.tsx';
 import { type PersonInlineFragment } from '../../../core/graphql';
 import { ItemDeleted } from '../ItemDeleted.tsx';
 import { ItemsCounts } from '../ItemsCounts';
+import { ItemVerified } from '../ItemVerified.tsx';
 
 export const PersonCard: FC<{ data: PersonInlineFragment }> = ({ data }) => {
   const { tags } = data;
@@ -17,6 +18,7 @@ export const PersonCard: FC<{ data: PersonInlineFragment }> = ({ data }) => {
         <Link className="text-dark" to={`/person/${data.id}`}>
           {data.name}
         </Link>
+        <ItemVerified item={data} />
         <ItemDeleted item={data} />
       </h5>
 

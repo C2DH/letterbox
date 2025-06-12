@@ -10,6 +10,7 @@ export const AddressInline = graphql(`
     peopleCount
     tags
     deleted
+    verified
   }
 `);
 
@@ -24,6 +25,7 @@ export const CompanyInline = graphql(`
     years
     tags
     deleted
+    verified
   }
 `);
 
@@ -37,6 +39,7 @@ export const CountryInline = graphql(`
     peopleCount
     tags
     deleted
+    verified
   }
 `);
 
@@ -67,6 +70,7 @@ export const MessageInline = graphql(`
     }
     tags
     deleted
+    verified
   }
 `);
 
@@ -80,5 +84,6 @@ export const PersonInline = graphql(`
     messagesCount
     tags
     deleted
+    verified
   }
 `);
