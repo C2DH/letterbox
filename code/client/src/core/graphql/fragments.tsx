@@ -71,6 +71,8 @@ export const MessageInline = graphql(`
     tags
     deleted
     verified
+    filename
+    pageNumber
   }
 `);
 

@@ -58,6 +58,7 @@ async function getGraphQlItems<T>(
     // @ts-ignore
     transforms,
   });
+
   return data
     ? data.map((d: object) => ({ __typename: Neo4jLabels[type], ...d }) as unknown as NodeItem)
     : undefined;

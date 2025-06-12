@@ -398,7 +398,7 @@ type Message
   id: ID! @unique
   year: Int!
   filename: String!
-  pageNumber: Int!
+  pageNumber: Float!
   message: String!
   tags: [String]
   verified: Boolean

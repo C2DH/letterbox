@@ -248,7 +248,7 @@ export type Message = {
   filename: Scalars['String']['output'];
   id: Scalars['ID']['output'];
   message: Scalars['String']['output'];
-  pageNumber: Scalars['Int']['output'];
+  pageNumber: Scalars['Float']['output'];
   people: Array<Person>;
   peopleCount: Scalars['Int']['output'];
   raw_address: Scalars['String']['output'];
@@ -760,7 +760,7 @@ export type MessageResolvers<ContextType = any, ParentType extends ResolversPare
   filename?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   message?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  pageNumber?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  pageNumber?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   people?: Resolver<Array<ResolversTypes['Person']>, ParentType, ContextType, RequireFields<MessagePeopleArgs, 'limit' | 'skip'>>;
   peopleCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   raw_address?: Resolver<ResolversTypes['String'], ParentType, ContextType>;

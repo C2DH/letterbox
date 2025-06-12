@@ -1,9 +1,12 @@
 import { useApolloClient } from '@apollo/client';
 import { useFacetsContext } from '@ouestware/facets-client';
 import { InfiniteScroll, InfiniteScrollProps } from '@ouestware/infinite-scroll';
+import { useNotifications } from '@ouestware/notifications';
 import cx from 'classnames';
 import { isNil } from 'lodash';
 import { FC, useCallback, useMemo } from 'react';
+import { RiDownloadLine } from 'react-icons/ri';
+import streamSaver from 'streamsaver';
 
 import {
   APP_LANGUAGE,
@@ -14,6 +17,8 @@ import {
 } from '../core/consts';
 import { EsSortDirection, NodeItem } from '../core/graphql';
 import { searchItems } from '../core/graphql/queries/search';
+import { escapeToCSVValue, objectToCSV } from '../utils/csv.ts';
+import { ITEM_CSV_FIELDS_BY_TYPE } from '../utils/data.ts';
 import { filtersStateToSearchFilters } from '../utils/filters';
 import { QueryForm } from './facets/QueryForm.tsx';
 import { ItemCard } from './items/card/ItemCard.tsx';
@@ -31,9 +36,10 @@ const ItemComponent: ListProps['element'] = ({ itemType, data }) => {
 
 export const ItemsList: FC<{ itemType: ItemType }> = ({ itemType }) => {
   const { state } = useFacetsContext();
+  const { notify } = useNotifications();
   const client = useApolloClient();
   const loadData = useCallback(
-    async (from: number) => {
+    async (from: number, limit = 30) => {
       const sortBy = [{ direction: EsSortDirection.Desc, field: '_score' }];
       switch (itemType) {
         case 'company':
@@ -50,8 +56,8 @@ export const ItemsList: FC<{ itemType: ItemType }> = ({ itemType }) => {
         query: searchItems,
         variables: {
           itemType: ITEM_TYPE_TO_DATA_TYPE[itemType],
-          limit: 30,
           filters: filtersStateToSearchFilters(state),
+          limit,
           from,
           sortBy,
         },
@@ -68,6 +74,56 @@ export const ItemsList: FC<{ itemType: ItemType }> = ({ itemType }) => {
     [client, itemType, state],
   );
 
+  /**
+   * Download function to create a CSV file.
+   * It takes the histogramData that we already have, and generate a CSV of it.
+   */
+  const download = useCallback(async () => {
+    const fileStream = streamSaver.createWriteStream(
+      `${ITEM_TYPE_LABELS_PLURAL[itemType].toLowerCase()}.csv`,
+    );
+    const writer = fileStream.getWriter();
+    try {
+      // Header
+      const headers = ITEM_CSV_FIELDS_BY_TYPE[itemType];
+      if (!headers) throw new Error(`${itemType} has no CSV definition`);
+      writer.write(
+        new TextEncoder().encode(headers.map((e) => escapeToCSVValue(e)).join(',') + '\n'),
+      );
+
+      // Load data in chunks of 500 items
+      notify({
+        type: 'info',
+        text: `Generating CSV for ${ITEM_TYPE_LABELS_PLURAL[itemType].toLowerCase()}`,
+      });
+      let hasMore = true;
+      let from = 0;
+      while (hasMore) {
+        const result = await loadData(from, 500);
+        if (result.data.length === 0) hasMore = false;
+        else {
+          for (const item of result.data) {
+            writer.write(new TextEncoder().encode(objectToCSV(item, headers) + '\n'));
+            from++;
+          }
+        }
+      }
+      notify({
+        type: 'success',
+        text: `CSV has been downloaded successfully`,
+      });
+    } catch (e) {
+      console.error('Error while generating CSV:', e);
+      writer.abort(e);
+      notify({
+        type: 'error',
+        text: `Error while generating ${ITEM_TYPE_LABELS_PLURAL[itemType].toLowerCase()}`,
+      });
+    } finally {
+      writer.close();
+    }
+  }, [itemType, loadData, notify]);
+
   const Top: ListProps['top'] = useMemo(
     () =>
       ({ total }) => (
@@ -81,12 +137,20 @@ export const ItemsList: FC<{ itemType: ItemType }> = ({ itemType }) => {
               </>
             )}
           </h2>
-          <div className="col-4">
+
+          <div className="col-4 d-flex">
             <QueryForm itemType={itemType} />
+            <button
+              className="btn btn-outline-dark btn-ico p-2 ms-2"
+              title={`Download top 500 ${ITEM_TYPE_LABELS_PLURAL[itemType].toLowerCase()}`}
+              onClick={download}
+            >
+              <RiDownloadLine />
+            </button>
           </div>
         </div>
       ),
-    [itemType],
+    [itemType, download],
   );
 
   const Bottom: ListProps['bottom'] = useMemo(
