@@ -55,7 +55,7 @@ export const ItemCard: FC<{ itemType: ItemType; data: NodeItem; fromMessageId?: 
       <div className="card-body">
         {/* Edition UI for non-message items */}
         {enabled && itemType !== 'message' && 'name' in data && (
-          <div className="d-flex  align-items-center justify-content-end mb-2 w-100 gap-1">
+          <div className="d-flex align-items-center justify-content-end mb-2 w-100 gap-1">
             {/* cart action */}
             <InCartButton label={getItemName(data)} type={itemType} id={data.id} />
             {/* Edition actions */}

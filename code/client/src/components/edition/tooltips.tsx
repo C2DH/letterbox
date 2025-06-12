@@ -2,7 +2,7 @@ import { Tooltip } from '@ouestware/tooltip';
 import { FC } from 'react';
 import { RiMore2Line } from 'react-icons/ri';
 
-import { ItemType } from '../../core/consts.tsx';
+import { DEFAULT_TOOLTIP_CLASSNAME, ItemType } from '../../core/consts.tsx';
 import { ItemEditionMenu } from './ItemEditionMenu.tsx';
 import { QuickSwapTypeMenu } from './QuickSwapTypeMenu.tsx';
 
@@ -17,7 +17,7 @@ export const EditionActionsTooltip: FC<{
 
   return (
     <Tooltip
-      className="p-0 py-1"
+      className={DEFAULT_TOOLTIP_CLASSNAME}
       rootClassName="small d-inline-block"
       attachment={['top', 'right']}
       targetAttachment={['bottom', 'right']}

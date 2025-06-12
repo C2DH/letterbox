@@ -136,6 +136,8 @@ export const FACETS_DICT = keyBy(FACETS, 'id');
 
 export type ItemValue = ValueWithCount & { link?: string; label?: string };
 
+export const DEFAULT_TOOLTIP_CLASSNAME = 'tooltip show opacity-100 py-1';
+
 export const REACT_SELECT_BASE_PROPS: Partial<Props> = {
   classNames: {
     valueContainer: () => 'form-control px-3',

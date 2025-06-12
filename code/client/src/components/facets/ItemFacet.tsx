@@ -9,18 +9,11 @@ import {
   useInputKeywords,
   useKeywordsFacetSimpleHistogram,
 } from '@ouestware/facets-client';
-import { Tooltip } from '@ouestware/tooltip';
 import cx from 'classnames';
 import { keyBy, pick, without } from 'lodash';
 import { FC, useCallback, useMemo } from 'react';
 import { IconType } from 'react-icons';
-import {
-  RiDownloadLine,
-  RiFilterLine,
-  RiFilterOffLine,
-  RiMore2Line,
-  RiShareBoxLine,
-} from 'react-icons/ri';
+import { RiDownloadLine, RiFilterLine, RiFilterOffLine, RiShareBoxLine } from 'react-icons/ri';
 import { Link } from 'react-router-dom';
 import AsyncSelect from 'react-select/async';
 import streamSaver from 'streamsaver';
@@ -35,7 +28,8 @@ import {
   REACT_SELECT_BASE_PROPS,
 } from '../../core/consts.tsx';
 import { useEditionContext } from '../../core/edition.ts';
-import { ItemEditionMenu } from '../edition/ItemEditionMenu.tsx';
+import { InCartButton } from '../edition/InCartButton.tsx';
+import { EditionActionsTooltip } from '../edition/tooltips.tsx';
 
 const HistogramRow: FC<
   {
@@ -100,24 +94,15 @@ const HistogramRow: FC<
           )}
         </div>
 
-        {enabled && itemType !== 'message' && (
-          <Tooltip
-            className="p-0 py-1"
-            rootClassName="small d-inline-block"
-            attachment={['top', 'right']}
-            targetAttachment={['bottom', 'right']}
-          >
-            <button type="button" className="btn btn-sm btn-ico ms-2 p-1 btn-outline-purple-300">
-              <RiMore2Line />
-            </button>
-            <div className="border border-light-gray-300 p-2 rounded bg-white color-purple-300">
-              <ItemEditionMenu type={itemType} id={value} label={label || value} />
-            </div>
-          </Tooltip>
-        )}
-
-        <div className="d-inline-block ms-2">
+        <div className="ms-2 d-inline-flex flex-column align-items-end justify-content-center">
           <Icon className="flex-shrink-0" />
+
+          {enabled && itemType !== 'message' && (
+            <div className="p-0 py-1 d-flex flex-row align-items-baseline gap-1">
+              <InCartButton label={label || value} type={itemType} id={value} />
+              <EditionActionsTooltip itemType={itemType} id={value} label={label || value} />
+            </div>
+          )}
         </div>
       </div>
     </button>
