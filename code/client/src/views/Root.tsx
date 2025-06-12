@@ -1,27 +1,31 @@
+import { useStorage } from '@ouestware/hooks';
 import { ModalProvider } from '@ouestware/modals';
 import { NotificationProvider } from '@ouestware/notifications';
 import { cloneDeep } from 'lodash';
-import { FC, useCallback, useEffect, useState } from 'react';
+import { FC, useCallback } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 
 import { Error } from '../components/error';
-import { EditionContext, EditionDataType, EditionItem } from '../core/edition.ts';
+import { DEFAULT_EDITION_DATA, EditionContext, EditionItem } from '../core/edition.ts';
 import { ApolloProvider } from '../core/graphql';
-import { loadEditionState, saveEditionState } from '../utils/edition.ts';
+import { deserializeEditionState, EDITION_STATE_KEY } from '../utils/edition.ts';
 import { Explore } from './Explore.tsx';
 import { ItemView } from './ItemView.tsx';
 
 export const Root: FC = () => {
-  const [editionState, setEditionState] = useState<EditionDataType>(loadEditionState());
+  const [editionState, setEditionState] = useStorage('localStorage', EDITION_STATE_KEY, {
+    defaultValue: DEFAULT_EDITION_DATA,
+    deserialize: deserializeEditionState,
+  });
 
   const toggleEdition = useCallback(
     (value?: boolean) =>
       setEditionState((state) => ({
-        ...state,
+        ...(state || DEFAULT_EDITION_DATA),
         enabled: typeof value === 'boolean' ? value : !state.enabled,
       })),
-    [],
+    [setEditionState],
   );
   const addToCart = useCallback(
     ({ type, ...item }: EditionItem) =>
@@ -34,7 +38,7 @@ export const Root: FC = () => {
           cart,
         };
       }),
-    [],
+    [setEditionState],
   );
   const removeFromCart = useCallback(
     ({ type, id }: Pick<EditionItem, 'type' | 'id'>) =>
@@ -46,12 +50,8 @@ export const Root: FC = () => {
           cart,
         };
       }),
-    [],
+    [setEditionState],
   );
-
-  useEffect(() => {
-    saveEditionState(editionState);
-  }, [editionState]);
 
   return (
     <ErrorBoundary FallbackComponent={Error}>
