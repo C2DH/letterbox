@@ -149,27 +149,50 @@ export class DatasetEdition {
     // Some checks
     if (type === 'message') throw Boom.badRequest(`Cannot change type of a message node`);
     if (newType === 'message') throw Boom.badRequest(`Cannot change type to message`);
-    await this.checkItemExists(type, id);
 
     const session = this.neo4j.getWriteSession();
     const tx = session.beginTransaction();
     try {
-      // Change the type
-      const result = await this.neo4j.getTxFirstResultQuery<string[]>(
-        tx,
-        ` MATCH (n:${Neo4jLabels[type]} { id: $id })
-          REMOVE n:${Neo4jLabels[type]}
-          SET n:${Neo4jLabels[newType]}
-          SET n.updated = datetime()
-          WITH n
-            MATCH (n)<-[rm:CONTAINS]-(msg:Message) WHERE NOT coalesce(rm.deleted, false) 
-            RETURN collect(distinct msg.id) AS result`,
-        { id },
-      );
-      if (result) await this.markMessagesForReIndexing(tx, result);
-      await tx.commit();
+      // Check that the node exists and get its graph fingerprint
+      const data = await this.getItemGraphFingerprint(tx, type, id);
 
-      return { type, id };
+      // Create the new node with the new type
+      const newNode = { id: uuid(), name: data.name, otherNames: data.otherNames };
+      await this.neo4j.getTxFirstResultQuery(
+        tx,
+        ` CREATE (n:${Neo4jLabels[newType]}:${Neo4jLabelsPendingModificationsLabels.ToReIndexFlag} { 
+              id: $newNode.id, 
+              name: $newNode.name, 
+              otherNames: $newNode.otherNames, 
+              created: datetime(), 
+              updated: datetime() 
+            })
+            WITH n 
+              CALL(n) {
+                UNWIND $inEdges as edge
+                  MATCH (m) WHERE elementId(m) = edge.elementId
+                  CREATE (m)-[:$(edge.type) { created: datetime(), updated: datetime() }]->(n)
+              }
+              CALL(n) {
+                UNWIND $outEdges as edge
+                  MATCH (m) WHERE elementId(m) = edge.elementId
+                  CREATE (n)-[:$(edge.type) { created: datetime(), updated: datetime() }]->(m)
+              }
+            RETURN count(*) AS result`,
+        { ...data, newNode },
+      );
+
+      // Delete the current node: this action will flag all impacted messages
+      await this.deleteNode(type, id, tx);
+
+      // Commit
+      await tx.commit();
+      await this.updateNodesInMainIndex([
+        { type: newType, id: newNode.id },
+        { type, id },
+      ]);
+
+      return { type: newType, id: newNode.id };
     } catch (e) {
       tx.rollback();
       throw Boom.internal(`Failed to changeNodeType ${type}/${id} with new type ${type}`, e);
@@ -198,7 +221,7 @@ export class DatasetEdition {
         tx,
         ` MATCH (n:${Neo4jLabels[type]} { id: $id })<-[r:CONTAINS]-(m:Message { id: $messageId }) 
           SET r.deleted = true, 
-            r.updated = datetime()
+              r.updated = datetime()
           RETURN 1 as result`,
         { id, messageId },
       );
@@ -686,6 +709,7 @@ export class DatasetEdition {
     // Check that the node exists
     const data = await this.neo4j.getTxFirstResultQuery<{
       elementId: string;
+      name: string;
       otherNames: string[];
       inEdges: Array<{ elementId: string; type: string }>;
       outEdges: Array<{ elementId: string; type: string }>;
@@ -695,6 +719,7 @@ export class DatasetEdition {
       ` MATCH (n:${Neo4jLabels[type]} { id: $id }) 
         RETURN {
           elementId: elementId(n),
+          name: n.name,
           otherNames: coalesce(n.otherNames, []),
           inEdges: [(n)<-[r]-(m) WHERE NOT coalesce(r.deleted, false) | { elementId: elementId(m), type: type(r) }],
           outEdges: [(n)-[r]->(m) WHERE NOT coalesce(r.deleted, false) | { elementId: elementId(m), type: type(r) }],
