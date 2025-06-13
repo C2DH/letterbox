@@ -17,7 +17,11 @@ export const CompanyCard: FC<{ data: CompanyInlineFragment }> = ({ data }) => {
   return (
     <>
       <h5 className="card-title">
-        <Link className="text-dark" to={`/company/${data.id}`}>
+        <Link
+          className="text-dark"
+          to={`/company/${data.id}`}
+          title={`View company "${data.name}"`}
+        >
           {data.name}
         </Link>
         <ItemVerified item={data} />

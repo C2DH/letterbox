@@ -15,7 +15,11 @@ export const CountryCard: FC<{ data: CountryInlineFragment }> = ({ data }) => {
   return (
     <>
       <h5 className="card-title">
-        <Link className="text-dark" to={`/country/${data.id}`}>
+        <Link
+          className="text-dark"
+          to={`/country/${data.id}`}
+          title={`View country "${data.name}"`}
+        >
           {data.name}
         </Link>
         <ItemVerified item={data} />

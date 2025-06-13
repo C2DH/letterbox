@@ -15,6 +15,7 @@ export const InCartButton: FC<{ type: ItemType; id: string; label: string; fromC
   return (
     <button
       className="btn btn-sm btn-outline-purple-300 btn-ico p-1"
+      title={inCart ? 'Remove from cart' : 'Add to cart'}
       onClick={(e) => {
         e.preventDefault();
         e.stopPropagation();

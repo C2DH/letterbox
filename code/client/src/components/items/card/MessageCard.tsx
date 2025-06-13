@@ -33,7 +33,11 @@ export const MessageCard: FC<{ data: MessageInlineFragment }> = ({ data }) => {
   return (
     <>
       <h5 className="card-title d-flex flex-row align-items-baseline">
-        <Link to={`/message/${data.id}`} className="flex-grow-1 flex-shrink-1">
+        <Link
+          to={`/message/${data.id}`}
+          className="flex-grow-1 flex-shrink-1"
+          title={`View message "${name}"`}
+        >
           {name}
           {data.companiesCount > 3 && ` and ${data.companiesCount - 3} more`}
         </Link>

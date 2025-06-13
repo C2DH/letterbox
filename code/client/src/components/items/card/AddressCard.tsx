@@ -15,7 +15,11 @@ export const AddressCard: FC<{ data: AddressInlineFragment }> = ({ data }) => {
   return (
     <>
       <h5 className="card-title">
-        <Link className="text-dark me-1" to={`/address/${data.id}`}>
+        <Link
+          className="text-dark me-1"
+          to={`/address/${data.id}`}
+          title={`View address "${data.name}"`}
+        >
           {data.name}
         </Link>
         <ItemVerified item={data} />
