@@ -36,7 +36,8 @@ export const QuickSwapTypeMenu: FC<{ type: ItemType; id: string }> = ({ type: it
                   ? 'border-1 border-top-0 border-end-0 border-bottom-0 btn-outline-purple-300'
                   : 'btn-outline-purple-300 border-0',
             )}
-            onClick={async () => {
+            onClick={async (e) => {
+              e.stopPropagation();
               setLoading(type);
               try {
                 await changeItemType(itemType as DataItemType, id, type as DataItemType);
