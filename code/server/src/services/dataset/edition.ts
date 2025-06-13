@@ -61,7 +61,7 @@ export class DatasetEdition {
       await tx.commit();
       return { type, id: nodeId };
     } catch (e) {
-      tx.rollback();
+      await tx.rollback();
       throw Boom.internal(`Failed to create ${type} with name ${name}`, e);
     } finally {
       await tx.close();
@@ -98,7 +98,7 @@ export class DatasetEdition {
       await this.markMessagesForReIndexing(tx, [messageId]);
       await tx.commit();
     } catch (e) {
-      tx.rollback();
+      await tx.rollback();
       throw Boom.internal(`Failed to link ${type}/${id} on message ${messageId}`, e);
     } finally {
       await tx.close();
@@ -132,7 +132,7 @@ export class DatasetEdition {
       await tx.commit();
       await this.updateNodesInMainIndex([{ type, id }]);
     } catch (e) {
-      tx.rollback();
+      await tx.rollback();
       throw Boom.internal(`Failed to renameNode ${type}/${id} with name ${name}`, e);
     } finally {
       await tx.close();
@@ -194,7 +194,7 @@ export class DatasetEdition {
 
       return { type: newType, id: newNode.id };
     } catch (e) {
-      tx.rollback();
+      await tx.rollback();
       throw Boom.internal(`Failed to changeNodeType ${type}/${id} with new type ${type}`, e);
     } finally {
       await tx.close();
@@ -274,7 +274,7 @@ export class DatasetEdition {
         await this.updateNodesInMainIndex([{ type, id }]);
       }
     } catch (e) {
-      if (!tx) currentTx.rollback();
+      if (!tx) await currentTx.rollback();
       throw Boom.internal(`Failed to delete ${type}/${id}`, e);
     } finally {
       if (!tx) await currentTx.close();

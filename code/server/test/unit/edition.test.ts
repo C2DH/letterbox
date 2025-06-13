@@ -69,11 +69,11 @@ describe('Dataset edition', () => {
 
       // Do the change
       // ~~~~~~~~~~~~~~~~~~~~~~
-      await edition.changeNodeType('company', company.id, 'person');
+      const { id } = await edition.changeNodeType('company', company.id, 'person');
 
       // Check the node has been changed
       // ~~~~~~~~~~~~~~~~~~~~~~
-      const newValue = await getItemData('person', company.id);
+      const newValue = await getItemData('person', id);
       expect(newValue).not.toBeNull();
       expect(newValue!.name).toBe(company.name);
     });
