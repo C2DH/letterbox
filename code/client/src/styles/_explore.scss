@@ -15,8 +15,80 @@ main {
   overflow-y: auto;
 }
 
+.explore-header {
+  height: 150px;
+}
+
 .timeline {
-  height: 48px;
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: end;
+
+  .timeline-barchart {
+    position: absolute;
+    inset: 0;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+
+    .bar-wrapper {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: end;
+      align-items: center;
+
+      .bar {
+        background: $secondary;
+      }
+    }
+  }
+
+  .filter-range,
+  .local-range {
+    position: absolute;
+    top: 0;
+    height: 100%;
+  }
+  .filter-range {
+    background: $white;
+    transition: all ease-in-out 0.4s;
+  }
+  .local-range {
+    border: 1px solid $secondary;
+    transition: all ease-out 0.05s;
+    cursor: col-resize;
+
+    .handle {
+      position: absolute;
+      border: 1px solid $secondary;
+      border-radius: 100%;
+      background: $yellow-100;
+      top: 50%;
+      margin-top: -1em;
+      height: 2em;
+      width: 2em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      &.handle-left {
+        left: -1em;
+        cursor: w-resize;
+      }
+      &.handle-right {
+        right: -1em;
+        cursor: e-resize;
+      }
+    }
+  }
+
+  &.dragging {
+    user-select: none;
+  }
 }
 
 .histogram-row:hover {

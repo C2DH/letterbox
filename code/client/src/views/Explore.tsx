@@ -106,9 +106,9 @@ export const Explore: FC = () => {
       {/* MAIN CONTENT */}
       <main className="p-4">
         {/* HEADER (timeline + date inputs) */}
-        <section className="d-flex flex-row align-items-end mb-4">
-          <div className="me-4 timeline flex-grow-1">
-            <Timeline filters={state} itemType={ITEM_TYPE_TO_DATA_TYPE[selectedType]} />
+        <section className="explore-header d-flex flex-row align-items-end mb-4">
+          <div className="h-100 flex-grow-1">
+            <Timeline itemType={ITEM_TYPE_TO_DATA_TYPE[selectedType]} />
           </div>
           <div>
             <DateFacet />
