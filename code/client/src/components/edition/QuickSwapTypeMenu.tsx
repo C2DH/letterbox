@@ -9,6 +9,7 @@ import { useEditionContext } from '../../core/edition.ts';
 import { DataItemType } from '../../core/graphql/index.ts';
 import { useItemActions } from '../../hooks/useItemActions.tsx';
 import { isInCart } from '../../utils/edition.ts';
+import { getErrorData } from '../../utils/error.ts';
 
 export const QuickSwapTypeMenu: FC<{ type: ItemType; id: string }> = ({ type: itemType, id }) => {
   const [loading, setLoading] = useState<ItemType | undefined>(undefined);
@@ -50,6 +51,8 @@ export const QuickSwapTypeMenu: FC<{ type: ItemType; id: string }> = ({ type: it
                 // reload the page but after 1s to let notification appear...
                 setTimeout(() => navigate(0), 1500);
                 notify({ type: 'success', text: `Item type changed to "${type}"` });
+              } catch (e) {
+                notify({ type: 'error', text: `Error changing item type: ${getErrorData(e)}` });
               } finally {
                 setLoading(undefined);
               }
