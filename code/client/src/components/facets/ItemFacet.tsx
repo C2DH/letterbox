@@ -9,6 +9,7 @@ import {
   useInputKeywords,
   useKeywordsFacetSimpleHistogram,
 } from '@ouestware/facets-client';
+import { InfiniteScroll } from '@ouestware/infinite-scroll';
 import { Spinner } from '@ouestware/loaders';
 import cx from 'classnames';
 import { keyBy, pick, without } from 'lodash';
@@ -191,26 +192,38 @@ const Histogram: FC<
           </li>
         ))}
       </ul>
-      <ul className="list-unstyled">
-        {unselected.map(({ label, value, count, link }, i) => (
-          <li key={i} className="d-flex">
-            <HistogramRow
-              itemType={itemType}
-              selectedType={selectedType}
-              label={label}
-              value={value}
-              count={count}
-              link={link}
-              onClick={() => {
-                onChange((values || []).concat([value]));
-              }}
-              maxCount={maxCount}
-              index={i}
-              Icon={RiFilterLine}
-            />
+      <InfiniteScroll
+        list={({ children }) => <ul className="list-unstyled">{children}</ul>}
+        bottom={() => (
+          <li className="text-center pt-3">
+            <Spinner />
           </li>
-        ))}
-      </ul>
+        )}
+        loadData={async (from) => {
+          const valuesToLoad = unselected.slice(from, from + 20);
+          return {
+            data: valuesToLoad.map((item, index) => ({ item, index: from + index })),
+            total: unselected.length,
+          };
+        }}
+        getDataId={(data: { item: ItemValue }) => `${data.item.label}-${data.item.count}`}
+        element={({ data }) => (
+          <HistogramRow
+            itemType={itemType}
+            selectedType={selectedType}
+            label={data.item.label}
+            value={data.item.value}
+            count={data.item.count}
+            link={data.item.link}
+            onClick={() => {
+              onChange((values || []).concat([data.item.value]));
+            }}
+            maxCount={maxCount}
+            index={data.index}
+            Icon={RiFilterLine}
+          />
+        )}
+      />
       <div className="d-flex align-items-baseline flex-row small">
         {/* <button type="button" className="btn btn-sm btn-outline-dark" disabled>
           TODO: Load more
