@@ -45,6 +45,24 @@ main {
         background: $secondary;
       }
     }
+
+    &.axis-x  {
+      inset: unset;
+      width: 100%;
+      top: 100%;
+
+      .bar-wrapper {
+        .tick {
+          width: 1px;
+          height: 5px;
+          background-color: var(--bs-border-color-translucent);
+        }
+        .label {
+          font-size: 0.75em;
+          line-height: 0.75em;
+        }
+      }
+    }
   }
 
   .filter-range,
@@ -82,6 +100,11 @@ main {
       &.handle-right {
         right: -1em;
         cursor: e-resize;
+      }
+      &.handle-close {
+        top: 0;
+        right: -1em;
+        cursor: pointer;
       }
     }
   }

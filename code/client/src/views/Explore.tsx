@@ -107,10 +107,15 @@ export const Explore: FC = () => {
       <main className="p-4">
         {/* HEADER (timeline + date inputs) */}
         <section className="explore-header d-flex flex-row align-items-end mb-4">
-          <div className="h-100 flex-grow-1">
+          <div
+            className="h-100 flex-grow-1"
+            style={{
+              borderBottom: 'var(--bs-border-width) solid var(--bs-border-color-translucent)',
+            }}
+          >
             <Timeline itemType={ITEM_TYPE_TO_DATA_TYPE[selectedType]} />
           </div>
-          <div>
+          <div className="ps-2">
             <DateFacet />
           </div>
         </section>
