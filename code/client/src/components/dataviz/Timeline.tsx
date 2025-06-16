@@ -5,7 +5,15 @@ import { getAsyncMemoData, useAsyncMemo } from '@ouestware/hooks';
 import { LoaderFill } from '@ouestware/loaders';
 import cx from 'classnames';
 import { clamp, fromPairs, max, range } from 'lodash';
-import { CSSProperties, FC, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  CSSProperties,
+  FC,
+  MouseEvent as ReactMouseEvent,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { RiContractLeftLine, RiContractRightLine } from 'react-icons/ri';
 
 import config from '../../config.ts';
@@ -25,7 +33,7 @@ type BaseDragMouseState = {
 type DragHandleMouseState = BaseDragMouseState & {
   type: 'dragHandle';
   side: 'left' | 'right';
-  initialValue: number;
+  initialExtents: Extents;
 };
 type DragSliderMouseState = BaseDragMouseState & {
   type: 'dragSlider';
@@ -44,6 +52,15 @@ function getSliderStyle(extents: Extents): CSSProperties {
     left: ((min - minYear) / (maxYear - minYear + 1)) * 100 + '%',
     right: ((maxYear - max) / (maxYear - minYear + 1)) * 100 + '%',
   };
+}
+
+function getX(e: ReactMouseEvent | MouseEvent, referential: HTMLElement): number {
+  return e.pageX - referential.getBoundingClientRect().left;
+}
+
+function getYear(x: number, width: number): number {
+  const yearPx = width / (maxYear - minYear + 1);
+  return minYear + Math.floor(x / yearPx);
 }
 
 export const Timeline: FC<{
@@ -91,7 +108,7 @@ export const Timeline: FC<{
       e.stopPropagation();
       setMouse({
         ...mouse,
-        x: e.clientX,
+        x: getX(e, root.current!),
       });
     };
     const upHandler = () => {
@@ -134,35 +151,39 @@ export const Timeline: FC<{
         });
         break;
       }
-      case 'dragHandle':
-        if (mouse.side === 'left') {
-          setExtents((state) => {
-            const { x, initialX, initialValue: min } = mouse;
-            const offset = x - initialX;
-            const yearsOffset = Math.round(
-              (offset / root.current!.offsetWidth) * (maxYear - minYear + 1),
-            );
-            const clampedNewMin = clamp(min + yearsOffset, minYear, state?.max ?? maxYear);
-            return {
-              min: clampedNewMin,
-              max: state?.max ?? maxYear,
-            };
-          });
-        } else {
-          setExtents((state) => {
-            const { x, initialX, initialValue: max } = mouse;
-            const offset = x - initialX;
-            const yearsOffset = Math.round(
-              (offset / root.current!.offsetWidth) * (maxYear - minYear + 1),
-            );
-            const clampedNewMax = clamp(max + yearsOffset, state?.min ?? minYear, maxYear);
-            return {
-              min: state?.min ?? minYear,
-              max: clampedNewMax,
-            };
-          });
-        }
+      case 'dragHandle': {
+        setExtents(() => {
+          const { x, initialX, initialExtents } = mouse;
+          const offset = x - initialX;
+          const yearsOffset = Math.round(
+            (offset / root.current!.offsetWidth) * (maxYear - minYear + 1),
+          );
+          let newMin = initialExtents?.min ?? minYear;
+          let newMax = initialExtents?.max ?? maxYear;
+
+          if (mouse.side === 'left') {
+            const clampedNewMin = clamp(newMin + yearsOffset, minYear, maxYear);
+            if (clampedNewMin <= newMax) newMin = clampedNewMin;
+            else {
+              newMin = newMax;
+              newMax = clampedNewMin;
+            }
+          } else {
+            const clampedNewMax = clamp(newMax + yearsOffset, minYear, maxYear);
+            if (clampedNewMax >= newMin) newMax = clampedNewMax;
+            else {
+              newMax = newMin;
+              newMin = clampedNewMax;
+            }
+          }
+
+          return {
+            min: newMin,
+            max: newMax,
+          };
+        });
         break;
+      }
     }
   }, [mouse]);
 
@@ -181,13 +202,30 @@ export const Timeline: FC<{
       {filter && <div className="filter-range" style={getSliderStyle(filter)}></div>}
       <div
         className="timeline-barchart"
-        onClick={(e) => {
+        onMouseDown={(e) => {
+          if (mouse.type !== 'idle' || extents || !root.current) return;
+
           e.stopPropagation();
           e.preventDefault();
 
-          const x = e.pageX - root.current!.getBoundingClientRect().x;
-          const mouseYear =
-            minYear + Math.round((x / root.current!.offsetWidth) * (maxYear - minYear + 1));
+          const x = getX(e, root.current);
+          const mouseYear = getYear(x, root.current.offsetWidth);
+
+          setMouse({
+            type: 'dragHandle',
+            side: 'right',
+            initialExtents: { min: mouseYear, max: mouseYear },
+            initialX: x,
+            x,
+          });
+        }}
+        onClick={(e) => {
+          if (!root.current || !filter) return;
+
+          e.stopPropagation();
+          e.preventDefault();
+
+          const mouseYear = getYear(getX(e, root.current), root.current.offsetWidth);
 
           if (extents) {
             const { min = minYear, max = maxYear } = extents;
@@ -232,10 +270,12 @@ export const Timeline: FC<{
           onMouseDown={(e) => {
             e.stopPropagation();
             e.preventDefault();
+
+            const x = getX(e, root.current!);
             setMouse({
               type: 'dragSlider',
-              x: e.clientX,
-              initialX: e.clientX,
+              x,
+              initialX: x,
               initialExtents: extents,
             });
           }}
@@ -246,12 +286,14 @@ export const Timeline: FC<{
             onMouseDown={(e) => {
               e.stopPropagation();
               e.preventDefault();
+
+              const x = getX(e, root.current!);
               setMouse({
                 type: 'dragHandle',
                 side: 'left',
-                x: e.clientX,
-                initialX: e.clientX,
-                initialValue: extents?.min ?? minYear,
+                x,
+                initialX: x,
+                initialExtents: extents,
               });
             }}
           >
@@ -262,12 +304,14 @@ export const Timeline: FC<{
             onMouseDown={(e) => {
               e.stopPropagation();
               e.preventDefault();
+
+              const x = getX(e, root.current!);
               setMouse({
                 type: 'dragHandle',
                 side: 'right',
-                x: e.clientX,
-                initialX: e.clientX,
-                initialValue: extents?.max ?? maxYear,
+                x,
+                initialX: x,
+                initialExtents: extents,
               });
             }}
           >
