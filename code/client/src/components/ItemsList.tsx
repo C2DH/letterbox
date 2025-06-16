@@ -99,13 +99,19 @@ export const ItemsList: FC<{ itemType: ItemType }> = ({ itemType }) => {
       let hasMore = true;
       let from = 0;
       while (hasMore) {
-        const result = await loadData(from, 500);
-        if (result.data.length === 0) hasMore = false;
-        else {
-          for (const item of result.data) {
-            writer.write(new TextEncoder().encode(objectToCSV(item, headers) + '\n'));
-            from++;
-          }
+        // With from & size, ES has a limit of 10k results
+        let limit = 500;
+        if (from + 500 >= 10000) {
+          limit = 10000 - from;
+          hasMore = false; // We are at the limit of 10k items
+        }
+        const result = await loadData(from, limit);
+        for (const item of result.data) {
+          writer.write(new TextEncoder().encode(objectToCSV(item, headers) + '\n'));
+          from++;
+        }
+        if (result.data.length < 500) {
+          hasMore = false; // No more data to fetch
         }
       }
       notify({
@@ -142,7 +148,7 @@ export const ItemsList: FC<{ itemType: ItemType }> = ({ itemType }) => {
             <QueryForm itemType={itemType} />
             <button
               className="btn btn-outline-dark btn-ico p-2 ms-2"
-              title={`Download top 500 ${ITEM_TYPE_LABELS_PLURAL[itemType].toLowerCase()}`}
+              title={`Download ${ITEM_TYPE_LABELS_PLURAL[itemType].toLowerCase()} (Limited to 10k items)`}
               onClick={download}
             >
               <RiDownloadLine />

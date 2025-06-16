@@ -295,19 +295,59 @@ export const ItemFacet: FC<{ itemType: ItemType; selectedType: ItemType }> = ({
    * It takes the histogramData that we already have, and generate a CSV of it.
    */
   const download = useCallback(() => {
-    const fileStream = streamSaver.createWriteStream(
-      `${ITEM_TYPE_LABELS_PLURAL[itemType].toLowerCase()}-top500.csv`,
-    );
-    const writer = fileStream.getWriter();
     // Header
-    writer.write(new TextEncoder().encode('Label,Count,ID\n'));
+    let headerLine = ``;
+    let fileName = 'top500-';
+    switch (itemType) {
+      case 'address':
+        headerLine += `Address`;
+        fileName += 'addresses';
+        break;
+      case 'country':
+        headerLine = `Country`;
+        fileName += 'countries';
+        break;
+      case 'company':
+        headerLine = `Company`;
+        fileName += 'companies';
+        break;
+      case 'person':
+        headerLine = `Person`;
+        fileName += 'persons';
+        break;
+    }
+    switch (selectedType) {
+      case 'address':
+        headerLine += `,Count by address`;
+        fileName += '-by-address';
+        break;
+      case 'country':
+        headerLine += `,Count by country`;
+        fileName += '-by-country';
+        break;
+      case 'company':
+        headerLine += `,Count by company`;
+        fileName += '-by-company';
+        break;
+      case 'person':
+        headerLine += `,Count by person`;
+        fileName += '-by-person';
+        break;
+    }
+    headerLine += `,ID\n`;
+    fileName += '.csv';
+
+    const fileStream = streamSaver.createWriteStream(fileName);
+    const writer = fileStream.getWriter();
+
+    writer.write(new TextEncoder().encode(headerLine));
     histogramData.histogramValues?.forEach(({ value, label, count }) => {
       writer.write(
         new TextEncoder().encode(`"${label?.split(`"`).join(`""`)}",${count},${value},\n`),
       );
     });
     writer.close();
-  }, [itemType, histogramData]);
+  }, [itemType, selectedType, histogramData]);
 
   return (
     <>
