@@ -1,6 +1,7 @@
 import { DateFilter } from '@ouestware/facets';
 import { useFacetsContext } from '@ouestware/facets-client';
 import { FC, useEffect, useMemo, useState } from 'react';
+import { RiCloseFill } from 'react-icons/ri';
 
 import config from '../../config.ts';
 
@@ -46,17 +47,27 @@ export const DateFacet: FC = () => {
             <label htmlFor={`date-${key}`} className="form-label">
               {label}
             </label>
-            <input
-              type="number"
-              className="form-control"
-              style={{ width: 120 }}
-              id={`date-${key}`}
-              value={state[key] || ''}
-              placeholder={placeholder + ''}
-              onChange={(e) =>
-                setState({ ...state, [key]: e.target.value ? +e.target.value : undefined })
-              }
-            />
+            <div className="input-group">
+              <input
+                type="number"
+                className="form-control"
+                style={{ width: 120 }}
+                id={`date-${key}`}
+                value={state[key] || ''}
+                placeholder={placeholder + ''}
+                onChange={(e) =>
+                  setState({ ...state, [key]: e.target.value ? +e.target.value : undefined })
+                }
+              />
+              <button
+                className="btn btn-outline-secondary"
+                type="button"
+                title={'Set to default value'}
+                onClick={() => setState({ ...state, [key]: undefined })}
+              >
+                <RiCloseFill />
+              </button>
+            </div>
           </div>
         ))}
         <button className="btn ms-2" type="submit" disabled={isDisabled}>
