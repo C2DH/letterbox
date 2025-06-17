@@ -19,7 +19,7 @@ export const IndexationManagement: FC = () => {
   return (
     <div>
       {onGoingIndexation === undefined && (
-        <div className="d-flex justify-content-between">
+        <div className="d-flex justify-content-between gap-1">
           <button
             className="btn btn-purple-300"
             disabled={nbItemsWithPendingModifications === 0}
@@ -27,7 +27,7 @@ export const IndexationManagement: FC = () => {
           >
             Update Explorer
           </button>
-          <div>
+          <div className="text-center">
             Items impacted:
             <br />
             {nbItemsWithPendingModifications
