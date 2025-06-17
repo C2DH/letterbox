@@ -12,10 +12,6 @@ export const DateFacet: FC = () => {
   } = useFacetsContext();
   const [state, setState] = useState<{ min?: number; max?: number }>({});
   const filter = useMemo(() => (filters || {}).date as DateFilter | undefined, [filters]);
-  const isDisabled = useMemo(
-    () => filter?.min === state.min && filter?.max === state.max,
-    [filter?.max, filter?.min, state.max, state.min],
-  );
 
   useEffect(() => {
     setState({
@@ -63,14 +59,21 @@ export const DateFacet: FC = () => {
                 className="btn btn-outline-secondary"
                 type="button"
                 title={'Set to default value'}
-                onClick={() => setState({ ...state, [key]: undefined })}
+                onClick={() => {
+                  setFilter('date', {
+                    ...(filter || {}),
+                    ...state,
+                    type: 'date',
+                    [key]: undefined,
+                  });
+                }}
               >
                 <RiCloseFill />
               </button>
             </div>
           </div>
         ))}
-        <button className="btn ms-2" type="submit" disabled={isDisabled}>
+        <button className="btn ms-2" type="submit">
           Update
         </button>
       </section>
