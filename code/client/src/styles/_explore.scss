@@ -8,6 +8,9 @@ aside {
   width: 316px;
   flex-shrink: 0;
   background: $gray-100;
+  @include media-breakpoint-down(xl) {
+    width: 237px;
+  }
 }
 
 main {
@@ -120,8 +123,30 @@ main {
     user-select: none;
   }
 }
+.histogram-row {
+  --histoPadding: 2rem;
+  display: flex;
+  gap: 1rem;
+  padding: 0 var(--histoPadding) 0 var(--histoPadding);
 
-.histogram-row:hover {
-  background-color: $yellow-250 !important;
-  border-radius: $spacer * 0.25;
+  &:hover {
+    background-color: $yellow-250 !important;
+    border-radius: $spacer * 0.25;
+  }
+
+  .histogram-row-index-marker {
+    width: calc(var(--histoPadding) - 0.2rem);
+    padding-left: 0px;
+  }
+
+  @include media-breakpoint-down(xl) {
+    --histoPadding: 0.5rem;
+    .histogram-row-index-marker {
+      display: none;
+    }
+
+    .histogram-row-value {
+      display: none;
+    }
+  }
 }

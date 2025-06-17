@@ -31,6 +31,7 @@ import {
   REACT_SELECT_BASE_PROPS,
 } from '../../core/consts.tsx';
 import { useEditionContext } from '../../core/edition.ts';
+import { shortenNumber } from '../../utils/number.ts';
 import { InCartButton } from '../edition/InCartButton.tsx';
 import { EditionActionsTooltip } from '../edition/tooltips.tsx';
 
@@ -61,64 +62,65 @@ const HistogramRow: FC<
 
   return (
     <div
-      className="histogram-row btn btn-light bg-transparent w-100 border-0 py-3 ps-4 pe-3 position-relative"
+      className="histogram-row  w-100 border-0  position-relative"
       title={`${label || 'No value'} (linked to ${count.toLocaleString(APP_LANGUAGE)} ${(count > 1 ? ITEM_TYPE_LABELS_PLURAL[selectedType] : ITEM_TYPE_LABELS[selectedType]).toLowerCase()})`}
-      onClick={(e) => {
-        e.preventDefault();
-        onClick();
-      }}
     >
-      <div className="d-flex flex-row align-items-bottom">
-        <div className="position-relative flex-grow-1 text-start">
-          <span>
-            {label || <span className="muted fst-italic">No value</span>}
-            {link && (
-              <>
-                {' '}
-                <Link
-                  to={link}
-                  target="_blank"
-                  className="text-dark"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <RiShareBoxLine />
-                </Link>
-              </>
-            )}
+      {/* clickable part of the row */}
+      <div
+        className="d-flex h-100 flex-column flex-grow-1 justify-content-middle py-4 align-items-bottom btn btn-light bg-transparent border-0 position-relative p-0 "
+        onClick={(e) => {
+          e.preventDefault();
+          onClick();
+        }}
+      >
+        <div className=" flex-grow-1 d-flex gap-1 align-items-center text-start justify-content-between">
+          <span className="d-flex align-items-center gap-1">
+            {label ? <span>{label}</span> : <span className="muted fst-italic">No value</span>}{' '}
+            <Icon className="flex-shrink-0" />
           </span>
-          <div
-            style={{
-              height: 4,
-            }}
-            className={cx(
-              'position-absolute top-100 w-100 start-0 mt-1',
-              active ? 'bg-yellow-100' : 'bg-light-gray',
-            )}
-          >
-            <div
-              className={cx('h-100', active ? 'bg-primary' : 'bg-secondary')}
-              style={{ width: (count / maxCount) * 100 + '%' }}
-            />
-          </div>
 
-          {typeof index === 'number' && (index === 0 || !((index + 1) % 5)) && (
-            <span
-              className="text-muted position-absolute end-100 ps-2 top-0 text-start small"
-              style={{ width: '40px', marginTop: '2px' }}
-            >
-              {index + 1}
-            </span>
+          <span className="histogram-row-value">{shortenNumber(count)}</span>
+        </div>
+        <div
+          style={{
+            height: 4,
+          }}
+          className={cx(
+            ' mt-1', //position-absolute top-100 w-100 start-0
+            active ? 'bg-yellow-100' : 'bg-light-gray',
           )}
+        >
+          <div
+            className={cx('h-100', active ? 'bg-primary' : 'bg-secondary')}
+            style={{ width: (count / maxCount) * 100 + '%' }}
+          />
         </div>
 
-        <div className="ms-2 d-inline-flex flex-column align-items-end justify-content-center">
-          <Icon className="flex-shrink-0" />
+        {typeof index === 'number' && (index === 0 || !((index + 1) % 5)) && (
+          <span className="histogram-row-index-marker text-muted position-absolute end-100  top-10 text-start small h-100">
+            {index + 1}
+          </span>
+        )}
+      </div>
 
+      <div className="h-100 my-auto d-flex align-items-center    ">
+        <div className="  d-flex flex-row justify-content-center  gap-1 flex-wrap">
           {enabled && itemType !== 'message' && (
-            <div className="p-0 py-1 d-flex flex-row align-items-baseline gap-1">
+            <>
               <InCartButton label={label || value} type={itemType} id={value} />
               <EditionActionsTooltip itemType={itemType} id={value} label={label || value} />
-            </div>
+            </>
+          )}
+
+          {link && (
+            <Link
+              to={link}
+              target="_blank"
+              className="text-dark"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <RiShareBoxLine />
+            </Link>
           )}
         </div>
       </div>
@@ -208,20 +210,22 @@ const Histogram: FC<
         }}
         getDataId={(data: { item: ItemValue }) => `${data.item.label}-${data.item.count}`}
         element={({ data }) => (
-          <HistogramRow
-            itemType={itemType}
-            selectedType={selectedType}
-            label={data.item.label}
-            value={data.item.value}
-            count={data.item.count}
-            link={data.item.link}
-            onClick={() => {
-              onChange((values || []).concat([data.item.value]));
-            }}
-            maxCount={maxCount}
-            index={data.index}
-            Icon={RiFilterLine}
-          />
+          <li className="d-flex">
+            <HistogramRow
+              itemType={itemType}
+              selectedType={selectedType}
+              label={data.item.label}
+              value={data.item.value}
+              count={data.item.count}
+              link={data.item.link}
+              onClick={() => {
+                onChange((values || []).concat([data.item.value]));
+              }}
+              maxCount={maxCount}
+              index={data.index}
+              Icon={RiFilterLine}
+            />
+          </li>
         )}
       />
       <div className="d-flex align-items-baseline flex-row small">
