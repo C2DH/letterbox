@@ -26,10 +26,20 @@ export const EditionActionsTooltip: FC<{
         type="button"
         className="btn btn-sm btn-ico p-1 btn-outline-purple-300"
         title={'Edition tools'}
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+        }}
       >
         <RiMore2Line />
       </button>
-      <div className="border border-light-gray rounded bg-white color-purple-300 overflow-hidden p-2">
+      <div
+        className="border border-light-gray rounded bg-white color-purple-300 overflow-hidden p-2"
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+        }}
+      >
         Edition tools:
         <ItemEditionMenu type={itemType} id={id} label={label} messageId={fromMessageId} />
         Item type:
