@@ -106,7 +106,7 @@ export const Explore: FC = () => {
       {/* MAIN CONTENT */}
       <main className="p-4">
         {/* HEADER (timeline + date inputs) */}
-        <section className="explore-header d-flex flex-row align-items-end mb-4">
+        <section className="explore-header d-flex flex-row align-items-end mb-4 pb-1">
           <div
             className="h-100 flex-grow-1"
             style={{

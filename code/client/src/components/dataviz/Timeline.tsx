@@ -81,6 +81,7 @@ export const Timeline: FC<{
   const dataState = useAsyncMemo(
     () =>
       client.query({
+        fetchPolicy: 'no-cache',
         query: itemType === 'message' ? messagesTimeline : itemsTimeline,
         variables: {
           itemType,
@@ -201,12 +202,17 @@ export const Timeline: FC<{
     <>
       <section className={cx('timeline', mouse.type !== 'idle' && 'dragging')} ref={root}>
         {filter && <div className="filter-range" style={getSliderStyle(filter)}></div>}
-        <div className="timeline-barchart axis-x">
+        <div className="timeline-barchart axis-x justify-content-around">
           {range(minYear, maxYear + 1).map((year) => {
             return (
-              <div key={year} className="bar-wrapper fs-6" style={{ width: 5 }}>
-                {year % 10 === 0 && (
-                  <span className="d-flex flex-column align-items-center">
+              <div key={year} className="bar-wrapper flex-grow-0 fs-6" style={{ width: 5 }}>
+                {(year % 10 === 0 || year === minYear || year === maxYear) && (
+                  <span
+                    className={cx(
+                      'd-flex flex-column w-100',
+                      year === minYear ? 'align-items-start' : 'align-items-center',
+                    )}
+                  >
                     <span className="tick" />
                     <span className="label">{year}</span>
                   </span>

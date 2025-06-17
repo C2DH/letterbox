@@ -46,15 +46,17 @@ main {
       }
     }
 
-    &.axis-x  {
+    &.axis-x {
       inset: unset;
       width: 100%;
       top: 100%;
 
       .bar-wrapper {
         .tick {
-          width: 2px;
-          height: 6px;
+          width: 5px;
+          height: 4px;
+          margin-top: 2px;
+          margin-bottom: 4px;
           background-color: var(--bs-border-color-translucent);
         }
         .label {
@@ -79,6 +81,7 @@ main {
     border: 1px solid $secondary;
     transition: all ease-out 0.05s;
     cursor: col-resize;
+    margin: 0 -0.5px;
 
     .handle {
       position: absolute;
@@ -101,11 +104,15 @@ main {
         right: -1em;
         cursor: e-resize;
       }
-      &.handle-close {
-        top: 0.5em;
-        right: -0.5em;
-        cursor: pointer;
-      }
+    }
+
+    .handle-close {
+      top: 0;
+      height: 1.5em;
+      width: 1.5em;
+      margin-top: -0.75em;
+      right: -0.75em;
+      cursor: pointer;
     }
   }
 
