@@ -1,5 +1,6 @@
 import { Spinner } from '@ouestware/loaders';
 import { FC, useEffect } from 'react';
+import { RiLoopRightFill } from 'react-icons/ri';
 
 import { useIndexationManagement } from '../../hooks/useIndexationManagement';
 
@@ -17,22 +18,24 @@ export const IndexationManagement: FC = () => {
   }, [refetch]);
 
   return (
-    <div>
+    <div className="indexation-management">
       {onGoingIndexation === undefined && (
-        <div className="d-flex justify-content-between gap-1">
-          <button
-            className="btn btn-purple-300"
-            disabled={nbItemsWithPendingModifications === 0}
-            onClick={indexPendingModifications}
-          >
-            Update Explorer
-          </button>
-          <div className="text-center">
-            Items impacted:
-            <br />
+        <div className="d-flex flex-column justify-content-between gap-1">
+          <div className="text-start">
             {nbItemsWithPendingModifications
               ? numberFormat.format(nbItemsWithPendingModifications)
-              : 0}
+              : 0}{' '}
+            Items impacted
+          </div>
+          <div>
+            <button
+              className="btn btn-purple-300 "
+              disabled={nbItemsWithPendingModifications === 0}
+              onClick={indexPendingModifications}
+            >
+              <RiLoopRightFill className="pe-1" />
+              Update Explorer
+            </button>
           </div>
         </div>
       )}

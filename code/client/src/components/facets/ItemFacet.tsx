@@ -31,7 +31,6 @@ import {
   REACT_SELECT_BASE_PROPS,
 } from '../../core/consts.tsx';
 import { useEditionContext } from '../../core/edition.ts';
-import { shortenNumber } from '../../utils/number.ts';
 import { InCartButton } from '../edition/InCartButton.tsx';
 import { EditionActionsTooltip } from '../edition/tooltips.tsx';
 
@@ -67,28 +66,25 @@ const HistogramRow: FC<
     >
       {/* clickable part of the row */}
       <div
-        className="d-flex h-100 flex-column flex-grow-1 justify-content-middle py-4 align-items-bottom btn btn-light bg-transparent border-0 position-relative p-0 "
+        className="clickable-area d-flex h-100 flex-column flex-grow-1 justify-content-middle align-items-bottom btn btn-light bg-transparent border-0 position-relative"
         onClick={(e) => {
           e.preventDefault();
           onClick();
         }}
       >
-        <div className=" flex-grow-1 d-flex gap-1 align-items-center text-start justify-content-between">
-          <span className="d-flex align-items-center gap-1">
-            {label ? <span>{label}</span> : <span className="muted fst-italic">No value</span>}{' '}
-            <Icon className="flex-shrink-0" />
+        <div className=" flex-grow-1 d-flex gap-1 align-items-end text-start justify-content-between">
+          <span className="">
+            {label ? <span>{label} </span> : <span className="muted fst-italic">No value</span>}{' '}
+            <Icon className="align-baseline" />
           </span>
 
-          <span className="histogram-row-value">{shortenNumber(count)}</span>
+          <span className="histogram-row-value">{count.toLocaleString(APP_LANGUAGE)}</span>
         </div>
         <div
           style={{
             height: 4,
           }}
-          className={cx(
-            ' mt-1', //position-absolute top-100 w-100 start-0
-            active ? 'bg-yellow-100' : 'bg-light-gray',
-          )}
+          className={cx(' mt-1', active ? 'bg-yellow-100' : 'bg-light-gray')}
         >
           <div
             className={cx('h-100', active ? 'bg-primary' : 'bg-secondary')}
@@ -97,14 +93,14 @@ const HistogramRow: FC<
         </div>
 
         {typeof index === 'number' && (index === 0 || !((index + 1) % 5)) && (
-          <span className="histogram-row-index-marker text-muted position-absolute end-100  top-10 text-start small h-100">
-            {index + 1}
+          <span className="histogram-row-index-marker text-muted position-absolute  text-start small h-100">
+            <span className="histogram-row-index-marker-value">{index + 1}</span>
           </span>
         )}
       </div>
 
-      <div className="h-100 my-auto d-flex align-items-center    ">
-        <div className="  d-flex flex-row justify-content-center  gap-1 flex-wrap">
+      <div className="h-100 my-auto d-flex align-items-center  justify-content-center actions-container ">
+        <div className="  d-flex flex-row justify-content-start  gap-1  ">
           {enabled && itemType !== 'message' && (
             <>
               <InCartButton label={label || value} type={itemType} id={value} />
@@ -116,7 +112,7 @@ const HistogramRow: FC<
             <Link
               to={link}
               target="_blank"
-              className="text-dark"
+              className="btn btn-ico btn-outline-dark p-1 border-0"
               onClick={(e) => e.stopPropagation()}
             >
               <RiShareBoxLine />
@@ -174,26 +170,28 @@ const Histogram: FC<
 
   return (
     <>
-      <ul className="list-unstyled bg-yellow-300 rounded my-2">
-        {selected.map(({ label, value, count, link }, i) => (
-          <li key={i} className="d-flex">
-            <HistogramRow
-              itemType={itemType}
-              selectedType={selectedType}
-              label={label}
-              value={value}
-              count={count}
-              link={link}
-              onClick={() => {
-                onChange(without(values, value));
-              }}
-              maxCount={maxCount}
-              Icon={RiFilterOffLine}
-              active
-            />
-          </li>
-        ))}
-      </ul>
+      {selected.length > 0 && (
+        <ul className="list-unstyled bg-yellow-300 rounded my-2 py-1">
+          {selected.map(({ label, value, count, link }, i) => (
+            <li key={i} className="d-flex">
+              <HistogramRow
+                itemType={itemType}
+                selectedType={selectedType}
+                label={label}
+                value={value}
+                count={count}
+                link={link}
+                onClick={() => {
+                  onChange(without(values, value));
+                }}
+                maxCount={maxCount}
+                Icon={RiFilterOffLine}
+                active
+              />
+            </li>
+          ))}
+        </ul>
+      )}
       <InfiniteScroll
         list={({ children }) => <ul className="list-unstyled">{children}</ul>}
         bottom={() => (

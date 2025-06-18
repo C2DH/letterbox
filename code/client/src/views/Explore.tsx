@@ -123,7 +123,10 @@ export const Explore: FC = () => {
         {/* LIST BLOCKS */}
         <section className="row align-items-stretch">
           {listBlocks.map((itemType) => (
-            <div key={itemType} className={cx('mb-4', listBlocks.length === 3 ? 'col-4' : 'col-6')}>
+            <div
+              key={itemType}
+              className={cx('mb-4', listBlocks.length === 3 ? 'col-6 col-xxl-4' : 'col-6')}
+            >
               <div
                 className="card overflow-y-auto"
                 style={{ height: listBlocks.length === 3 ? 800 : 400 }}

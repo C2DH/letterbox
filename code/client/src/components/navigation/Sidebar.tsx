@@ -34,7 +34,7 @@ export const Sidebar: FC<{ activeItemType?: ItemType }> = ({ activeItemType }) =
         <EditionPanel />
       </section>
 
-      <section className="flex-shrink-0 p-4">
+      <section className="flex-shrink-0 p-4 position-relative">
         <IndexationManagement />
       </section>
     </aside>

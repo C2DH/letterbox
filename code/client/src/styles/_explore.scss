@@ -124,29 +124,67 @@ main {
   }
 }
 .histogram-row {
-  --histoPadding: 2rem;
+  // those could be SCSS vars, at some point we needed to modify them on responsiveness
+  --histoLeftPadding: 2rem;
+  --histoYPadding: 1rem;
+
   display: flex;
-  gap: 1rem;
-  padding: 0 var(--histoPadding) 0 var(--histoPadding);
+  padding: 0 1rem 0 0;
 
   &:hover {
     background-color: $yellow-250 !important;
     border-radius: $spacer * 0.25;
   }
 
+  .clickable-area {
+    padding: var(--histoYPadding) 1rem var(--histoYPadding) var(--histoLeftPadding);
+  }
+
   .histogram-row-index-marker {
-    width: calc(var(--histoPadding) - 0.2rem);
-    padding-left: 0px;
+    // place in parent left padding space
+    position: absolute;
+    top: 0;
+    left: 0;
+    // align child (value) vertically
+    height: 100%;
+    display: flex;
+    align-items: center;
   }
 
   @include media-breakpoint-down(xl) {
-    --histoPadding: 0.5rem;
+    // move action button underneath clickable area
+    flex-direction: column;
+    // align left
+    align-items: start;
+    // space between clickable and actions
+    gap: 0.5rem;
+    // padding bottom back not clickable
+    padding-bottom: var(--histoYPadding);
+    .clickable-area {
+      padding-bottom: 0 !important;
+      // strech horizontally
+      width: 100%;
+    }
+    .actions-container {
+      // align on left padding
+      padding-left: var(--histoLeftPadding);
+    }
     .histogram-row-index-marker {
-      display: none;
+      // correct vertical center
+      padding-top: var(--histoYPadding);
     }
+  }
+}
 
-    .histogram-row-value {
-      display: none;
-    }
+.indexation-management {
+  // fix height from the largest children which is label + button
+  height: 66px;
+  width: 100%;
+  // align child vertically
+  display: flex;
+  align-items: center;
+  // make sure that child like progress bar takes all available space
+  * {
+    width: 100%;
   }
 }
