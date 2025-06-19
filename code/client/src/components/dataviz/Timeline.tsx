@@ -93,7 +93,7 @@ export const Timeline: FC<{
         query: itemType === 'message' ? messagesTimeline : itemsTimeline,
         variables: {
           itemType,
-          filters: filtersStateToSearchFilters(filtersState),
+          filters: filtersStateToSearchFilters(filtersState, itemType),
         },
       }),
     [filtersState, itemType],

@@ -58,7 +58,7 @@ export const Explore: FC = () => {
           itemType: ITEM_TYPE_TO_DATA_TYPE[selectedType],
           field,
           limit: 500,
-          filters: filtersStateToSearchFilters(filters),
+          filters: filtersStateToSearchFilters(filters, inputType as ItemType),
           includes: input,
         },
         fetchPolicy: 'no-cache',
@@ -82,7 +82,7 @@ export const Explore: FC = () => {
         ),
       };
     },
-    [client, selectedType],
+    [client, selectedType, inputType],
   );
 
   // Update URL search:

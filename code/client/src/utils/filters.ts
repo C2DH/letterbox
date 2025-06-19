@@ -1,9 +1,12 @@
 import { FiltersState } from '@ouestware/facets';
 
-import { DATE_FACET, TAGS_FACET, VERIFIED_FACET } from '../core/consts.tsx';
+import { DATE_FACET, ItemType, TAGS_FACET, VERIFIED_FACET } from '../core/consts.tsx';
 import { FilterTypes, SearchFilters } from '../core/graphql';
 
-export function filtersStateToSearchFilters({ filters = {}, query }: FiltersState): SearchFilters {
+export function filtersStateToSearchFilters(
+  { filters = {}, query }: FiltersState,
+  itemType: ItemType,
+): SearchFilters {
   const res: SearchFilters = {};
 
   if (query) {
@@ -27,7 +30,7 @@ export function filtersStateToSearchFilters({ filters = {}, query }: FiltersStat
 
   const datesFilter = filters[DATE_FACET.id];
   if (datesFilter && datesFilter.type === 'date') {
-    res.years = {
+    res[itemType === 'message' ? 'year' : 'years'] = {
       type: FilterTypes.Date,
       min: datesFilter.min,
       max: datesFilter.max,

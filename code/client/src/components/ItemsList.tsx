@@ -56,7 +56,7 @@ export const ItemsList: FC<{ itemType: ItemType }> = ({ itemType }) => {
         query: searchItems,
         variables: {
           itemType: ITEM_TYPE_TO_DATA_TYPE[itemType],
-          filters: filtersStateToSearchFilters(state),
+          filters: filtersStateToSearchFilters(state, itemType),
           limit,
           from,
           sortBy,
