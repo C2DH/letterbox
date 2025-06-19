@@ -184,8 +184,4 @@ main {
   // align child vertically
   display: flex;
   align-items: center;
-  // make sure that child like progress bar takes all available space
-  * {
-    width: 100%;
-  }
 }

@@ -20,7 +20,7 @@ export const IndexationManagement: FC = () => {
   return (
     <div className="indexation-management">
       {onGoingIndexation === undefined && (
-        <div className="d-flex flex-column justify-content-between gap-1">
+        <div className="d-flex flex-column gap-1 w-100">
           <div className="text-start">
             {nbItemsWithPendingModifications
               ? numberFormat.format(nbItemsWithPendingModifications)
@@ -42,7 +42,7 @@ export const IndexationManagement: FC = () => {
       {onGoingIndexation !== undefined && nbItemsWithPendingModifications !== undefined && (
         <>
           {nbItemsWithPendingModifications <= onGoingIndexation.nbItems ? (
-            <div className="d-flex flex-column">
+            <div className="d-flex flex-column w-100">
               <label
                 htmlFor="indexation-progress-bar"
                 className="d-flex justify-content-between mb-1"
@@ -63,7 +63,7 @@ export const IndexationManagement: FC = () => {
               ></progress>
             </div>
           ) : (
-            <div>
+            <div className="w-100">
               <Spinner style={{ height: '14px', width: '14px' }} className="text-secondary" />{' '}
               Confirming Updates
             </div>
