@@ -36,6 +36,7 @@ main {
     display: flex;
     flex-direction: row;
     align-items: stretch;
+    justify-content: space-around;
 
     .bar-wrapper {
       flex-grow: 1;

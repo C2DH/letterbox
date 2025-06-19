@@ -4,7 +4,7 @@ import { useFacetsContext } from '@ouestware/facets-client';
 import { getAsyncMemoData, useAsyncMemo } from '@ouestware/hooks';
 import { LoaderFill } from '@ouestware/loaders';
 import cx from 'classnames';
-import { clamp, fromPairs, max, range } from 'lodash';
+import { clamp, fromPairs, inRange, max, range } from 'lodash';
 import {
   CSSProperties,
   FC,
@@ -17,7 +17,7 @@ import {
 import { RiCloseFill, RiContractLeftLine, RiContractRightLine } from 'react-icons/ri';
 
 import config from '../../config.ts';
-import { APP_LANGUAGE } from '../../core/consts.tsx';
+import { APP_LANGUAGE, ITEM_TYPE_LABELS, ITEM_TYPE_LABELS_PLURAL } from '../../core/consts.tsx';
 import { DataItemType } from '../../core/graphql';
 import { itemsTimeline, messagesTimeline } from '../../core/graphql/queries/timeline.ts';
 import { filtersStateToSearchFilters } from '../../utils/filters.ts';
@@ -54,8 +54,15 @@ function getSliderStyle(extents: Extents): CSSProperties {
   };
 }
 
+function getCoordinates(e: ReactMouseEvent | MouseEvent, referential: HTMLElement) {
+  const rect = referential.getBoundingClientRect();
+  return {
+    x: e.pageX - rect.left,
+    y: e.pageY - rect.top,
+  };
+}
 function getX(e: ReactMouseEvent | MouseEvent, referential: HTMLElement): number {
-  return e.pageX - referential.getBoundingClientRect().left;
+  return getCoordinates(e, referential).x;
 }
 
 function getYear(x: number, width: number): number {
@@ -76,6 +83,7 @@ export const Timeline: FC<{
     min: minYear + 3,
     max: minYear + 5,
   });
+  const [hoveredYear, setHoveredYear] = useState<null | number>(null);
   const [mouse, setMouse] = useState<MouseState>({ type: 'idle' });
   const client = useApolloClient();
   const dataState = useAsyncMemo(
@@ -100,7 +108,7 @@ export const Timeline: FC<{
     };
   }, [data]);
 
-  // Handle body mouse events:
+  // Handle body mouse events while interacting with the timeline:
   useEffect(() => {
     if (mouse.type === 'idle') return;
 
@@ -131,6 +139,24 @@ export const Timeline: FC<{
       document.body.removeEventListener('mouseup', upHandler);
     };
   }, [extents, filter, mouse, setFilter]);
+
+  // Handle body move event to detect hovered year:
+  useEffect(() => {
+    const moveHandler = (e: MouseEvent) => {
+      const dom = root.current!;
+      const { x, y } = getCoordinates(e, dom);
+
+      // If mouse is hovering the timeline, update hoveredYear:
+      if (inRange(x, 0, dom.offsetWidth) && inRange(y, 0, dom.offsetHeight))
+        setHoveredYear(getYear(x, dom.offsetWidth));
+      else setHoveredYear(null);
+    };
+
+    document.body.addEventListener('mousemove', moveHandler);
+    return () => {
+      document.body.removeEventListener('mousemove', moveHandler);
+    };
+  }, []);
 
   // Update extents on mouse move:
   useEffect(() => {
@@ -199,163 +225,179 @@ export const Timeline: FC<{
   }, [filter]);
 
   return (
-    <>
-      <section className={cx('timeline', mouse.type !== 'idle' && 'dragging')} ref={root}>
-        {filter && <div className="filter-range" style={getSliderStyle(filter)}></div>}
-        <div className="timeline-barchart axis-x justify-content-around">
-          {range(minYear, maxYear + 1).map((year) => {
-            return (
-              <div key={year} className="bar-wrapper flex-grow-0 fs-6" style={{ width: 5 }}>
-                {(year % 10 === 0 || year === minYear || year === maxYear) && (
-                  <span
-                    className={cx(
-                      'd-flex flex-column w-100',
-                      year === minYear ? 'align-items-start' : 'align-items-center',
-                    )}
-                  >
-                    <span className="tick" />
-                    <span className="label">{year}</span>
-                  </span>
+    <section className={cx('timeline', mouse.type !== 'idle' && 'dragging')} ref={root}>
+      {filter && <div className="filter-range" style={getSliderStyle(filter)}></div>}
+      <div className="timeline-barchart axis-x justify-content-around">
+        {range(minYear, maxYear + 1).map((year) => (
+          <div
+            key={year}
+            className="bar-wrapper position-relative flex-grow-0 fs-6"
+            style={{ width: 5 }}
+          >
+            {(year % 10 === 0 || year === minYear || year === maxYear) && (
+              <span
+                className={cx(
+                  'd-flex flex-column w-100',
+                  year === minYear ? 'align-items-start' : 'align-items-center',
                 )}
+              >
+                <span className="tick" />
+                <span className="label">{year}</span>
+              </span>
+            )}
+            {year === hoveredYear && (
+              <div
+                className="position-absolute bg-primary text-light rounded z-3 small text-nowrap px-3 py-1 mt-1"
+                style={{ top: 0, left: 0 }}
+              >
+                <div
+                  className="position-absolute bg-primary"
+                  style={{
+                    width: 5,
+                    height: 20,
+                    top: -3,
+                    left: 0,
+                  }}
+                ></div>
+                {year}: {(timelineData?.counts[year] || 0).toLocaleString(APP_LANGUAGE)}{' '}
+                {(timelineData?.counts[year] || 0 > 1
+                  ? ITEM_TYPE_LABELS_PLURAL[itemType]
+                  : ITEM_TYPE_LABELS[itemType]
+                ).toLowerCase()}
               </div>
-            );
-          })}
-        </div>
-        <div
-          className="timeline-barchart"
-          onMouseDown={(e) => {
-            if (mouse.type !== 'idle' || extents || !root.current) return;
+            )}
+          </div>
+        ))}
+      </div>
+      <div
+        className="timeline-barchart"
+        onMouseDown={(e) => {
+          if (mouse.type !== 'idle' || extents || !root.current) return;
 
+          e.stopPropagation();
+          e.preventDefault();
+
+          const x = getX(e, root.current);
+          const mouseYear = getYear(x, root.current.offsetWidth);
+
+          setMouse({
+            type: 'dragHandle',
+            side: 'right',
+            initialExtents: { min: mouseYear, max: mouseYear },
+            initialX: x,
+            x,
+          });
+        }}
+        onClick={(e) => {
+          if (!root.current || !filter) return;
+
+          e.stopPropagation();
+          e.preventDefault();
+
+          const mouseYear = getYear(getX(e, root.current), root.current.offsetWidth);
+
+          if (extents) {
+            const { min = minYear, max = maxYear } = extents;
+
+            const centerYear = Math.round((min + max) / 2);
+            const clampedYearsOffset = clamp(mouseYear - centerYear, minYear - min, maxYear - max);
+
+            setFilter('date', {
+              type: 'date',
+              min: min + clampedYearsOffset,
+              max: max + clampedYearsOffset,
+            });
+          } else {
+            setFilter('date', {
+              type: 'date',
+              min: mouseYear,
+              max: mouseYear,
+            });
+          }
+        }}
+      >
+        {range(minYear, maxYear + 1).map((year) => {
+          const count = timelineData?.counts[year] || 0;
+          const ratio = count / (timelineData?.maxCount || 1);
+          return (
+            <div key={year} className="bar-wrapper flex-grow-0" style={{ width: 5 }}>
+              <div
+                className={cx('bar', year === hoveredYear && 'bg-primary')}
+                style={{ height: ratio * 100 + '%', width: 5 }}
+              />
+            </div>
+          );
+        })}
+      </div>
+      {extents && (
+        <div
+          className="local-range"
+          onDoubleClick={() => {
+            setFilter('date', undefined);
+          }}
+          onMouseDown={(e) => {
             e.stopPropagation();
             e.preventDefault();
 
-            const x = getX(e, root.current);
-            const mouseYear = getYear(x, root.current.offsetWidth);
-
+            const x = getX(e, root.current!);
             setMouse({
-              type: 'dragHandle',
-              side: 'right',
-              initialExtents: { min: mouseYear, max: mouseYear },
-              initialX: x,
+              type: 'dragSlider',
               x,
+              initialX: x,
+              initialExtents: extents,
             });
           }}
-          onClick={(e) => {
-            if (!root.current || !filter) return;
-
-            e.stopPropagation();
-            e.preventDefault();
-
-            const mouseYear = getYear(getX(e, root.current), root.current.offsetWidth);
-
-            if (extents) {
-              const { min = minYear, max = maxYear } = extents;
-
-              const centerYear = Math.round((min + max) / 2);
-              const clampedYearsOffset = clamp(
-                mouseYear - centerYear,
-                minYear - min,
-                maxYear - max,
-              );
-
-              setFilter('date', {
-                type: 'date',
-                min: min + clampedYearsOffset,
-                max: max + clampedYearsOffset,
-              });
-            } else {
-              setFilter('date', {
-                type: 'date',
-                min: mouseYear,
-                max: mouseYear,
-              });
-            }
-          }}
+          style={getSliderStyle(extents)}
         >
-          {range(minYear, maxYear + 1).map((year) => {
-            const count = timelineData?.counts[year] || 0;
-            const ratio = count / (timelineData?.maxCount || 1);
-            return (
-              <div key={year} className="bar-wrapper">
-                <div
-                  className="bar"
-                  title={`${count.toLocaleString(APP_LANGUAGE)} message${count > 1 ? 's' : ''} in ${year}`}
-                  style={{ height: ratio * 100 + '%', width: 5 }}
-                />
-              </div>
-            );
-          })}
-        </div>
-        {extents && (
           <div
-            className="local-range"
-            onDoubleClick={() => {
+            className="handle handle-close"
+            onMouseDown={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
               setFilter('date', undefined);
             }}
+          >
+            <RiCloseFill />
+          </div>
+          <div
+            className="handle handle-left"
             onMouseDown={(e) => {
               e.stopPropagation();
               e.preventDefault();
 
               const x = getX(e, root.current!);
               setMouse({
-                type: 'dragSlider',
+                type: 'dragHandle',
+                side: 'left',
                 x,
                 initialX: x,
                 initialExtents: extents,
               });
             }}
-            style={getSliderStyle(extents)}
           >
-            <div
-              className="handle handle-close"
-              onMouseDown={(e) => {
-                e.stopPropagation();
-                e.preventDefault();
-                setFilter('date', undefined);
-              }}
-            >
-              <RiCloseFill />
-            </div>
-            <div
-              className="handle handle-left"
-              onMouseDown={(e) => {
-                e.stopPropagation();
-                e.preventDefault();
-
-                const x = getX(e, root.current!);
-                setMouse({
-                  type: 'dragHandle',
-                  side: 'left',
-                  x,
-                  initialX: x,
-                  initialExtents: extents,
-                });
-              }}
-            >
-              <RiContractLeftLine />
-            </div>
-            <div
-              className="handle handle-right"
-              onMouseDown={(e) => {
-                e.stopPropagation();
-                e.preventDefault();
-
-                const x = getX(e, root.current!);
-                setMouse({
-                  type: 'dragHandle',
-                  side: 'right',
-                  x,
-                  initialX: x,
-                  initialExtents: extents,
-                });
-              }}
-            >
-              <RiContractRightLine />
-            </div>
+            <RiContractLeftLine />
           </div>
-        )}
-        {dataState.type === 'loading' && <LoaderFill />}
-      </section>
-    </>
+          <div
+            className="handle handle-right"
+            onMouseDown={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+
+              const x = getX(e, root.current!);
+              setMouse({
+                type: 'dragHandle',
+                side: 'right',
+                x,
+                initialX: x,
+                initialExtents: extents,
+              });
+            }}
+          >
+            <RiContractRightLine />
+          </div>
+        </div>
+      )}
+      {dataState.type === 'loading' && <LoaderFill />}
+    </section>
   );
 };
