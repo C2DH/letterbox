@@ -1,4 +1,5 @@
 import Boom from '@hapi/boom';
+import { parallelize } from '@ouestware/async';
 import { getLogger } from '@ouestware/node-logger';
 import { flatten, isNil, uniq } from 'lodash';
 import type { Transaction } from 'neo4j-driver';
@@ -6,6 +7,7 @@ import * as neo4j from 'neo4j-driver';
 import { inject, singleton } from 'tsyringe';
 import { v4 as uuid } from 'uuid';
 
+import config from '../../config';
 import { NodeItem } from '../../graphql/generated/types';
 import {
   ImportReport,
@@ -495,60 +497,99 @@ export class DatasetEdition {
       // in case items were modified during the process we check at the end if there are new cases to treat
       // is yes we loop
       while (nbItemsModifiedDuringProcess !== 0) {
-        const messagesReport = await this.indexation.indexMessages(
-          undefined,
-          true,
-          removeToBeIndexFlag('message'),
-          5000,
+        const _reports = await parallelize<[ItemType, ImportReport]>(
+          [
+            // Messages
+            async () => {
+              const messagesReport = await this.indexation.indexMessages(
+                undefined,
+                true,
+                removeToBeIndexFlag('message'),
+                1000,
+              );
+              return [
+                'message',
+                {
+                  count: messagesReport.count,
+                  errors: messagesReport.errors,
+                },
+              ];
+            },
+            // Companies
+            async () => {
+              const companiesReport = await this.indexation.indexCompanies(
+                undefined,
+                true,
+                removeToBeIndexFlag('company'),
+                1000,
+              );
+              return [
+                'company',
+                {
+                  count: companiesReport.count,
+                  errors: companiesReport.errors,
+                },
+              ];
+            },
+            // People
+            async () => {
+              const peopleReport = await this.indexation.indexPeople(
+                undefined,
+                true,
+                removeToBeIndexFlag('person'),
+                100,
+              );
+              return [
+                'person',
+                {
+                  count: peopleReport.count,
+                  errors: peopleReport.errors,
+                },
+              ];
+            },
+            // Addresses
+            async () => {
+              const addressesReport = await this.indexation.indexAddresses(
+                undefined,
+                true,
+                removeToBeIndexFlag('address'),
+                1000,
+              );
+              return [
+                'address',
+                {
+                  count: addressesReport.count,
+                  errors: addressesReport.errors,
+                },
+              ];
+            },
+            // Countries
+            async () => {
+              const countriesReports = await this.indexation.indexCountries(
+                undefined,
+                true,
+                removeToBeIndexFlag('country'),
+                5,
+              );
+              return [
+                'country',
+                {
+                  count: countriesReports.count,
+                  errors: countriesReports.errors,
+                },
+              ];
+            },
+          ],
+          config.elastic.maxParallelBulkUpdate,
         );
-        reports.message = {
-          count: reports.message?.count || 0 + messagesReport.count,
-          errors: [...(reports.message?.errors || []), ...messagesReport.errors],
-        };
 
-        const companiesReport = await this.indexation.indexCompanies(
-          undefined,
-          true,
-          removeToBeIndexFlag('company'),
-          1000,
-        );
-        reports.company = {
-          count: reports.company?.count || 0 + companiesReport.count,
-          errors: [...(reports.company?.errors || []), ...companiesReport.errors],
-        };
-
-        const peopleReport = await this.indexation.indexPeople(
-          undefined,
-          true,
-          removeToBeIndexFlag('person'),
-          100,
-        );
-        reports.person = {
-          count: reports.person?.count || 0 + peopleReport.count,
-          errors: [...(reports.person?.errors || []), ...peopleReport.errors],
-        };
-
-        const addressesReport = await this.indexation.indexAddresses(
-          undefined,
-          true,
-          removeToBeIndexFlag('address'),
-          1000,
-        );
-        reports.address = {
-          count: reports.address?.count || 0 + addressesReport.count,
-          errors: [...(reports.address?.errors || []), ...addressesReport.errors],
-        };
-
-        const countriesReports = await this.indexation.indexCountries(
-          undefined,
-          true,
-          removeToBeIndexFlag('country'),
-          5,
-        );
-        reports.country = {
-          count: reports.country?.count || 0 + countriesReports.count,
-          errors: [...(reports.country?.errors || []), ...countriesReports.errors],
-        };
+        // update reports
+        _reports.forEach(([itemType, report]) => {
+          reports[itemType] = {
+            count: reports[itemType]?.count || 0 + report.count,
+            errors: [...(reports[itemType]?.errors || []), ...report.errors],
+          };
+        });
 
         // how many items were modified during the process
         nbItemsModifiedDuringProcess = await this.countItemsWithPendingModifications();

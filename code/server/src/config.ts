@@ -33,6 +33,11 @@ export default {
     index_prefix: process.env.ELASTICSEARCH_INDEX_PREFIX || '',
     nested_objects_limit: 1000,
     idValueSeparator: '¤¤',
+    maxParallelBulkUpdate:
+      process.env.ELASTICSEARCH_MAX_PARALLEL_UPDATE &&
+      !isNaN(+process.env.ELASTICSEARCH_MAX_PARALLEL_UPDATE)
+        ? +process.env.ELASTICSEARCH_MAX_PARALLEL_UPDATE
+        : 2,
   },
   neo4j: {
     url: process.env.NEO4J_URL || 'bolt://localhost:7687',

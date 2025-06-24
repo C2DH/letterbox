@@ -52,8 +52,8 @@ export const IndexationManagement: FC = () => {
                   Updating
                 </span>{' '}
                 <span>
-                  {numberFormat.format(nbItemsWithPendingModifications)} /{' '}
-                  {numberFormat.format(onGoingIndexation.nbItems)}
+                  {numberFormat.format(onGoingIndexation.nbItems - nbItemsWithPendingModifications)}{' '}
+                  / {numberFormat.format(onGoingIndexation.nbItems)}
                 </span>
               </label>
               <progress
