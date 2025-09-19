@@ -143,7 +143,7 @@ export const ItemView: FC = () => {
                 <h3 className="fs-6 fw-medium">Original document</h3>
                 <PdfViewer
                   className="w-100"
-                  filename={itemData.filename}
+                  filepath={`${itemData.year}/${itemData.filename}`}
                   pageNumber={itemData.pageNumber}
                 />
               </section>

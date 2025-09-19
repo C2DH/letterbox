@@ -21,8 +21,8 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   import.meta.url,
 ).toString();
 
-export const PdfViewer: FC<{ className?: string; filename: string; pageNumber: number }> = ({
-  filename,
+export const PdfViewer: FC<{ className?: string; filepath: string; pageNumber: number }> = ({
+  filepath,
   pageNumber,
   className,
 }) => {
@@ -47,7 +47,7 @@ export const PdfViewer: FC<{ className?: string; filename: string; pageNumber: n
       <div style={{ height: '720px' }} className="overflow-auto">
         <Document
           className={className}
-          file={`${config.pdfURLPrefix}${filename}`}
+          file={`${config.pdfURLPrefix}${filepath}`}
           loading={<Spinner />}
           onLoadSuccess={(props) => {
             setTotalPage(props._pdfInfo.numPages);
@@ -119,7 +119,7 @@ export const PdfViewer: FC<{ className?: string; filename: string; pageNumber: n
           target="_blank"
           rel="noreferrer"
           className="btn with-icon btn-medium-gray"
-          href={`${config.pdfURLPrefix}${filename}#page=${pageNumber}`}
+          href={`${config.pdfURLPrefix}${filepath}#page=${pageNumber}`}
         >
           <RiShareBoxLine />
         </a>
