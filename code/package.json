@@ -20,6 +20,7 @@
     "build": "npm run build --workspaces --if-present",
     "lint": "npm run lint --workspaces --if-present",
     "test": "npm run test --workspaces --if-present",
+    "dev-client": "npm run dev --workspace=@letterbox/client",
     "dev": "concurrently -n client,server \"npm run dev --workspace=@letterbox/client\" \"npm run start --workspace=@letterbox/server\"",
     "prod": "concurrently -n client,server \"npm run build --workspace=@letterbox/client\" \"npm run start --workspace=@letterbox/server\""
   },
