@@ -1,5 +1,30 @@
 # Letter Box
 
+## Development of the client with proxied API
+
+For local development using a remote API server, configure the proxy settings in your local environment:
+
+1. Create or edit `code/client/.env.development.local`
+2. Set the following variables:
+
+- `VITE_PROXY_API_TARGET`: Point to your API server
+- `VITE_GRAPHQL_SCHEMA_URL`: Point to the `/graphql` endpoint
+
+```bash
+cd code/client
+npm install
+npm run dev-client
+```
+
+Defaults value are:
+
+```env
+VITE_PROXY_API_TARGET=http://localhost:3000
+VITE_GRAPHQL_SCHEMA_URL=http://localhost:4000/graphql
+```
+
+This setup allows you to develop the client while connecting to a remote API instance.
+
 ## Production with docker
 
 To deploy for production one can use docker in prod mode.
