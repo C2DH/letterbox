@@ -9,22 +9,26 @@ export const getCountryById = graphql(`
       tags
       verified
       deleted
-      addressesCount
       addresses(skip: 0, limit: 20) {
         ...AddressInline
       }
-      companiesCount
       companies(skip: 0, limit: 20) {
         ...CompanyInline
       }
-      messagesCount
       messages {
         ...MessageInline
       }
-      peopleCount
       people(skip: 0, limit: 20) {
         ...PersonInline
       }
+    }
+  }
+`);
+
+export const getCountryItemsCounts = graphql(`
+  query GetCountryItemsCounts($id: ID!) {
+    result: countries(where: { id_EQ: $id }) {
+      ...CountryItemsCounts
     }
   }
 `);

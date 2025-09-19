@@ -10,22 +10,29 @@ export const getPersonById = graphql(`
       verified
       deleted
 
-      addressesCount
       addresses(skip: 0, limit: 20) {
         ...AddressInline
       }
-      companiesCount
+
       companies(skip: 0, limit: 20) {
         ...CompanyInline
       }
-      countriesCount
+
       countries(skip: 0, limit: 20) {
         ...CountryInline
       }
-      messagesCount
+
       messages {
         ...MessageInline
       }
+    }
+  }
+`);
+
+export const getPersonItemsCounts = graphql(`
+  query GetPersonItemsCount($id: ID!) {
+    result: people(where: { id_EQ: $id }) {
+      ...PersonItemCounts
     }
   }
 `);

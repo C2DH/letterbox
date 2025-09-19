@@ -1,3 +1,4 @@
+import { Spinner } from '@ouestware/loaders';
 import { filter, isNil } from 'lodash';
 import { useMemo, type FC } from 'react';
 import { Link } from 'react-router-dom';
@@ -14,6 +15,7 @@ import {
 } from '../../../core/consts.tsx';
 import { useEditionContext } from '../../../core/edition.ts';
 import { type MessageInlineFragment } from '../../../core/graphql';
+import { useItemCounts } from '../../../hooks/useItemCounts.ts';
 import { getMessageName } from '../../../utils/data.ts';
 import { Collapsable } from '../../Collapsable';
 import { InCartButton } from '../../edition/InCartButton.tsx';
@@ -24,6 +26,7 @@ const TYPES = FILTERABLE_ITEM_TYPES as Exclude<ItemType, 'message'>[];
 
 export const MessageCard: FC<{ data: MessageInlineFragment }> = ({ data }) => {
   const { enabled } = useEditionContext();
+  const { itemCounts, loading } = useItemCounts('message', data.id);
   const name = getMessageName(data);
   const cleanedTags = useMemo(
     () => filter(data.tags || [], (s) => !isNil(s)) as string[],
@@ -39,11 +42,13 @@ export const MessageCard: FC<{ data: MessageInlineFragment }> = ({ data }) => {
           title={`View message "${name}"`}
         >
           {name}
-          {data.companiesCount > 3 && ` and ${data.companiesCount - 3} more`}
+          {itemCounts !== null && 'companiesCount' in itemCounts
+            ? itemCounts.companiesCount > 3 && ` and ${itemCounts.companiesCount - 3} more`
+            : null}
         </Link>
         <ItemVerified item={data} />
       </h5>
-      <ItemsCounts itemType="message" data={data} />
+      <ItemsCounts itemType="message" data={itemCounts} loadingData={loading} />
       {!!cleanedTags.length && (
         <section>
           {cleanedTags.map((tag, i) => (
@@ -54,7 +59,12 @@ export const MessageCard: FC<{ data: MessageInlineFragment }> = ({ data }) => {
 
       {TYPES.map((type) => {
         const list = data[ITEM_TYPE_TO_FIELD[type]];
-        const count = data[ITEM_TYPE_TO_COUNT_FIELD[type]];
+        const count =
+          itemCounts !== null && ITEM_TYPE_TO_COUNT_FIELD[type] in itemCounts
+            ? itemCounts[
+                ITEM_TYPE_TO_COUNT_FIELD[type] as Exclude<keyof typeof itemCounts, '__typename'>
+              ]
+            : list.length;
         const remaining = count - list.length;
         if (!list.length) return null;
 
@@ -72,6 +82,7 @@ export const MessageCard: FC<{ data: MessageInlineFragment }> = ({ data }) => {
                 </span>
               ),
             )}
+            {loading && <Spinner className="spinner-border-sm" />}
             {!!remaining && (
               <span className="text-muted">
                 and {remaining} other{' '}

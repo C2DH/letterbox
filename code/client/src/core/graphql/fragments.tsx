@@ -4,13 +4,18 @@ export const AddressInline = graphql(`
   fragment AddressInline on Address {
     id
     name
+    tags
+    deleted
+    verified
+  }
+`);
+
+export const AddressItemsCounts = graphql(`
+  fragment AddressItemsCounts on Address {
     companiesCount
     countriesCount
     messagesCount
     peopleCount
-    tags
-    deleted
-    verified
   }
 `);
 
@@ -18,10 +23,6 @@ export const CompanyInline = graphql(`
   fragment CompanyInline on Company {
     id
     name
-    addressesCount
-    countriesCount
-    messagesCount
-    peopleCount
     years
     tags
     deleted
@@ -29,17 +30,31 @@ export const CompanyInline = graphql(`
   }
 `);
 
+export const CompanyItemsCounts = graphql(`
+  fragment CompanyItemsCounts on Company {
+    addressesCount
+    countriesCount
+    messagesCount
+    peopleCount
+  }
+`);
+
 export const CountryInline = graphql(`
   fragment CountryInline on Country {
     id
     name
+    tags
+    deleted
+    verified
+  }
+`);
+
+export const CountryItemsCounts = graphql(`
+  fragment CountryItemsCounts on Country {
     addressesCount
     companiesCount
     messagesCount
     peopleCount
-    tags
-    deleted
-    verified
   }
 `);
 
@@ -48,22 +63,18 @@ export const MessageInline = graphql(`
     id
     year
     message
-    addressesCount
     addresses(limit: 5) {
       id
       name
     }
-    companiesCount
     companies(limit: 5) {
       id
       name
     }
-    countriesCount
     countries(limit: 5) {
       id
       name
     }
-    peopleCount
     people(limit: 5) {
       id
       name
@@ -76,16 +87,30 @@ export const MessageInline = graphql(`
   }
 `);
 
+export const MessageItemsCounts = graphql(`
+  fragment MessageItemsCounts on Message {
+    addressesCount
+    companiesCount
+    countriesCount
+    peopleCount
+  }
+`);
+
 export const PersonInline = graphql(`
   fragment PersonInline on Person {
     id
     name
+    tags
+    deleted
+    verified
+  }
+`);
+
+export const PersonItemCounts = graphql(`
+  fragment PersonItemCounts on Person {
     addressesCount
     companiesCount
     countriesCount
     messagesCount
-    tags
-    deleted
-    verified
   }
 `);

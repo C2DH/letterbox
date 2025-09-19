@@ -4,12 +4,14 @@ import { Link } from 'react-router-dom';
 
 import { Badge } from '../../../Badge.tsx';
 import { type PersonInlineFragment } from '../../../core/graphql';
+import { useItemCounts } from '../../../hooks/useItemCounts.ts';
 import { ItemDeleted } from '../ItemDeleted.tsx';
 import { ItemsCounts } from '../ItemsCounts';
 import { ItemVerified } from '../ItemVerified.tsx';
 
 export const PersonCard: FC<{ data: PersonInlineFragment }> = ({ data }) => {
   const { tags } = data;
+  const { itemCounts, loading } = useItemCounts('person', data.id);
   const cleanedTags = useMemo(() => filter(tags || [], (s) => !isNil(s)) as string[], [tags]);
 
   return (
@@ -22,7 +24,7 @@ export const PersonCard: FC<{ data: PersonInlineFragment }> = ({ data }) => {
         <ItemDeleted item={data} />
       </h5>
 
-      <ItemsCounts itemType="person" data={data} />
+      <ItemsCounts itemType="person" data={itemCounts} loadingData={loading} />
 
       {!!cleanedTags.length && (
         <section>
