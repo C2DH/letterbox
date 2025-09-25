@@ -13,7 +13,17 @@ fi
 echo "(i) Npm version is $(npm -v)"
 echo "(i) Node version is $(node -v)"
 
-cd /code
+# Ensure /code exists and is writable by node
+CODE_DIR="/code"
+mkdir -p "$CODE_DIR"
+chown -R node:node "$CODE_DIR"
+cd "$CODE_DIR"
+
+echo
+echo " ~"
+echo " ~ Code directory: $CODE_DIR"
+echo " ~"
+ls -la
 
 echo
 echo " ~"
