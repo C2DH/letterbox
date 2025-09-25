@@ -3,37 +3,48 @@ import { useCallback, useMemo } from 'react';
 
 import { ITEM_TYPE_TO_FIELD, ItemType } from '../core/consts.tsx';
 import {
+  AddressItemsCountsFragment,
+  CompanyItemsCountsFragment,
+  CountryItemsCountsFragment,
   getAddressById,
   getAddressCompanies,
   getAddressCountries,
+  getAddressItemsCounts,
   getAddressMessages,
   getAddressPeople,
   getCompanyAddresses,
   getCompanyById,
   getCompanyCountries,
+  getCompanyItemsCounts,
   getCompanyMessages,
   getCompanyPeople,
   getCountryAddresses,
   getCountryById,
   getCountryCompanies,
+  getCountryItemsCounts,
   getCountryMessages,
   getCountryPeople,
   getMessageAddresses,
   getMessageById,
   getMessageCompanies,
   getMessageCountries,
+  getMessageItemsCounts,
   getMessagePeople,
   getPersonAddresses,
   getPersonById,
   getPersonCompanies,
   getPersonCountries,
+  getPersonItemsCounts,
   getPersonMessages,
+  MessageItemsCountsFragment,
   NodeItem,
+  PersonItemCountsFragment,
 } from '../core/graphql';
 
 const QUERIES = {
   company: {
     getItemById: getCompanyById,
+    itemsCounts: getCompanyItemsCounts,
     relations: {
       address: getCompanyAddresses,
       country: getCompanyCountries,
@@ -43,6 +54,7 @@ const QUERIES = {
   },
   address: {
     getItemById: getAddressById,
+    itemsCounts: getAddressItemsCounts,
     relations: {
       company: getAddressCompanies,
       country: getAddressCountries,
@@ -52,6 +64,7 @@ const QUERIES = {
   },
   country: {
     getItemById: getCountryById,
+    itemsCounts: getCountryItemsCounts,
     relations: {
       company: getCountryCompanies,
       address: getCountryAddresses,
@@ -61,6 +74,7 @@ const QUERIES = {
   },
   person: {
     getItemById: getPersonById,
+    itemsCounts: getPersonItemsCounts,
     relations: {
       company: getPersonCompanies,
       address: getPersonAddresses,
@@ -70,6 +84,7 @@ const QUERIES = {
   },
   message: {
     getItemById: getMessageById,
+    itemsCounts: getMessageItemsCounts,
     relations: {
       company: getMessageCompanies,
       address: getMessageAddresses,
@@ -86,6 +101,14 @@ export function useLoadItemData(
   loading?: boolean;
   itemData?: NodeItem;
   fetchRelations: (relationType: ItemType, skip: number, limit: number) => Promise<NodeItem[]>;
+  fetchItemsCounts: () => Promise<
+    | PersonItemCountsFragment
+    | CountryItemsCountsFragment
+    | CompanyItemsCountsFragment
+    | MessageItemsCountsFragment
+    | AddressItemsCountsFragment
+    | null
+  >;
 } {
   const client = useApolloClient();
 
@@ -122,5 +145,17 @@ export function useLoadItemData(
     [client, id, itemType],
   );
 
-  return { loading, itemData, fetchRelations };
+  const fetchItemsCounts = useCallback(async () => {
+    const query = QUERIES[itemType].itemsCounts;
+
+    const result = await client.query({
+      query,
+      variables: { id: id || '' },
+    });
+
+    const firstResult = result.data?.result[0];
+    return firstResult ? firstResult : null;
+  }, [client, id, itemType]);
+
+  return { loading, itemData, fetchRelations, fetchItemsCounts };
 }

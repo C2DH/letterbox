@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 
 import { Badge } from '../../../Badge.tsx';
 import { type AddressInlineFragment } from '../../../core/graphql';
+import { useItemCounts } from '../../../hooks/useItemCounts.ts';
 import { ItemDeleted } from '../ItemDeleted.tsx';
 import { ItemsCounts } from '../ItemsCounts';
 import { ItemVerified } from '../ItemVerified.tsx';
@@ -11,6 +12,8 @@ import { ItemVerified } from '../ItemVerified.tsx';
 export const AddressCard: FC<{ data: AddressInlineFragment }> = ({ data }) => {
   const { tags } = data;
   const cleanedTags = useMemo(() => filter(tags || [], (s) => !isNil(s)) as string[], [tags]);
+
+  const { itemCounts, loading } = useItemCounts('address', data.id);
 
   return (
     <>
@@ -26,7 +29,7 @@ export const AddressCard: FC<{ data: AddressInlineFragment }> = ({ data }) => {
         <ItemDeleted item={data} />
       </h5>
 
-      <ItemsCounts itemType="address" data={data} />
+      <ItemsCounts itemType="address" data={itemCounts} loadingData={loading} />
 
       {!!cleanedTags.length && (
         <section>

@@ -27,6 +27,7 @@ import {
 import { useEditionContext } from '../core/edition.ts';
 import { NodeItem } from '../core/graphql';
 import { useLoadItemData } from '../hooks/useItem.tsx';
+import { useItemCounts } from '../hooks/useItemCounts.ts';
 import { getMessageName } from '../utils/data.ts';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -42,6 +43,7 @@ export const ItemView: FC = () => {
   }, [inputType]);
   const loadItemData = useLoadItemData(itemType, id);
   const { loading, itemData, fetchRelations } = loadItemData;
+  const { itemCounts } = useItemCounts(itemType, id || '');
 
   const editionEnabled = useMemo(() => {
     return enabled && itemData && !itemData.deleted;
@@ -57,17 +59,18 @@ export const ItemView: FC = () => {
 
             const listKey = ITEM_TYPE_TO_FIELD[type];
             const countKey = ITEM_TYPE_TO_COUNT_FIELD[type];
+            const total =
+              itemCounts !== null ? itemCounts[countKey as keyof typeof itemCounts] : undefined;
 
             return [
               {
                 title: (
                   <span className="fs-2">
-                    <ItemIcon type={type} /> {ITEM_TYPE_LABELS_PLURAL[type]} (
-                    {itemData[countKey as keyof NodeItem]})
+                    <ItemIcon type={type} /> {ITEM_TYPE_LABELS_PLURAL[type]} {total && `(${total})`}
                   </span>
                 ),
                 data: itemData[listKey as keyof NodeItem],
-                total: itemData[countKey as keyof NodeItem],
+                total,
                 fetch: fetchRelations.bind(null, type),
                 getItemKey: (data: NodeItem) => data.id,
                 renderItem: (data: NodeItem) => (
@@ -79,7 +82,7 @@ export const ItemView: FC = () => {
             ];
           })
         : [],
-    [itemData, itemType, fetchRelations, fromMessageId],
+    [itemData, itemType, fetchRelations, fromMessageId, itemCounts],
   );
 
   const name = !itemData
@@ -143,7 +146,7 @@ export const ItemView: FC = () => {
                 <h3 className="fs-6 fw-medium">Original document</h3>
                 <PdfViewer
                   className="w-100"
-                  filename={itemData.filename}
+                  filepath={`${itemData.year}/${itemData.filename}`}
                   pageNumber={itemData.pageNumber}
                 />
               </section>

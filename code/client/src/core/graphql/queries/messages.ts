@@ -10,22 +10,26 @@ export const getMessageById = graphql(`
       pageNumber
       deleted
 
-      addressesCount
       addresses(skip: 0, limit: 20) {
         ...AddressInline
       }
-      companiesCount
       companies(skip: 0, limit: 20) {
         ...CompanyInline
       }
-      countriesCount
       countries(skip: 0, limit: 20) {
         ...CountryInline
       }
-      peopleCount
       people(skip: 0, limit: 20) {
         ...PersonInline
       }
+    }
+  }
+`);
+
+export const getMessageItemsCounts = graphql(`
+  query GetMessageItemsCounts($id: ID!) {
+    result: messages(where: { id_EQ: $id }) {
+      ...MessageItemsCounts
     }
   }
 `);
