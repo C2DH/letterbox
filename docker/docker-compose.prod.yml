@@ -6,7 +6,7 @@ services:
     ports:
       - ${ELASTICSEARCH_PORT}:9200
   project:
-    depends_on:
+    #    depends_on:
     environment:
       - MODE=prod
   letterbox:
@@ -15,4 +15,4 @@ services:
     volumes:
       - ${PROJECT_PATH}/docker/nginx.prod.conf:/etc/nginx/conf.d/default.conf
       - ${PROJECT_PATH}/code/client/dist:/var/www/client
-      - ${PROJECT_PATH}/docker/nginx/data/pdf:/var/www/pdf
+      - ${PROJECT_MEDIA_PDF_PATH:-./nginx/data/pdf}:/var/www/pdf
