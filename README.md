@@ -171,3 +171,13 @@ If you change the GraphQL schema on the server, you need to update the types on 
 cd code/client
 npm run generate
 ```
+
+## Docker Images
+
+Docker images for both client and server are built and published to Docker Hub via GitHub Actions. The frontend docker image, whose code source is located in `code/client`, consists only of static files (HTML, CSS, JS). You can find the Letterbox frontend image at [Docker Hub](https://hub.docker.com/r/c2dhunilu/letterbox-frontend) or build it locally using the following command:
+
+```bash
+make build-client
+```
+
+The action `.github/workflows/docker-build-publish-client.yml` contains the workflow to build and publish the image automatically on each push related to `code/client` content to the main branch.
