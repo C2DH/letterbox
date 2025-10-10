@@ -1,0 +1,51 @@
+FROM node:24-alpine3.21 AS builder
+
+WORKDIR /app
+
+# Copy package files
+COPY package.json package-lock.json ./
+COPY client/package.json client/
+COPY server/package.json server/
+
+
+RUN npm ci
+COPY prettier.config.mjs .
+COPY eslint.config.mjs .
+
+# Copy server source and config
+COPY server/src server/src
+COPY server/codegen.ts server/codegen.ts
+COPY server/tsconfig.json server/tsconfig.json
+
+# Build the server application
+RUN npm run build --workspace=server
+
+FROM node:24-alpine3.21 AS production
+
+# Set environment to production
+ENV NODE_ENV=production
+
+# Set the working directory
+WORKDIR /app
+
+# 1. Copy only the production dependencies from the builder stage
+# We only need 'production' dependencies for the server to run.
+# The 'server' build is located in /app/server/build/
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/server/build ./build
+COPY --from=builder /app/server/package.json ./package.json
+
+# 2. Add dynamic build info (if needed for the server runtime)
+ARG BUILD_DATE
+ARG GIT_TAG
+ARG GIT_BRANCH
+ARG GIT_COMMIT_SHA
+ARG GIT_LAST_COMMIT_DATE
+RUN echo "{\"BUILD_DATE\": \"${BUILD_DATE}\", \"GIT_TAG\": \"${GIT_TAG}\", \"GIT_BRANCH\": \"${GIT_BRANCH}\", \"GIT_COMMIT_SHA\": \"${GIT_COMMIT_SHA}\", \"GIT_LAST_COMMIT_DATE\": \"${GIT_LAST_COMMIT_DATE}\"}" > build/info.json
+
+# 3. Expose the default port (adjust if your Express app uses a different port)
+EXPOSE 3000
+
+# 4. Command to run the application
+# Your server's main entry point is 'build/index.js' as defined in package.json
+CMD [ "node", "build/index.js" ]
