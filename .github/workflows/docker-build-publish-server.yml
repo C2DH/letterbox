@@ -1,4 +1,4 @@
-name: Build and publish Docker image for @letterbox/client
+name: Build and publish Docker image for @letterbox/server
 on:
   # Trigger the workflow on push or pull request,
   # for the develop branch and all new tags
@@ -6,7 +6,7 @@ on:
     branches:
       - main
     paths:
-      - 'code/client/**'
+      - 'code/server/**'
 
 jobs:
   build:
@@ -29,7 +29,7 @@ jobs:
           GIT_COMMIT_SHA: ${{ env.GIT_COMMIT_SHA }}
           GIT_LAST_COMMIT_DATE: ${{ env.GIT_LAST_COMMIT_DATE }}
         with:
-          name: c2dhunilu/letterbox-client
+          name: c2dhunilu/letterbox-server
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
           buildoptions: '--compress --force-rm'
@@ -37,4 +37,4 @@ jobs:
             GIT_TAG,GIT_BRANCH,GIT_COMMIT_SHA,BUILD_DATE,GIT_LAST_COMMIT_DATE
           tags: 'latest'
           workdir: code/
-          dockerfile: Dockerfile.client
+          dockerfile: Dockerfile.server
