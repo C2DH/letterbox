@@ -11,7 +11,7 @@ COPY server/package.json server/
 RUN npm ci
 COPY prettier.config.mjs .
 COPY eslint.config.mjs .
-
+COPY tsconfig.base.json tsconfig.base.json
 # Copy server source and config
 COPY server/src server/src
 COPY server/codegen.ts server/codegen.ts
