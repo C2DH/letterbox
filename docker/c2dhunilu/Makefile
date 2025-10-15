@@ -41,7 +41,7 @@ build-client:
 		--build-arg GIT_TAG=$(TAG) \
 		--build-arg GIT_BRANCH=$(GIT_BRANCH) \
 		--build-arg GIT_COMMIT_SHA=$(GIT_COMMIT_SHA) \
-		--build-arg GIT_LAST_COMMIT_DATE=$(GIT_LAST_COMMIT_DATE) .
+		--build-arg GIT_LAST_COMMIT_DATE=$(GIT_LAST_COMMIT_DATE) ../../. 
 	@echo "Client build successful! Image tagged as $(CLIENT_IMAGE_NAME):$(TAG)"
 
 # Target: Build the Server Image
@@ -54,5 +54,5 @@ build-server:
 		--build-arg GIT_TAG=$(TAG) \
 		--build-arg GIT_BRANCH=$(GIT_BRANCH) \
 		--build-arg GIT_COMMIT_SHA=$(GIT_COMMIT_SHA) \
-		--build-arg GIT_LAST_COMMIT_DATE=$(GIT_LAST_COMMIT_DATE) .
+		--build-arg GIT_LAST_COMMIT_DATE=$(GIT_LAST_COMMIT_DATE) ../../.
 	@echo "Server build successful! Image tagged as $(SERVER_IMAGE_NAME):$(TAG)"

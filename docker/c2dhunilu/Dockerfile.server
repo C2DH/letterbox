@@ -1,26 +1,17 @@
-FROM node:24-alpine3.21 AS builder
+FROM node:lts-alpine AS builder
 
 WORKDIR /app
 
 # Copy package files
-COPY package.json package-lock.json ./
-COPY client/package.json client/
-COPY server/package.json server/
+COPY ./code/ ./
 
-
+# Install dependencies at root level
 RUN npm ci
-COPY prettier.config.mjs .
-COPY eslint.config.mjs .
-COPY tsconfig.base.json tsconfig.base.json
-# Copy server source and config
-COPY server/src server/src
-COPY server/codegen.ts server/codegen.ts
-COPY server/tsconfig.json server/tsconfig.json
 
 # Build the server application
 RUN npm run build --workspace=server
 
-FROM node:24-alpine3.21 AS production
+FROM node:lts-alpine AS production
 
 # Set environment to production
 ENV NODE_ENV=production
@@ -46,6 +37,8 @@ RUN echo "{\"BUILD_DATE\": \"${BUILD_DATE}\", \"GIT_TAG\": \"${GIT_TAG}\", \"GIT
 # 3. Expose the default port (adjust if your Express app uses a different port)
 EXPOSE 3000
 
+WORKDIR /app/build
+
 # 4. Command to run the application
 # Your server's main entry point is 'build/index.js' as defined in package.json
-CMD [ "node", "build/index.js" ]
+CMD [ "node", "index.js" ]
