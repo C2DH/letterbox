@@ -44,7 +44,7 @@ export const getCountryCompanies = graphql(`
 `);
 
 export const getCountryAddresses = graphql(`
-  query GetCountryCountries($id: ID!, $skip: Int, $limit: Int) {
+  query GetCountryAddresses($id: ID!, $skip: Int, $limit: Int) {
     result: countries(where: { id_EQ: $id }) {
       addresses(skip: $skip, limit: $limit) {
         ...AddressInline
@@ -68,6 +68,16 @@ export const getCountryPeople = graphql(`
     result: countries(where: { id_EQ: $id }) {
       people(skip: $skip, limit: $limit) {
         ...PersonInline
+      }
+    }
+  }
+`);
+
+export const getCountryCountries = graphql(`
+  query GetCountryCountries($id: ID!, $skip: Int, $limit: Int) {
+    result: countries(where: { id_EQ: $id }) {
+      countries(skip: $skip, limit: $limit) {
+        ...CountryInline
       }
     }
   }

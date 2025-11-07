@@ -19,6 +19,8 @@ export type Scalars = {
 
 export type Address = {
   __typename?: 'Address';
+  addresses: Array<Address>;
+  addressesCount: Scalars['Int']['output'];
   companies: Array<Company>;
   companiesCount: Scalars['Int']['output'];
   countries: Array<Country>;
@@ -33,6 +35,12 @@ export type Address = {
   peopleCount: Scalars['Int']['output'];
   tags?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
   verified?: Maybe<Scalars['Boolean']['output']>;
+};
+
+
+export type AddressAddressesArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
@@ -99,6 +107,8 @@ export type Company = {
   __typename?: 'Company';
   addresses: Array<Address>;
   addressesCount: Scalars['Int']['output'];
+  companies: Array<Company>;
+  companiesCount: Scalars['Int']['output'];
   countries: Array<Country>;
   countriesCount: Scalars['Int']['output'];
   deleted?: Maybe<Scalars['Boolean']['output']>;
@@ -116,6 +126,12 @@ export type Company = {
 
 
 export type CompanyAddressesArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type CompanyCompaniesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   skip?: InputMaybe<Scalars['Int']['input']>;
 };
@@ -155,6 +171,8 @@ export type Country = {
   addressesCount: Scalars['Int']['output'];
   companies: Array<Company>;
   companiesCount: Scalars['Int']['output'];
+  countries: Array<Country>;
+  countriesCount: Scalars['Int']['output'];
   deleted?: Maybe<Scalars['Boolean']['output']>;
   id: Scalars['ID']['output'];
   messages: Array<Message>;
@@ -175,6 +193,12 @@ export type CountryAddressesArgs = {
 
 
 export type CountryCompaniesArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type CountryCountriesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   skip?: InputMaybe<Scalars['Int']['input']>;
 };
@@ -416,6 +440,8 @@ export type Person = {
   messagesCount: Scalars['Int']['output'];
   name: Scalars['String']['output'];
   otherNames?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
+  people: Array<Person>;
+  peopleCount: Scalars['Int']['output'];
   tags?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
   verified?: Maybe<Scalars['Boolean']['output']>;
 };
@@ -440,6 +466,12 @@ export type PersonCountriesArgs = {
 
 
 export type PersonMessagesArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type PersonPeopleArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   skip?: InputMaybe<Scalars['Int']['input']>;
 };
@@ -664,6 +696,8 @@ export type ResolversParentTypes = {
 };
 
 export type AddressResolvers<ContextType = any, ParentType extends ResolversParentTypes['Address'] = ResolversParentTypes['Address']> = {
+  addresses?: Resolver<Array<ResolversTypes['Address']>, ParentType, ContextType, RequireFields<AddressAddressesArgs, 'limit' | 'skip'>>;
+  addressesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   companies?: Resolver<Array<ResolversTypes['Company']>, ParentType, ContextType, RequireFields<AddressCompaniesArgs, 'limit' | 'skip'>>;
   companiesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   countries?: Resolver<Array<ResolversTypes['Country']>, ParentType, ContextType, RequireFields<AddressCountriesArgs, 'limit' | 'skip'>>;
@@ -697,6 +731,8 @@ export type AggregateValueResolvers<ContextType = any, ParentType extends Resolv
 export type CompanyResolvers<ContextType = any, ParentType extends ResolversParentTypes['Company'] = ResolversParentTypes['Company']> = {
   addresses?: Resolver<Array<ResolversTypes['Address']>, ParentType, ContextType, RequireFields<CompanyAddressesArgs, 'limit' | 'skip'>>;
   addressesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  companies?: Resolver<Array<ResolversTypes['Company']>, ParentType, ContextType, RequireFields<CompanyCompaniesArgs, 'limit' | 'skip'>>;
+  companiesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   countries?: Resolver<Array<ResolversTypes['Country']>, ParentType, ContextType, RequireFields<CompanyCountriesArgs, 'limit' | 'skip'>>;
   countriesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   deleted?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
@@ -724,6 +760,8 @@ export type CountryResolvers<ContextType = any, ParentType extends ResolversPare
   addressesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   companies?: Resolver<Array<ResolversTypes['Company']>, ParentType, ContextType, RequireFields<CountryCompaniesArgs, 'limit' | 'skip'>>;
   companiesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  countries?: Resolver<Array<ResolversTypes['Country']>, ParentType, ContextType, RequireFields<CountryCountriesArgs, 'limit' | 'skip'>>;
+  countriesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   deleted?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   messages?: Resolver<Array<ResolversTypes['Message']>, ParentType, ContextType, RequireFields<CountryMessagesArgs, 'limit' | 'skip'>>;
@@ -815,6 +853,8 @@ export type PersonResolvers<ContextType = any, ParentType extends ResolversParen
   messagesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   otherNames?: Resolver<Maybe<Array<Maybe<ResolversTypes['String']>>>, ParentType, ContextType>;
+  people?: Resolver<Array<ResolversTypes['Person']>, ParentType, ContextType, RequireFields<PersonPeopleArgs, 'limit' | 'skip'>>;
+  peopleCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   tags?: Resolver<Maybe<Array<Maybe<ResolversTypes['String']>>>, ParentType, ContextType>;
   verified?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;

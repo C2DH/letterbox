@@ -21,6 +21,9 @@ export const getAddressById = graphql(`
       people(skip: 0, limit: 20) {
         ...PersonInline
       }
+      addresses(skip: 0, limit: 20) {
+        ...AddressInline
+      }
     }
   }
 `);
@@ -68,6 +71,16 @@ export const getAddressPeople = graphql(`
     result: addresses(where: { id_EQ: $id }) {
       people(skip: $skip, limit: $limit) {
         ...PersonInline
+      }
+    }
+  }
+`);
+
+export const getAddressAddresses = graphql(`
+  query GetAddressAddresses($id: ID!, $skip: Int, $limit: Int) {
+    result: addresses(where: { id_EQ: $id }) {
+      addresses(skip: $skip, limit: $limit) {
+        ...AddressInline
       }
     }
   }

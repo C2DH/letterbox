@@ -25,6 +25,10 @@ export const getPersonById = graphql(`
       messages {
         ...MessageInline
       }
+
+      people {
+        ...PersonInline
+      }
     }
   }
 `);
@@ -48,7 +52,7 @@ export const getPersonCompanies = graphql(`
 `);
 
 export const getPersonAddresses = graphql(`
-  query GetPersonCountries($id: ID!, $skip: Int, $limit: Int) {
+  query GetPersonAddresses($id: ID!, $skip: Int, $limit: Int) {
     result: people(where: { id_EQ: $id }) {
       addresses(skip: $skip, limit: $limit) {
         ...AddressInline
@@ -68,10 +72,20 @@ export const getPersonMessages = graphql(`
 `);
 
 export const getPersonCountries = graphql(`
-  query GetPersonPeople($id: ID!, $skip: Int, $limit: Int) {
+  query GetPersonCountries($id: ID!, $skip: Int, $limit: Int) {
     result: people(where: { id_EQ: $id }) {
       countries(skip: $skip, limit: $limit) {
         ...CountryInline
+      }
+    }
+  }
+`);
+
+export const getPersonPeople = graphql(`
+  query GetPersonPeople($id: ID!, $skip: Int, $limit: Int) {
+    result: people(where: { id_EQ: $id }) {
+      people(skip: $skip, limit: $limit) {
+        ...PersonInline
       }
     }
   }

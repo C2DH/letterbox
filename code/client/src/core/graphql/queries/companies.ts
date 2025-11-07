@@ -23,6 +23,9 @@ export const getCompanyById = graphql(`
       people(skip: 0, limit: 20) {
         ...PersonInline
       }
+      companies(skip: 0, limit: 20) {
+        ...CompanyInline
+      }
     }
   }
 `);
@@ -70,6 +73,16 @@ export const getCompanyPeople = graphql(`
     result: companies(where: { id_EQ: $id }) {
       people(skip: $skip, limit: $limit) {
         ...PersonInline
+      }
+    }
+  }
+`);
+
+export const getCompanyCompanies = graphql(`
+  query GetCompanyCompanies($id: ID!, $skip: Int, $limit: Int) {
+    result: companies(where: { id_EQ: $id }) {
+      companies(skip: $skip, limit: $limit) {
+        ...CompanyInline
       }
     }
   }

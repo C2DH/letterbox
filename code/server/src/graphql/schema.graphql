@@ -136,6 +136,30 @@ type Address
       LIMIT $limit
       """
     )
+  #
+  # Address relationships
+  #
+  addressesCount: Int!
+    @cypher(
+      columnName: "result"
+      statement: """
+      MATCH (this)<-[r1]-(:Message)-[r2]->(n:Address)
+      WHERE id(this) <> id(n) AND NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false) AND NOT coalesce(n.deleted, false)
+      RETURN COUNT(DISTINCT n) AS result
+      """
+    )
+  addresses(skip: Int = 0, limit: Int = 20): [Address!]!
+    @cypher(
+      columnName: "result"
+      statement: """
+      MATCH (this)<-[r1]-(:Message)-[r2]->(n:Address)
+      WHERE id(this) <> id(n) AND NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false)
+      RETURN DISTINCT n AS result
+      ORDER BY result.name ASC
+      SKIP $skip
+      LIMIT $limit
+      """
+    )
 }
 
 #
@@ -247,6 +271,30 @@ type Company
       statement: """
       MATCH (this)<-[r1]-(:Message)-[r2]->(n:Person)
       WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false) AND NOT coalesce(n.deleted, false)
+      RETURN DISTINCT n AS result
+      ORDER BY result.name ASC
+      SKIP $skip
+      LIMIT $limit
+      """
+    )
+  #
+  # Company relationships
+  #
+  companiesCount: Int!
+    @cypher(
+      columnName: "result"
+      statement: """
+      MATCH (this)<-[r1]-(:Message)-[r2]->(n:Company)
+      WHERE id(this) <> id(n) AND NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false) AND NOT coalesce(n.deleted, false)
+      RETURN COUNT(DISTINCT n) AS result
+      """
+    )
+  companies(skip: Int = 0, limit: Int = 20): [Company!]!
+    @cypher(
+      columnName: "result"
+      statement: """
+      MATCH (this)<-[r1]-(:Message)-[r2]->(n:Company)
+      WHERE id(this) <> id(n) AND NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false) AND NOT coalesce(n.deleted, false)
       RETURN DISTINCT n AS result
       ORDER BY result.name ASC
       SKIP $skip
@@ -378,6 +426,30 @@ type Country
       statement: """
       MATCH (this)<-[r1]-(:Message)-[r2]->(n:Person)
       WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false) AND NOT coalesce(n.deleted, false)
+      RETURN DISTINCT n AS result
+      ORDER BY result.name ASC
+      SKIP $skip
+      LIMIT $limit
+      """
+    )
+  #
+  # Country relationships
+  #
+  countriesCount: Int!
+    @cypher(
+      columnName: "result"
+      statement: """
+      MATCH (this)<-[r1]-(:Message)-[r2]->(n:Country)
+      WHERE id(this) <> id(n) AND NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false) AND NOT coalesce(n.deleted, false)
+      RETURN COUNT(DISTINCT n) AS result
+      """
+    )
+  countries(skip: Int = 0, limit: Int = 20): [Country!]!
+    @cypher(
+      columnName: "result"
+      statement: """
+      MATCH (this)<-[r1]-(:Message)-[r2]->(n:Country)
+      WHERE  id(this) <> id(n) AND NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false) AND NOT coalesce(n.deleted, false)
       RETURN DISTINCT n AS result
       ORDER BY result.name ASC
       SKIP $skip
@@ -621,6 +693,31 @@ type Person
       statement: """
       MATCH (this)<-[r1]-(:Message)-[r2]->(n:Country)
       WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false) AND NOT coalesce(n.deleted, false)
+      RETURN DISTINCT n AS result
+      ORDER BY result.name ASC
+      SKIP $skip
+      LIMIT $limit
+      """
+    )
+
+  #
+  # People relationships
+  #
+  peopleCount: Int!
+    @cypher(
+      columnName: "result"
+      statement: """
+      MATCH (this)<-[r1]-(:Message)-[r2]->(n:Person)
+      WHERE id(this) <> id(n) AND NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false) AND NOT coalesce(n.deleted, false)
+      RETURN COUNT(DISTINCT n) AS result
+      """
+    )
+  people(skip: Int = 0, limit: Int = 20): [Person!]!
+    @cypher(
+      columnName: "result"
+      statement: """
+      MATCH (this)<-[r1]-(:Message)-[r2]->(n:Person)
+      WHERE  id(this) <> id(n) AND NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false) AND NOT coalesce(n.deleted, false)
       RETURN DISTINCT n AS result
       ORDER BY result.name ASC
       SKIP $skip

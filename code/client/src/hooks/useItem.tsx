@@ -6,6 +6,7 @@ import {
   AddressItemsCountsFragment,
   CompanyItemsCountsFragment,
   CountryItemsCountsFragment,
+  getAddressAddresses,
   getAddressById,
   getAddressCompanies,
   getAddressCountries,
@@ -14,6 +15,7 @@ import {
   getAddressPeople,
   getCompanyAddresses,
   getCompanyById,
+  getCompanyCompanies,
   getCompanyCountries,
   getCompanyItemsCounts,
   getCompanyMessages,
@@ -36,6 +38,7 @@ import {
   getPersonCountries,
   getPersonItemsCounts,
   getPersonMessages,
+  getPersonPeople,
   MessageItemsCountsFragment,
   NodeItem,
   PersonItemCountsFragment,
@@ -46,6 +49,7 @@ const QUERIES = {
     getItemById: getCompanyById,
     itemsCounts: getCompanyItemsCounts,
     relations: {
+      company: getCompanyCompanies,
       address: getCompanyAddresses,
       country: getCompanyCountries,
       person: getCompanyPeople,
@@ -60,6 +64,7 @@ const QUERIES = {
       country: getAddressCountries,
       person: getAddressPeople,
       message: getAddressMessages,
+      address: getAddressAddresses,
     },
   },
   country: {
@@ -70,6 +75,7 @@ const QUERIES = {
       address: getCountryAddresses,
       person: getCountryPeople,
       message: getCountryMessages,
+      //country: getCountryCountries,
     },
   },
   person: {
@@ -80,6 +86,7 @@ const QUERIES = {
       address: getPersonAddresses,
       country: getPersonCountries,
       message: getPersonMessages,
+      person: getPersonPeople,
     },
   },
   message: {
@@ -128,9 +135,6 @@ export function useLoadItemData(
 
   const fetchRelations = useCallback(
     async (relationType: ItemType, skip: number, limit: number) => {
-      if (itemType === relationType)
-        throw new Error(`Items of type ${itemType} have no relation to themselves.`);
-
       const queries = QUERIES[itemType].relations;
 
       const result = await client.query({

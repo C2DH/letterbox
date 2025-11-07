@@ -55,9 +55,9 @@ export const ItemView: FC = () => {
     () =>
       itemData
         ? ITEM_TYPES.flatMap((type) => {
-            if (type === itemType) return [];
-
             const listKey = ITEM_TYPE_TO_FIELD[type];
+            if (itemData[listKey as keyof NodeItem] === undefined) return [];
+
             const countKey = ITEM_TYPE_TO_COUNT_FIELD[type];
             const total =
               itemCounts !== null ? itemCounts[countKey as keyof typeof itemCounts] : undefined;
@@ -82,7 +82,7 @@ export const ItemView: FC = () => {
             ];
           })
         : [],
-    [itemData, itemType, fetchRelations, fromMessageId, itemCounts],
+    [itemData, fetchRelations, fromMessageId, itemCounts],
   );
 
   const name = !itemData

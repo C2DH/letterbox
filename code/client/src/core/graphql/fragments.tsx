@@ -16,6 +16,7 @@ export const AddressItemsCounts = graphql(`
     countriesCount
     messagesCount
     peopleCount
+    addressesCount
   }
 `);
 
@@ -36,6 +37,7 @@ export const CompanyItemsCounts = graphql(`
     countriesCount
     messagesCount
     peopleCount
+    companiesCount
   }
 `);
 
@@ -112,5 +114,6 @@ export const PersonItemCounts = graphql(`
     companiesCount
     countriesCount
     messagesCount
+    peopleCount
   }
 `);
