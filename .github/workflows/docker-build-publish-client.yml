@@ -6,7 +6,9 @@ on:
     branches:
       - main
     paths:
-      - "code/client/**"
+      - 'code/client/**'
+
+  workflow_dispatch:
 
 jobs:
   build:
@@ -24,7 +26,7 @@ jobs:
         uses: elgohr/Publish-Docker-Github-Action@v5
         env:
           BUILD_DATE: ${{ env.BUILD_DATE }}
-          GIT_TAG: "latest"
+          GIT_TAG: 'latest'
           GIT_BRANCH: ${{ env.GIT_BRANCH }}
           GIT_COMMIT_SHA: ${{ env.GIT_COMMIT_SHA }}
           GIT_LAST_COMMIT_DATE: ${{ env.GIT_LAST_COMMIT_DATE }}
@@ -32,10 +34,10 @@ jobs:
           name: c2dhunilu/letterbox-client
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-          buildoptions: "--compress --force-rm"
+          buildoptions: '--compress --force-rm'
           buildargs: |
             GIT_TAG,GIT_BRANCH,GIT_COMMIT_SHA,BUILD_DATE,GIT_LAST_COMMIT_DATE
-          tags: "latest"
+          tags: 'latest'
           workdir: docker/c2dhunilu
           context: ../../.
           dockerfile: Dockerfile.client
