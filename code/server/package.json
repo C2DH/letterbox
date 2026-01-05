@@ -4,9 +4,10 @@
   "main": "build/index.js",
   "scripts": {
     "clean": "rimraf build .eslintcache",
-    "build": "npm run clean && npm run generate &&  tsc",
+    "build": "npm run clean && npm run generate && tsc && npm run assets",
     "init": "tsx src/bin/neo4j-schema",
     "start": "npm run init && nodemon",
+    "assets": "copyfiles -u 2 src/graphql/schema.graphql build/graphql/",
     "lint": "eslint 'src/**/*.ts' --ignore-pattern src/graphql/generated/** --cache",
     "test": "vitest",
     "generate": "graphql-codegen",

@@ -20,6 +20,10 @@ async function initServer() {
     // Generic filter to handler errors
     app.use(errorFilter);
 
+    app.get('/health', (_, res) => {
+      res.status(200).send('Okay!');
+    });
+
     // Create a server
     const server: Server = http.createServer(app);
 

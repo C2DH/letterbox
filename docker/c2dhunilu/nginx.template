@@ -1,0 +1,42 @@
+upstream server {
+  server ${NGINX_UPSTREAM_SERVER};
+}
+
+server {
+  listen 80;
+  server_name ${NGINX_SERVER_NAME};
+  client_max_body_size 50M;
+  root /var/www/client;
+
+  location /graphql {
+    proxy_set_header X-Real-IP ${DOLLAR}remote_addr;
+    proxy_set_header X-Forwarded-For ${DOLLAR}proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto ${DOLLAR}http_x_forwarded_proto;
+    proxy_set_header Host ${DOLLAR}http_host;
+    proxy_set_header X-NginX-Proxy true;
+    proxy_set_header Cookie ${DOLLAR}http_cookie;
+    proxy_read_timeout 15m;
+    proxy_connect_timeout 15m;
+    proxy_pass http://server;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade ${DOLLAR}http_upgrade;
+    proxy_set_header Connection "upgrade";
+  }
+
+  location ~ \.mjs$ {
+    types { 
+      application/javascript mjs; 
+    }
+    default_type application/javascript;
+  }
+
+  location /pdf/ {
+    alias /var/www/pdf/;
+  }
+
+  location / {
+    try_files ${DOLLAR}uri ${DOLLAR}uri/ /index.html;
+  }
+
+
+}
