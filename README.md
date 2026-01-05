@@ -172,12 +172,35 @@ cd code/client
 npm run generate
 ```
 
-## Docker Images
+## Docker Images for C2DH
 
-Docker images for both client and server are built and published to Docker Hub via GitHub Actions. The frontend docker image, whose code source is located in `code/client`, consists only of static files (HTML, CSS, JS). You can find the Letterbox frontend image at [Docker Hub](https://hub.docker.com/r/c2dhunilu/letterbox-frontend) or build it locally using the following command:
+Docker images for both client and server are built and published to Docker Hub via GitHub Actions, availble as [c2dhunilu/letterbox-client](https://hub.docker.com/r/c2dhunilu/letterbox-client) and [c2dhunilu/letterbox-server](https://hub.docker.com/r/c2dhunilu/letterbox-server).
+You can build it locally using Makefile:
 
 ```bash
+cd docker/c2dhunilu
 make build-client
+make build-server
 ```
 
-The action `.github/workflows/docker-build-publish-client.yml` contains the workflow to build and publish the image automatically on each push related to `code/client` content to the main branch.
+The actions `.github/workflows/docker-build-publish-client.yml` and `.github/workflows/docker-build-publish-server.yml` contain the workflow to build and publish the images automatically on each push related to `code/client` or `code/server` content to the main branch.
+Note that the client docker image, whose code source is located in `code/client`, consists only of static files (HTML, CSS, JS).
+
+the folder `docker/c2dhunilu` contains a `docker-compose.yml` file that allows deployment of an instance of Letterbox. Create a `.env`file with the following:
+
+```bash
+ELASTICSEARCH_JVM_OPTS=-Xms512m -Xmx512m
+ELASTICSEARCH_MAX_PARALLEL_UPDATE=2
+NEO4J_LOGIN=************
+NEO4J_PASSWORD=*******
+NEO4J_HEAP=512m
+NEO4J_PAGECACHE=512m
+```
+
+Add the csv data as specified above, then run the import using the script included in the server image:
+
+```bash
+docker exec -it c2dhunilu-server-1 /bin/sh
+cd bin
+node dataset-import.js
+```

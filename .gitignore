@@ -40,3 +40,4 @@ tsconfig.tsbuildinfo
 # Sentry Config File
 .env.sentry-build-plugin
 *.tsbuildinfo
+docker/c2dhunilu/.env
