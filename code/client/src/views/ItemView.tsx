@@ -41,8 +41,7 @@ export const ItemView: FC = () => {
     if (!ITEM_TYPES_SET.has(inputType)) throw new Error(`Type ${inputType} is not handled yet.`);
     return inputType as ItemType;
   }, [inputType]);
-  const loadItemData = useLoadItemData(itemType, id);
-  const { loading, itemData, fetchRelations } = loadItemData;
+  const { loading, itemData, fetchRelations } = useLoadItemData(itemType, id);
   const { itemCounts } = useItemCounts(itemType, id || '');
 
   const editionEnabled = useMemo(() => {
@@ -153,7 +152,7 @@ export const ItemView: FC = () => {
 
               <section className="mb-3">
                 <h3 className="fs-6 fw-medium">Extracted data</h3>
-                <article style={{ maxWidth: 580 }}>{itemData.message}</article>
+                <article style={{ maxWidth: 580 }}>{itemData.message}</article>loadItemData
               </section>
 
               <section className="mb-3">
