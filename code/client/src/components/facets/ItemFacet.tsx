@@ -227,9 +227,6 @@ const Histogram: FC<
         )}
       />
       <div className="d-flex align-items-baseline flex-row small">
-        {/* <button type="button" className="btn btn-sm btn-outline-dark" disabled>
-          TODO: Load more
-        </button> */}
         {!!total && (
           <>
             {' '}
