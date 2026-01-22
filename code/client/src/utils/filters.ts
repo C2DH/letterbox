@@ -55,7 +55,9 @@ export function filtersStateToSearchFilters(
     ] as const
   ).forEach(({ gqlField, field }) => {
     const filter = filters[field];
-    if (filter && filter.type === 'keywords') {
+    // If we have a keyword filter (ie some selected element)
+    // which type differ from the current type (ie. on companies explore page, filter on companies is disabled, but not the content one )
+    if (filter && filter.type === 'keywords' && field !== itemType) {
       res[gqlField] = {
         type: FilterTypes.Keywords,
         values: filter.values,
