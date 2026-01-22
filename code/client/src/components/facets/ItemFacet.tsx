@@ -1,6 +1,5 @@
 import { KeywordsFilter } from '@ouestware/facets';
 import {
-  AutocompleteData,
   HistogramData,
   InputKeywordsProps,
   KeywordsFacetSimpleHistogramProps,
@@ -13,7 +12,7 @@ import { InfiniteScroll } from '@ouestware/infinite-scroll';
 import { Spinner } from '@ouestware/loaders';
 import cx from 'classnames';
 import { keyBy, pick, without } from 'lodash';
-import { FC, useCallback, useMemo } from 'react';
+import { FC, useCallback, useMemo, useState } from 'react';
 import { IconType } from 'react-icons';
 import { RiDownloadLine, RiFilterLine, RiFilterOffLine, RiShareBoxLine } from 'react-icons/ri';
 import { Link } from 'react-router-dom';
@@ -31,8 +30,11 @@ import {
   REACT_SELECT_BASE_PROPS,
 } from '../../core/consts.tsx';
 import { useEditionContext } from '../../core/edition.ts';
+import type { AsyncStatus } from '../../types.ts';
+import { getErrorData } from '../../utils/error.ts';
 import { InCartButton } from '../edition/InCartButton.tsx';
 import { EditionActionsTooltip } from '../edition/tooltips.tsx';
+import { ErrorInline } from '../error/index.tsx';
 
 const HistogramRow: FC<
   {
@@ -248,17 +250,27 @@ export const ItemFacet: FC<{ itemType: ItemType; selectedType: ItemType }> = ({
   const { state, loadHistogram, autocomplete } = useFacetsContext();
   const facet = useMemo(() => FACETS_DICT[itemType], [itemType]);
   const { filter, onChange } = useFacet(facet);
+  const [loadDataStatus, setLoadDataStatus] = useState<AsyncStatus>({ type: 'idle' });
 
   const fnAutocomplete = useMemo(() => {
     return facet.type === 'keywords' && facet.autocomplete && autocomplete
-      ? (inputValue: string) =>
-          autocomplete(facet, state, inputValue) as Promise<AutocompleteData<ItemValue>>
+      ? (inputValue: string) => autocomplete(facet, state, inputValue)
       : undefined;
   }, [facet, autocomplete, state]);
 
   const fnLoadHistogram = useMemo(() => {
     return facet.type === 'keywords' && facet.histogram && loadHistogram
-      ? () => loadHistogram(facet, state) as Promise<HistogramData<ItemValue>>
+      ? async () => {
+          setLoadDataStatus({ type: 'loading' });
+          try {
+            const result = await loadHistogram(facet, state);
+            setLoadDataStatus({ type: 'success' });
+            return result;
+          } catch (e) {
+            setLoadDataStatus({ type: 'error', message: getErrorData(e).message });
+            throw e;
+          }
+        }
       : undefined;
   }, [facet, loadHistogram, state]);
 
@@ -383,6 +395,7 @@ export const ItemFacet: FC<{ itemType: ItemType; selectedType: ItemType }> = ({
         itemType={itemType}
         selectedType={selectedType}
       />
+      {loadDataStatus.type === 'error' && <ErrorInline message={loadDataStatus.message} />}
     </>
   );
 };

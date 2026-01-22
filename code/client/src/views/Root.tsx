@@ -2,8 +2,10 @@ import { useStorage } from '@ouestware/hooks';
 import { ModalProvider } from '@ouestware/modals';
 import { NotificationProvider } from '@ouestware/notifications';
 import { cloneDeep } from 'lodash';
-import { FC, useCallback } from 'react';
+import { FC, useCallback, useMemo } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
+import { BsXOctagonFill } from 'react-icons/bs';
+import { FaCheckCircle, FaExclamationTriangle, FaInfoCircle } from 'react-icons/fa';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 
 import { Error } from '../components/error';
@@ -53,10 +55,20 @@ export const Root: FC = () => {
     [setEditionState],
   );
 
+  const nofiticationIcons = useMemo(
+    () => ({
+      error: <BsXOctagonFill className="text-danger" />,
+      warning: <FaExclamationTriangle className="text-warning" />,
+      success: <FaCheckCircle className="text-success" />,
+      info: <FaInfoCircle className="text-info" />,
+    }),
+    [],
+  );
+
   return (
     <ErrorBoundary FallbackComponent={Error}>
       <ApolloProvider>
-        <NotificationProvider>
+        <NotificationProvider icons={nofiticationIcons}>
           <EditionContext.Provider
             value={{ ...editionState, toggle: toggleEdition, addToCart, removeFromCart }}
           >

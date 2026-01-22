@@ -4,7 +4,7 @@ import { InfiniteScroll, InfiniteScrollProps } from '@ouestware/infinite-scroll'
 import { useNotifications } from '@ouestware/notifications';
 import cx from 'classnames';
 import { isNil } from 'lodash';
-import { FC, useCallback, useMemo } from 'react';
+import { FC, useCallback, useMemo, useState } from 'react';
 import { RiDownloadLine } from 'react-icons/ri';
 import streamSaver from 'streamsaver';
 
@@ -17,9 +17,12 @@ import {
 } from '../core/consts';
 import { EsSortDirection, NodeItem } from '../core/graphql';
 import { searchItems } from '../core/graphql/queries/search';
+import type { AsyncStatus } from '../types.ts';
 import { escapeToCSVValue, objectToCSV } from '../utils/csv.ts';
 import { ITEM_CSV_FIELDS_BY_TYPE } from '../utils/data.ts';
+import { getErrorData } from '../utils/error.ts';
 import { filtersStateToSearchFilters } from '../utils/filters';
+import { ErrorInline } from './error/index.tsx';
 import { QueryForm } from './facets/QueryForm.tsx';
 import { ItemCard } from './items/card/ItemCard.tsx';
 
@@ -38,38 +41,49 @@ export const ItemsList: FC<{ itemType: ItemType }> = ({ itemType }) => {
   const { state } = useFacetsContext();
   const { notify } = useNotifications();
   const client = useApolloClient();
+  const [loadDataStatus, setLoadDataStatus] = useState<AsyncStatus>({ type: 'idle' });
+
   const loadData = useCallback(
     async (from: number, limit = 30) => {
-      const sortBy = [{ direction: EsSortDirection.Desc, field: '_score' }];
-      switch (itemType) {
-        case 'company':
-          sortBy.push({ direction: EsSortDirection.Desc, field: 'peopleCount' });
-          break;
-        default:
-          sortBy.push({ direction: EsSortDirection.Desc, field: 'companiesCount' });
-          break;
+      try {
+        setLoadDataStatus({ type: 'loading' });
+        const sortBy = [{ direction: EsSortDirection.Desc, field: '_score' }];
+        switch (itemType) {
+          case 'company':
+            sortBy.push({ direction: EsSortDirection.Desc, field: 'peopleCount' });
+            break;
+          default:
+            sortBy.push({ direction: EsSortDirection.Desc, field: 'companiesCount' });
+            break;
+        }
+        const {
+          data: { search },
+          error,
+        } = await client.query({
+          query: searchItems,
+          variables: {
+            itemType: ITEM_TYPE_TO_DATA_TYPE[itemType],
+            filters: filtersStateToSearchFilters(state, itemType),
+            limit,
+            from,
+            sortBy,
+          },
+          fetchPolicy: 'no-cache',
+        });
+        if (error) throw error;
+        if (!search) throw new Error('No proper data was received from searchCompanies.');
+        setLoadDataStatus({ type: 'success' });
+        return {
+          total: search.total,
+          data: search.results.filter((r) => !isNil(r)) as NodeItem[],
+        };
+      } catch (e) {
+        setLoadDataStatus({ type: 'error', message: getErrorData(e).message });
+        return {
+          total: -1,
+          data: [],
+        };
       }
-      const {
-        data: { search },
-        error,
-      } = await client.query({
-        query: searchItems,
-        variables: {
-          itemType: ITEM_TYPE_TO_DATA_TYPE[itemType],
-          filters: filtersStateToSearchFilters(state, itemType),
-          limit,
-          from,
-          sortBy,
-        },
-        fetchPolicy: 'no-cache',
-      });
-      if (error) throw error;
-      if (!search) throw new Error('No proper data was received from searchCompanies.');
-
-      return {
-        total: search.total,
-        data: search.results.filter((r) => !isNil(r)) as NodeItem[],
-      };
     },
     [client, itemType, state],
   );
@@ -106,7 +120,7 @@ export const ItemsList: FC<{ itemType: ItemType }> = ({ itemType }) => {
           hasMore = false; // We are at the limit of 10k items
         }
         const result = await loadData(from, limit);
-        for (const item of result.data) {
+        for (const item of result.data || []) {
           writer.write(new TextEncoder().encode(objectToCSV(item, headers) + '\n'));
           from++;
         }
@@ -161,15 +175,20 @@ export const ItemsList: FC<{ itemType: ItemType }> = ({ itemType }) => {
 
   const Bottom: ListProps['bottom'] = useMemo(
     () => () => (
-      <div className={cx('mb-4', itemType === 'message' ? 'col-4' : 'col-2')}>
-        <div className="text-center pt-3">
-          <div className="spinner-border" role="status">
-            <span className="visually-hidden">Loading...</span>
+      <>
+        {loadDataStatus.type === 'loading' && (
+          <div className={cx('mb-4', itemType === 'message' ? 'col-4' : 'col-2')}>
+            <div className="text-center pt-3">
+              <div className="spinner-border" role="status">
+                <span className="visually-hidden">Loading...</span>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
+        )}
+        {loadDataStatus.type === 'error' && <ErrorInline message={loadDataStatus.message} />}
+      </>
     ),
-    [itemType],
+    [itemType, loadDataStatus],
   );
 
   const List: ListProps['list'] = useMemo(

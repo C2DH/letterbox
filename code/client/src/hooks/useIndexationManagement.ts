@@ -1,22 +1,32 @@
 import { useMutation, useQuery } from '@apollo/client';
-import { useCallback, useMemo } from 'react';
+import { useNotifications } from '@ouestware/notifications';
+import { useCallback, useEffect, useMemo } from 'react';
 
 import {
   countItemsWithPendingModifications,
   indexPendingModificationsMutation,
 } from '../core/graphql';
+import { getErrorData } from '../utils/error';
 
 /**
  * Hook to retrieve a person by its id.
  */
 export const useIndexationManagement = () => {
+  const { notify } = useNotifications();
+
   // get number of pending modifications
   const { loading, error, data, refetch } = useQuery(countItemsWithPendingModifications, {
     variables: {},
   });
-  if (error) throw error;
+
   const nbItemsWithPendingModifications = useMemo(() => data?.nbItems, [data]);
   const onGoingIndexation = useMemo(() => data?.onGoingIndexation[0], [data]);
+
+  useEffect(() => {
+    if (error) {
+      notify({ type: 'error', text: getErrorData(error).message });
+    }
+  }, [error, notify]);
 
   // Fetch addresses
   const [_indexPendingModifications] = useMutation(indexPendingModificationsMutation);
