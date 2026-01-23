@@ -1,8 +1,8 @@
 import { LoaderFill } from '@ouestware/loaders';
 import cx from 'classnames';
 import { ReactNode, useMemo, type FC } from 'react';
-import { RiAddCircleLine, RiFile3Line, RiPriceTag3Line } from 'react-icons/ri';
-import { useParams } from 'react-router-dom';
+import { RiFile3Line, RiPriceTag3Line } from 'react-icons/ri';
+import { Link, useParams } from 'react-router-dom';
 
 import { Collapsable } from '../components/Collapsable';
 import { InCartButton } from '../components/edition/InCartButton.tsx';
@@ -31,7 +31,7 @@ import { useItemCounts } from '../hooks/useItemCounts.ts';
 import { getMessageName } from '../utils/data.ts';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-type RelatedDefinition<T = any> = ListWithLoadMoreProps<T> & { title: ReactNode };
+type RelatedDefinition<T = any> = ListWithLoadMoreProps<T> & { title: ReactNode; type: ItemType };
 
 export const ItemView: FC = () => {
   const { enabled } = useEditionContext();
@@ -63,6 +63,7 @@ export const ItemView: FC = () => {
 
             return [
               {
+                type,
                 title: (
                   <span className="fs-2">
                     <ItemIcon type={type} /> {ITEM_TYPE_LABELS_PLURAL[type]} {total && `(${total})`}
@@ -124,13 +125,19 @@ export const ItemView: FC = () => {
 
           {relatedItems.map((related, index) => (
             <Collapsable key={index} title={related.title} className="mb-2" defaultOpen>
-              {editionEnabled && (
-                <div className="mb-3">
+              <div className="mb-3 d-flex gap-1">
+                <Link
+                  to={`/explore/${related.type}?${inputType}|values=${id}#result`}
+                  className="btn btn-dark"
+                >
+                  View in explore page
+                </Link>
+                {/* {editionEnabled && (
                   <button className="btn btn-purple-300 with-icon">
                     <RiAddCircleLine /> Add item
                   </button>
-                </div>
-              )}
+                )} */}
+              </div>
               <ListWithLoadMore className="row" {...related} />
             </Collapsable>
           ))}

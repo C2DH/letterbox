@@ -9,6 +9,7 @@ import { FaCheckCircle, FaExclamationTriangle, FaInfoCircle } from 'react-icons/
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 
 import { Error } from '../components/error';
+import ScrollToAnchor from '../components/ScrollToAnchor.tsx';
 import { DEFAULT_EDITION_DATA, EditionContext, EditionItem } from '../core/edition.ts';
 import { ApolloProvider } from '../core/graphql';
 import { deserializeEditionState, EDITION_STATE_KEY } from '../utils/edition.ts';
@@ -80,6 +81,7 @@ export const Root: FC = () => {
                   <Route path="/" element={<Navigate to="/explore/company" replace />} />
                 </Routes>
               </ModalProvider>
+              <ScrollToAnchor />
             </BrowserRouter>
           </EditionContext.Provider>
         </NotificationProvider>

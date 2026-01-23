@@ -198,16 +198,14 @@ export const ItemsList: FC<{ itemType: ItemType }> = ({ itemType }) => {
   );
 
   return (
-    <section>
-      <ListComponent
-        element={ItemComponent}
-        elementProps={{ itemType }}
-        getDataId={(data) => data.id}
-        loadData={loadData}
-        bottom={Bottom}
-        list={List}
-        top={Top}
-      />
-    </section>
+    <ListComponent
+      element={ItemComponent}
+      elementProps={{ itemType }}
+      getDataId={(data) => data.id}
+      loadData={loadData}
+      bottom={Bottom}
+      list={List}
+      top={Top}
+    />
   );
 };

@@ -22,6 +22,10 @@ main {
   height: 150px;
 }
 
+#result {
+  min-height: 100vh;
+}
+
 @media (max-width: 1370px) {
   .explore-header {
     .explore-date {

@@ -27,7 +27,7 @@ import { filtersStateToSearchFilters } from '../utils/filters';
 
 export const Explore: FC = () => {
   const { type: inputType } = useParams();
-  const { search } = useLocation();
+  const { search, hash } = useLocation();
   const navigate = useNavigate();
   const client = useApolloClient();
 
@@ -89,8 +89,10 @@ export const Explore: FC = () => {
   useEffect(() => {
     const newSearch = stateToSearch(state).toString();
     if (newSearch !== search)
-      navigate(`/explore/${selectedType}${newSearch ? '?' + newSearch : ''}`, { replace: true });
-  }, [navigate, search, selectedType, state]);
+      navigate(`/explore/${selectedType}${newSearch ? '?' + newSearch : ''}${hash}`, {
+        replace: true,
+      });
+  }, [navigate, search, selectedType, state, hash]);
 
   return (
     <FacetsRoot
@@ -153,7 +155,9 @@ export const Explore: FC = () => {
         </section>
 
         {/* CORE ITEMS LIST */}
-        <ItemsList key={fingerprint} itemType={selectedType} />
+        <section id="result">
+          <ItemsList key={fingerprint} itemType={selectedType} />
+        </section>
       </main>
     </FacetsRoot>
   );
