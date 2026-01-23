@@ -28,6 +28,7 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-error-boundary": "^5.0.0",
+    "react-helmet": "^6.1.0",
     "react-icons": "^5.3.0",
     "react-pdf": "^9.2.1",
     "react-router-dom": "7.3.0",
@@ -38,6 +39,7 @@
   "devDependencies": {
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
+    "@types/react-helmet": "^6.1.11",
     "@types/streamsaver": "^2.0.5",
     "@vitejs/plugin-react": "^4.3.1",
     "globals": "^15.9.0",

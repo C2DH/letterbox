@@ -1,6 +1,7 @@
 import { LoaderFill } from '@ouestware/loaders';
 import cx from 'classnames';
 import { ReactNode, useMemo, type FC } from 'react';
+import { Helmet } from 'react-helmet';
 import { RiFile3Line, RiPriceTag3Line } from 'react-icons/ri';
 import { Link, useParams } from 'react-router-dom';
 
@@ -95,6 +96,12 @@ export const ItemView: FC = () => {
 
   return (
     <>
+      <Helmet>
+        <title>
+          {name} - {itemType}
+        </title>
+      </Helmet>
+
       <Sidebar />
 
       {itemData && (

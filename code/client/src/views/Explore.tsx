@@ -4,6 +4,7 @@ import { FacetsRoot } from '@ouestware/facets-client';
 import cx from 'classnames';
 import { without } from 'lodash';
 import { FC, useCallback, useEffect, useMemo, useState } from 'react';
+import { Helmet } from 'react-helmet';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
 import { Timeline } from '../components/dataviz/Timeline.tsx';
@@ -16,6 +17,7 @@ import { Sidebar } from '../components/navigation/Sidebar.tsx';
 import {
   FACETS,
   FILTERABLE_ITEM_TYPES,
+  ITEM_TYPE_LABELS_PLURAL,
   ITEM_TYPE_TO_DATA_TYPE,
   ITEM_TYPE_TO_FIELD,
   ITEM_TYPES_SET,
@@ -95,70 +97,75 @@ export const Explore: FC = () => {
   }, [navigate, search, selectedType, state, hash]);
 
   return (
-    <FacetsRoot
-      filtersState={state}
-      onFiltersStateChange={setState}
-      portalId="portal-root"
-      autocomplete={fetchItems}
-      loadHistogram={(facet, filters) => fetchItems(facet, filters)}
-    >
-      {/* SIDEBAR */}
-      <Sidebar activeItemType={selectedType} />
+    <>
+      <Helmet>
+        <title>{ITEM_TYPE_LABELS_PLURAL[selectedType]} - Explore</title>
+      </Helmet>
+      <FacetsRoot
+        filtersState={state}
+        onFiltersStateChange={setState}
+        portalId="portal-root"
+        autocomplete={fetchItems}
+        loadHistogram={(facet, filters) => fetchItems(facet, filters)}
+      >
+        {/* SIDEBAR */}
+        <Sidebar activeItemType={selectedType} />
 
-      {/* MAIN CONTENT */}
-      <main className="p-4">
-        {/* HEADER (timeline + date inputs) */}
-        <section className="explore-header d-flex flex-row align-items-end mb-4 pb-1">
-          <div
-            className="h-100 flex-grow-1"
-            style={{
-              borderBottom: 'var(--bs-border-width) solid var(--bs-border-color-translucent)',
-            }}
-          >
-            <Timeline itemType={ITEM_TYPE_TO_DATA_TYPE[selectedType]} />
-          </div>
-          <div className="ps-2 explore-date">
-            <DateFacet />
-          </div>
-        </section>
-
-        {/* LIST BLOCKS */}
-        <section className="row align-items-stretch">
-          {listBlocks.map((itemType) => (
+        {/* MAIN CONTENT */}
+        <main className="p-4">
+          {/* HEADER (timeline + date inputs) */}
+          <section className="explore-header d-flex flex-row align-items-end mb-4 pb-1">
             <div
-              key={itemType}
-              className={cx('mb-4', listBlocks.length === 3 ? 'col-6 col-xxl-4' : 'col-6')}
+              className="h-100 flex-grow-1"
+              style={{
+                borderBottom: 'var(--bs-border-width) solid var(--bs-border-color-translucent)',
+              }}
             >
+              <Timeline itemType={ITEM_TYPE_TO_DATA_TYPE[selectedType]} />
+            </div>
+            <div className="ps-2 explore-date">
+              <DateFacet />
+            </div>
+          </section>
+
+          {/* LIST BLOCKS */}
+          <section className="row align-items-stretch">
+            {listBlocks.map((itemType) => (
               <div
-                className="card overflow-y-auto"
-                style={{ height: listBlocks.length === 3 ? 800 : 400 }}
+                key={itemType}
+                className={cx('mb-4', listBlocks.length === 3 ? 'col-6 col-xxl-4' : 'col-6')}
               >
-                <div className="card-body">
-                  <ItemFacet itemType={itemType} selectedType={selectedType} />
+                <div
+                  className="card overflow-y-auto"
+                  style={{ height: listBlocks.length === 3 ? 800 : 400 }}
+                >
+                  <div className="card-body">
+                    <ItemFacet itemType={itemType} selectedType={selectedType} />
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </section>
-
-        {/* OTHER FILTERS */}
-        <section className="row mb-6">
-          {/*TAG FILTERS*/}
-          <section className="col-4">
-            <TagsFacet />
+            ))}
           </section>
 
-          {/*TAG FILTERS*/}
-          <section className="col-4">
-            <StatusFacet />
-          </section>
-        </section>
+          {/* OTHER FILTERS */}
+          <section className="row mb-6">
+            {/*TAG FILTERS*/}
+            <section className="col-4">
+              <TagsFacet />
+            </section>
 
-        {/* CORE ITEMS LIST */}
-        <section id="result">
-          <ItemsList key={fingerprint} itemType={selectedType} />
-        </section>
-      </main>
-    </FacetsRoot>
+            {/*TAG FILTERS*/}
+            <section className="col-4">
+              <StatusFacet />
+            </section>
+          </section>
+
+          {/* CORE ITEMS LIST */}
+          <section id="result">
+            <ItemsList key={fingerprint} itemType={selectedType} />
+          </section>
+        </main>
+      </FacetsRoot>
+    </>
   );
 };
