@@ -115,7 +115,7 @@ export const Explore: FC = () => {
           >
             <Timeline itemType={ITEM_TYPE_TO_DATA_TYPE[selectedType]} />
           </div>
-          <div className="ps-2">
+          <div className="ps-2 explore-date">
             <DateFacet />
           </div>
         </section>

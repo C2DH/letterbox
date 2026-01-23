@@ -73,11 +73,10 @@ export const DateFacet: FC = () => {
             </div>
           </div>
         ))}
-        <button className="btn ms-2" type="submit">
+        <button className="btn btn-outline-dark ms-2" type="submit">
           Update
         </button>
       </section>
-      <section className="text-end"></section>
     </form>
   );
 };
