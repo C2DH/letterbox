@@ -1,5 +1,6 @@
 import { LoaderFill } from '@ouestware/loaders';
 import cx from 'classnames';
+import { isNil, omit } from 'lodash';
 import { ReactNode, useMemo, type FC } from 'react';
 import { Helmet } from 'react-helmet';
 import { RiFile3Line, RiPriceTag3Line } from 'react-icons/ri';
@@ -19,7 +20,6 @@ import {
   ITEM_TYPE_LABELS,
   ITEM_TYPE_LABELS_PLURAL,
   ITEM_TYPE_TO_COUNT_FIELD,
-  ITEM_TYPE_TO_FIELD,
   ITEM_TYPES,
   ITEM_TYPES_SET,
   ItemIcon,
@@ -55,9 +55,6 @@ export const ItemView: FC = () => {
     () =>
       itemData
         ? ITEM_TYPES.flatMap((type) => {
-            const listKey = ITEM_TYPE_TO_FIELD[type];
-            if (itemData[listKey as keyof NodeItem] === undefined) return [];
-
             const countKey = ITEM_TYPE_TO_COUNT_FIELD[type];
             const total =
               itemCounts !== null ? itemCounts[countKey as keyof typeof itemCounts] : undefined;
@@ -67,10 +64,10 @@ export const ItemView: FC = () => {
                 type,
                 title: (
                   <span className="fs-2">
-                    <ItemIcon type={type} /> {ITEM_TYPE_LABELS_PLURAL[type]} {total && `(${total})`}
+                    <ItemIcon type={type} /> {ITEM_TYPE_LABELS_PLURAL[type]}{' '}
+                    {!isNil(total) && `(${total})`}
                   </span>
                 ),
-                data: itemData[listKey as keyof NodeItem],
                 total,
                 fetch: fetchRelations.bind(null, type),
                 getItemKey: (data: NodeItem) => data.id,
@@ -131,7 +128,7 @@ export const ItemView: FC = () => {
           </section>
 
           {relatedItems.map((related, index) => (
-            <Collapsable key={index} title={related.title} className="mb-2" defaultOpen>
+            <Collapsable key={index} title={related.title} className="mb-2">
               <div className="mb-3 d-flex gap-1">
                 <Link
                   to={`/explore/${related.type}?${inputType}|values=${id}#result`}
@@ -145,7 +142,7 @@ export const ItemView: FC = () => {
                   </button>
                 )} */}
               </div>
-              <ListWithLoadMore className="row" {...related} />
+              <ListWithLoadMore className="row" {...omit(related, ['title'])} />
             </Collapsable>
           ))}
 

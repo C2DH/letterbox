@@ -9,18 +9,6 @@ export const getCountryById = graphql(`
       tags
       verified
       deleted
-      addresses(skip: 0, limit: 20) {
-        ...AddressInline
-      }
-      companies(skip: 0, limit: 20) {
-        ...CompanyInline
-      }
-      messages {
-        ...MessageInline
-      }
-      people(skip: 0, limit: 20) {
-        ...PersonInline
-      }
     }
   }
 `);

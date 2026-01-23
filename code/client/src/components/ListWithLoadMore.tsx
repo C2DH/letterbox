@@ -9,7 +9,6 @@ import {
 } from 'react';
 
 export type ListWithLoadMoreProps<T> = HTMLAttributes<HTMLElement> & {
-  data?: T[];
   fetch: (skip: number, limit: number) => Promise<T[]>;
   renderItem: (item: T) => ReactNode;
   renderLoader?: () => ReactNode;
@@ -17,7 +16,6 @@ export type ListWithLoadMoreProps<T> = HTMLAttributes<HTMLElement> & {
   total?: number;
 };
 export function ListWithLoadMore<T>({
-  data,
   fetch,
   renderItem,
   renderLoader,
@@ -25,7 +23,7 @@ export function ListWithLoadMore<T>({
   total,
   ...htmlAttributs
 }: ListWithLoadMoreProps<T>) {
-  const [items, setItems] = useState<T[]>(data || []);
+  const [items, setItems] = useState<T[]>([]);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
 
@@ -45,6 +43,11 @@ export function ListWithLoadMore<T>({
       setHasMore(false);
     }
   }, [total, items]);
+
+  useEffect(() => {
+    fetchMore();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <>

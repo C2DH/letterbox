@@ -27,7 +27,7 @@ export const Collapsable: FC<PropsWithChildren<CollapsableProps>> = ({
         {show ? <RiArrowDownSLine size={'2em'} /> : <RiArrowRightSLine size={'2em'} />} {title}
       </button>
 
-      <div className={cx('collapse', show && 'show')}>{children}</div>
+      <div className={cx('collapse', show && 'show')}>{show && <>{children}</>}</div>
     </section>
   );
 };

@@ -9,19 +9,6 @@ export const getMessageById = graphql(`
       filename
       pageNumber
       deleted
-
-      addresses(skip: 0, limit: 20) {
-        ...AddressInline
-      }
-      companies(skip: 0, limit: 20) {
-        ...CompanyInline
-      }
-      countries(skip: 0, limit: 20) {
-        ...CountryInline
-      }
-      people(skip: 0, limit: 20) {
-        ...PersonInline
-      }
     }
   }
 `);

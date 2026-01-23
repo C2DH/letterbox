@@ -9,26 +9,6 @@ export const getPersonById = graphql(`
       tags
       verified
       deleted
-
-      addresses(skip: 0, limit: 20) {
-        ...AddressInline
-      }
-
-      companies(skip: 0, limit: 20) {
-        ...CompanyInline
-      }
-
-      countries(skip: 0, limit: 20) {
-        ...CountryInline
-      }
-
-      messages {
-        ...MessageInline
-      }
-
-      people {
-        ...PersonInline
-      }
     }
   }
 `);

@@ -10,7 +10,7 @@ import {
 } from '../core/graphql';
 
 export function getMessageName(data: MessageInlineFragment): string {
-  return `${data.year}, ${data.companies.map((company) => company.name).join(', ')}`;
+  return `${data.year}, ${data.companies?.map((company) => company.name).join(', ')}`;
 }
 
 export function getItemName(data: NodeItem): string {

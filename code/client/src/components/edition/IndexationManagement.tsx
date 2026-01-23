@@ -11,7 +11,7 @@ export const IndexationManagement: FC = () => {
     useIndexationManagement();
 
   useEffect(() => {
-    const polling = setInterval(refetch, 1500);
+    const polling = setInterval(refetch, 10000);
     return () => {
       if (polling) clearInterval(polling);
     };

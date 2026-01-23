@@ -9,23 +9,6 @@ export const getCompanyById = graphql(`
       tags
       verified
       deleted
-
-      addresses(skip: 0, limit: 20) {
-        ...AddressInline
-      }
-
-      countries(skip: 0, limit: 20) {
-        ...CountryInline
-      }
-      messages {
-        ...MessageInline
-      }
-      people(skip: 0, limit: 20) {
-        ...PersonInline
-      }
-      companies(skip: 0, limit: 20) {
-        ...CompanyInline
-      }
     }
   }
 `);

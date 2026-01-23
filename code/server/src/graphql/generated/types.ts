@@ -430,6 +430,7 @@ export type Person = {
   __typename?: 'Person';
   addresses: Array<Address>;
   addressesCount: Scalars['Int']['output'];
+  commonCompaniesCount: Scalars['Int']['output'];
   companies: Array<Company>;
   companiesCount: Scalars['Int']['output'];
   countries: Array<Country>;
@@ -450,6 +451,11 @@ export type Person = {
 export type PersonAddressesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   skip?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type PersonCommonCompaniesCountArgs = {
+  personId: Scalars['ID']['input'];
 };
 
 
@@ -843,6 +849,7 @@ export type PendingModificationsIndexationReportResolvers<ContextType = any, Par
 export type PersonResolvers<ContextType = any, ParentType extends ResolversParentTypes['Person'] = ResolversParentTypes['Person']> = {
   addresses?: Resolver<Array<ResolversTypes['Address']>, ParentType, ContextType, RequireFields<PersonAddressesArgs, 'limit' | 'skip'>>;
   addressesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  commonCompaniesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType, RequireFields<PersonCommonCompaniesCountArgs, 'personId'>>;
   companies?: Resolver<Array<ResolversTypes['Company']>, ParentType, ContextType, RequireFields<PersonCompaniesArgs, 'limit' | 'skip'>>;
   companiesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   countries?: Resolver<Array<ResolversTypes['Country']>, ParentType, ContextType, RequireFields<PersonCountriesArgs, 'limit' | 'skip'>>;
