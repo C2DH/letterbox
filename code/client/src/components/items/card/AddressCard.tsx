@@ -13,7 +13,7 @@ export const AddressCard: FC<{ data: AddressInlineFragment }> = ({ data }) => {
   const { tags } = data;
   const cleanedTags = useMemo(() => filter(tags || [], (s) => !isNil(s)) as string[], [tags]);
 
-  const { itemCounts, loading } = useItemCounts('address', data.id);
+  const { itemCounts, loadingStatus } = useItemCounts('address', data.id);
 
   return (
     <>
@@ -29,7 +29,7 @@ export const AddressCard: FC<{ data: AddressInlineFragment }> = ({ data }) => {
         <ItemDeleted item={data} />
       </h5>
 
-      <ItemsCounts itemType="address" data={itemCounts} loadingData={loading} />
+      <ItemsCounts itemType="address" data={itemCounts} loadingStatus={loadingStatus} />
 
       {!!cleanedTags.length && (
         <section>

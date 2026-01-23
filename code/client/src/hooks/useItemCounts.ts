@@ -1,5 +1,5 @@
 import { useQuery } from '@apollo/client';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { ItemType } from '../core/consts';
 import {
@@ -14,6 +14,7 @@ import {
   MessageItemsCountsFragment,
   PersonItemCountsFragment,
 } from '../core/graphql';
+import type { AsyncStatusType } from '../types';
 
 const QUERIES = {
   company: getCompanyItemsCounts,
@@ -36,11 +37,24 @@ export const useItemCounts = (type: ItemType, id: string) => {
   >(QUERIES[type], {
     variables: { id },
   });
-  if (error) throw error;
+  const [loadingStatus, setLoadingStatus] = useState<AsyncStatusType>('idle');
   const itemCounts = useMemo(() => data?.result[0] || null, [data]);
 
+  useEffect(() => {
+    if (loading) {
+      setLoadingStatus('loading');
+    } else if (data) {
+      setLoadingStatus('success');
+    } else if (error) {
+      setLoadingStatus('error');
+      console.error(error);
+    } else {
+      setLoadingStatus('idle');
+    }
+  }, [error, loading, data]);
+
   return {
-    loading,
+    loadingStatus,
     itemCounts,
     refetch,
   };

@@ -26,7 +26,7 @@ const TYPES = FILTERABLE_ITEM_TYPES as Exclude<ItemType, 'message'>[];
 
 export const MessageCard: FC<{ data: MessageInlineFragment }> = ({ data }) => {
   const { enabled } = useEditionContext();
-  const { itemCounts, loading } = useItemCounts('message', data.id);
+  const { itemCounts, loadingStatus } = useItemCounts('message', data.id);
   const name = getMessageName(data);
   const cleanedTags = useMemo(
     () => filter(data.tags || [], (s) => !isNil(s)) as string[],
@@ -48,7 +48,7 @@ export const MessageCard: FC<{ data: MessageInlineFragment }> = ({ data }) => {
         </Link>
         <ItemVerified item={data} />
       </h5>
-      <ItemsCounts itemType="message" data={itemCounts} loadingData={loading} />
+      <ItemsCounts itemType="message" data={itemCounts} loadingStatus={loadingStatus} />
       {!!cleanedTags.length && (
         <section>
           {cleanedTags.map((tag, i) => (
@@ -82,7 +82,7 @@ export const MessageCard: FC<{ data: MessageInlineFragment }> = ({ data }) => {
                 </span>
               ),
             )}
-            {loading && <Spinner className="spinner-border-sm" />}
+            {loadingStatus === 'loading' && <Spinner className="spinner-border-sm" />}
             {!!remaining && (
               <span className="text-muted">
                 and {remaining} other{' '}

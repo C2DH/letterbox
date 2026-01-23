@@ -11,7 +11,7 @@ import { ItemVerified } from '../ItemVerified.tsx';
 
 export const CountryCard: FC<{ data: CountryInlineFragment }> = ({ data }) => {
   const { tags } = data;
-  const { itemCounts, loading } = useItemCounts('country', data.id);
+  const { itemCounts, loadingStatus } = useItemCounts('country', data.id);
   const cleanedTags = useMemo(() => filter(tags || [], (s) => !isNil(s)) as string[], [tags]);
 
   return (
@@ -28,7 +28,7 @@ export const CountryCard: FC<{ data: CountryInlineFragment }> = ({ data }) => {
         <ItemDeleted item={data} />
       </h5>
 
-      <ItemsCounts itemType="country" data={itemCounts} loadingData={loading} />
+      <ItemsCounts itemType="country" data={itemCounts} loadingStatus={loadingStatus} />
 
       {!!cleanedTags.length && (
         <section>

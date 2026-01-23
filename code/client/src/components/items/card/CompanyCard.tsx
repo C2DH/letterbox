@@ -11,7 +11,7 @@ import { ItemVerified } from '../ItemVerified.tsx';
 
 export const CompanyCard: FC<{ data: CompanyInlineFragment }> = ({ data }) => {
   const { tags, years } = data;
-  const { itemCounts, loading } = useItemCounts('company', data.id);
+  const { itemCounts, loadingStatus } = useItemCounts('company', data.id);
   const cleanedTags = useMemo(() => filter(tags || [], (s) => !isNil(s)) as string[], [tags]);
   const minYear = min(years);
   const maxYear = max(years);
@@ -30,7 +30,7 @@ export const CompanyCard: FC<{ data: CompanyInlineFragment }> = ({ data }) => {
         <ItemDeleted item={data} />
       </h5>
 
-      <ItemsCounts itemType="company" data={itemCounts} loadingData={loading} />
+      <ItemsCounts itemType="company" data={itemCounts} loadingStatus={loadingStatus} />
 
       {typeof minYear === 'number' && typeof maxYear === 'number' && (
         <section className="text-muted">

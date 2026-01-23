@@ -1,5 +1,6 @@
 import { Spinner } from '@ouestware/loaders';
 import cx from 'classnames';
+import { isNil } from 'lodash';
 import type { FC } from 'react';
 
 import {
@@ -10,11 +11,12 @@ import {
   ItemIcon,
   ItemType,
 } from '../../core/consts';
+import type { AsyncStatusType } from '../../types.ts';
 import { shortenNumber } from '../../utils/number.ts';
 
 export const ItemsCounts: FC<{
   itemType: ItemType;
-  loadingData?: boolean;
+  loadingStatus?: AsyncStatusType;
   data: null | Partial<{
     companiesCount: number;
     addressesCount: number;
@@ -22,7 +24,7 @@ export const ItemsCounts: FC<{
     countriesCount: number;
     messagesCount: number;
   }>;
-}> = ({ itemType, data, loadingData }) => {
+}> = ({ itemType, data, loadingStatus }) => {
   return (
     <ul className="list-inline my-1">
       {(
@@ -37,7 +39,7 @@ export const ItemsCounts: FC<{
         .filter(({ type }) => type !== itemType)
         .map(({ field, type }) => {
           const value = data && field in data ? data[field] || 0 : null;
-          if (value !== null || loadingData)
+          if (value !== null || loadingStatus !== undefined)
             return (
               <li
                 key={field}
@@ -47,11 +49,9 @@ export const ItemsCounts: FC<{
                 )}
                 title={`${value?.toLocaleString(APP_LANGUAGE) || '?'} ${value === null || value > 1 ? ITEM_TYPE_LABELS_PLURAL[type] : ITEM_TYPE_LABELS[type]}`.toLowerCase()}
               >
-                {loadingData || value === null ? (
-                  <Spinner className="spinner-border-sm" />
-                ) : (
-                  shortenNumber(value)
-                )}{' '}
+                {loadingStatus === 'loading' && <Spinner className="spinner-border-sm" />}
+                {loadingStatus === 'error' && <>!</>}
+                {loadingStatus === 'success' && !isNil(value) && <>{shortenNumber(value)}</>}{' '}
                 <ItemIcon type={type} />
               </li>
             );
