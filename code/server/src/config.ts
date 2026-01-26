@@ -31,7 +31,7 @@ export default {
     node: process.env.ELASTICSEARCH_URL || 'http://localhost:9200/',
     importBatchSize: 5000,
     index_prefix: process.env.ELASTICSEARCH_INDEX_PREFIX || '',
-    nested_objects_limit: 1000,
+    nested_objects_limit: 10000,
     idValueSeparator: '¤¤',
     maxParallelBulkUpdate:
       process.env.ELASTICSEARCH_MAX_PARALLEL_UPDATE &&
@@ -48,6 +48,8 @@ export default {
       disableLosslessIntegers: true,
       fetchSize: 10000,
       connectionAcquisitionTimeout: 60000,
+      maxRetries: 3,
+      requestTimeout: 10000,
     },
   },
   logs: {
