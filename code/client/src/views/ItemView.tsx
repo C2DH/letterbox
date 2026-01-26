@@ -128,14 +128,21 @@ export const ItemView: FC = () => {
           </section>
 
           {relatedItems.map((related, index) => (
-            <Collapsable key={index} title={related.title} className="mb-2">
+            <Collapsable
+              key={index}
+              title={related.title}
+              className="mb-2 disabled"
+              disabled={related.total ? related.total < 1 : true}
+            >
               <div className="mb-3 d-flex gap-1">
-                <Link
-                  to={`/explore/${related.type}?${inputType}|values=${id}#result`}
-                  className="btn btn-dark"
-                >
-                  View in explore page
-                </Link>
+                {related.type !== inputType && (
+                  <Link
+                    to={`/explore/${related.type}?${inputType}|values=${id}#result`}
+                    className="btn btn-dark"
+                  >
+                    View in explore page
+                  </Link>
+                )}
                 {/* {editionEnabled && (
                   <button className="btn btn-purple-300 with-icon">
                     <RiAddCircleLine /> Add item
