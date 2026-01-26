@@ -7,8 +7,13 @@ import { useIndexationManagement } from '../../hooks/useIndexationManagement';
 const numberFormat = new Intl.NumberFormat('en-EN');
 
 export const IndexationManagement: FC = () => {
-  const { nbItemsWithPendingModifications, indexPendingModifications, onGoingIndexation, refetch } =
-    useIndexationManagement();
+  const {
+    loadingIndexation,
+    nbItemsWithPendingModifications,
+    indexPendingModifications,
+    onGoingIndexation,
+    refetch,
+  } = useIndexationManagement();
 
   useEffect(() => {
     const polling = setInterval(refetch, 10000);
@@ -30,10 +35,10 @@ export const IndexationManagement: FC = () => {
           <div>
             <button
               className="btn btn-purple-300 "
-              disabled={nbItemsWithPendingModifications === 0}
+              disabled={nbItemsWithPendingModifications === 0 || loadingIndexation}
               onClick={indexPendingModifications}
             >
-              <RiLoopRightFill className="pe-1" />
+              {loadingIndexation ? <Spinner className="spinner-border-sm" /> : <RiLoopRightFill />}{' '}
               Update Explorer
             </button>
           </div>

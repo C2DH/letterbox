@@ -15,7 +15,7 @@ export const useIndexationManagement = () => {
   const { notify } = useNotifications();
 
   // get number of pending modifications
-  const { loading, error, data, refetch } = useQuery(countItemsWithPendingModifications, {
+  const { error, data, refetch } = useQuery(countItemsWithPendingModifications, {
     variables: {},
   });
 
@@ -28,15 +28,16 @@ export const useIndexationManagement = () => {
     }
   }, [error, notify]);
 
-  // Fetch addresses
-  const [_indexPendingModifications] = useMutation(indexPendingModificationsMutation);
+  const [_indexPendingModifications, { loading: loadingIndexation }] = useMutation(
+    indexPendingModificationsMutation,
+  );
   const indexPendingModifications = useCallback(async () => {
     const result = await _indexPendingModifications({ variables: {} });
     return result.data?.result;
   }, [_indexPendingModifications]);
 
   return {
-    loading,
+    loadingIndexation,
     nbItemsWithPendingModifications,
     onGoingIndexation,
     indexPendingModifications,
