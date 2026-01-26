@@ -23,6 +23,7 @@ import {
   getCountryAddresses,
   getCountryById,
   getCountryCompanies,
+  getCountryCountries,
   getCountryItemsCounts,
   getCountryMessages,
   getCountryPeople,
@@ -44,59 +45,69 @@ import {
   PersonItemCountsFragment,
 } from '../core/graphql';
 
-const QUERIES = {
+const SORT_HINT_COMMON = 'Companies in common (desc), name (asc)';
+const SORT_HINT_BY_NAME = 'Name (asc)';
+const SORT_HINT_BY_DATE = 'Date (asc)';
+
+export const QUERIES = {
   company: {
     getItemById: getCompanyById,
     itemsCounts: getCompanyItemsCounts,
     relations: {
-      company: getCompanyCompanies,
-      address: getCompanyAddresses,
-      country: getCompanyCountries,
-      person: getCompanyPeople,
-      message: getCompanyMessages,
+      address: { query: getCompanyAddresses, sortHint: SORT_HINT_BY_NAME },
+      company: { query: getCompanyCompanies, sortHint: SORT_HINT_BY_NAME },
+      country: { query: getCompanyCountries, sortHint: SORT_HINT_BY_NAME },
+      message: { query: getCompanyMessages, sortHint: SORT_HINT_BY_DATE },
+      person: { query: getCompanyPeople, sortHint: SORT_HINT_BY_NAME },
     },
   },
   address: {
     getItemById: getAddressById,
     itemsCounts: getAddressItemsCounts,
     relations: {
-      company: getAddressCompanies,
-      country: getAddressCountries,
-      person: getAddressPeople,
-      message: getAddressMessages,
-      address: getAddressAddresses,
+      address: { query: getAddressAddresses, sortHint: SORT_HINT_COMMON },
+      company: { query: getAddressCompanies, sortHint: SORT_HINT_COMMON },
+      country: { query: getAddressCountries, sortHint: SORT_HINT_COMMON },
+      message: { query: getAddressMessages, sortHint: SORT_HINT_BY_DATE },
+      person: { query: getAddressPeople, sortHint: SORT_HINT_COMMON },
     },
   },
   country: {
     getItemById: getCountryById,
     itemsCounts: getCountryItemsCounts,
     relations: {
-      company: getCountryCompanies,
-      address: getCountryAddresses,
-      person: getCountryPeople,
-      message: getCountryMessages,
-      //country: getCountryCountries,
+      address: { query: getCountryAddresses, sortHint: SORT_HINT_COMMON },
+      company: { query: getCountryCompanies, sortHint: SORT_HINT_COMMON },
+      country: { query: getCountryCountries, sortHint: SORT_HINT_COMMON },
+      message: { query: getCountryMessages, sortHint: SORT_HINT_BY_DATE },
+      person: { query: getCountryPeople, sortHint: SORT_HINT_COMMON },
     },
   },
   person: {
     getItemById: getPersonById,
     itemsCounts: getPersonItemsCounts,
     relations: {
-      company: getPersonCompanies,
-      address: getPersonAddresses,
-      country: getPersonCountries,
-      message: getPersonMessages,
-      person: getPersonPeople,
+      address: {
+        query: getPersonAddresses,
+        sortHint: SORT_HINT_COMMON,
+      },
+      company: {
+        query: getPersonCompanies,
+        sortHint: SORT_HINT_COMMON,
+      },
+      country: { query: getPersonCountries, sortHint: SORT_HINT_COMMON },
+      message: { query: getPersonMessages, sortHint: SORT_HINT_BY_DATE },
+      person: { query: getPersonPeople, sortHint: SORT_HINT_COMMON },
     },
   },
   message: {
     getItemById: getMessageById,
     itemsCounts: getMessageItemsCounts,
     relations: {
-      company: getMessageCompanies,
-      address: getMessageAddresses,
-      country: getMessageCountries,
-      person: getMessagePeople,
+      address: { query: getMessageAddresses, sortHint: SORT_HINT_BY_NAME },
+      company: { query: getMessageCompanies, sortHint: SORT_HINT_BY_NAME },
+      country: { query: getMessageCountries, sortHint: SORT_HINT_BY_NAME },
+      person: { query: getMessagePeople, sortHint: SORT_HINT_BY_NAME },
     },
   },
 } as const;
@@ -116,6 +127,7 @@ export function useLoadItemData(
     | AddressItemsCountsFragment
     | null
   >;
+  relationSortHints: Map<ItemType, string>;
 } {
   const client = useApolloClient();
 
@@ -138,7 +150,7 @@ export function useLoadItemData(
       const queries = QUERIES[itemType].relations;
 
       const result = await client.query({
-        query: queries[relationType as keyof typeof queries],
+        query: queries[relationType as keyof typeof queries].query,
         variables: { id: id || '', skip, limit },
       });
 
@@ -161,5 +173,21 @@ export function useLoadItemData(
     return firstResult ? firstResult : null;
   }, [client, id, itemType]);
 
-  return { loading, itemData, fetchRelations, fetchItemsCounts };
+  const relationSortHints = useMemo(() => {
+    const hints = new Map<ItemType, string>();
+    const relationsDefinition = QUERIES[itemType].relations;
+    if ('address' in relationsDefinition)
+      hints.set('address', relationsDefinition.address.sortHint);
+    if ('company' in relationsDefinition)
+      hints.set('company', relationsDefinition.company.sortHint);
+    if ('country' in relationsDefinition)
+      hints.set('country', relationsDefinition.country.sortHint);
+    if ('person' in relationsDefinition) hints.set('person', relationsDefinition.person.sortHint);
+    if ('message' in relationsDefinition)
+      hints.set('message', relationsDefinition.message.sortHint);
+
+    return hints;
+  }, [itemType]);
+
+  return { loading, itemData, fetchRelations, fetchItemsCounts, relationSortHints };
 }

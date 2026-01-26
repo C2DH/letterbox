@@ -1,12 +1,5 @@
 import { Spinner } from '@ouestware/loaders';
-import {
-  Fragment,
-  useCallback,
-  useEffect,
-  useState,
-  type HTMLAttributes,
-  type ReactNode,
-} from 'react';
+import { Fragment, useEffect, useState, type HTMLAttributes, type ReactNode } from 'react';
 
 export type ListWithLoadMoreProps<T> = HTMLAttributes<HTMLElement> & {
   fetch: (skip: number, limit: number) => Promise<T[]>;
@@ -27,16 +20,16 @@ export function ListWithLoadMore<T>({
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
 
-  const fetchMore = useCallback(async () => {
+  async function fetchMore(skip: number = 0) {
     setLoading(true);
     try {
-      const result = await fetch(items.length, 20);
+      const result = await fetch(skip, 20);
       if (result.length < 20) setHasMore(false);
-      setItems([...items, ...result]);
+      setItems((prev) => (skip === 0 ? result : [...prev, ...result]));
     } finally {
       setLoading(false);
     }
-  }, [fetch, items]);
+  }
 
   useEffect(() => {
     if (typeof total === 'number' && items.length >= total) {
@@ -60,8 +53,8 @@ export function ListWithLoadMore<T>({
       {hasMore && (
         <button
           disabled={loading}
-          className="btn btn-primary d-flex align-items-center mb-3"
-          onClick={fetchMore}
+          className="btn btn-primary d-flex align-items-center mb-3 mx-auto"
+          onClick={() => fetchMore(items.length)}
         >
           Load more
           {loading && <Spinner className="ms-1 fs-4" style={{ width: '1em', height: '1em' }} />}

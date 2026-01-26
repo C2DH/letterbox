@@ -3,17 +3,21 @@ import { useMemo, type FC } from 'react';
 import { Link } from 'react-router-dom';
 
 import { Badge } from '../../../Badge.tsx';
+import type { ItemType } from '../../../core/consts.tsx';
 import { type AddressInlineFragment } from '../../../core/graphql';
 import { useItemCounts } from '../../../hooks/useItemCounts.ts';
 import { ItemDeleted } from '../ItemDeleted.tsx';
 import { ItemsCounts } from '../ItemsCounts';
 import { ItemVerified } from '../ItemVerified.tsx';
 
-export const AddressCard: FC<{ data: AddressInlineFragment }> = ({ data }) => {
+export const AddressCard: FC<{
+  data: AddressInlineFragment;
+  from?: { type: ItemType; id: string };
+}> = ({ data, from }) => {
   const { tags } = data;
   const cleanedTags = useMemo(() => filter(tags || [], (s) => !isNil(s)) as string[], [tags]);
 
-  const { itemCounts, loadingStatus } = useItemCounts('address', data.id);
+  const { itemCounts, loadingStatus } = useItemCounts('address', data.id, from);
 
   return (
     <>

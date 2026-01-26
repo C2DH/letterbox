@@ -3,7 +3,7 @@ import cx from 'classnames';
 import { isNil, omit } from 'lodash';
 import { ReactNode, useMemo, type FC } from 'react';
 import { Helmet } from 'react-helmet';
-import { RiFile3Line, RiPriceTag3Line } from 'react-icons/ri';
+import { RiAddCircleLine, RiFile3Line, RiListSettingsLine, RiPriceTag3Line } from 'react-icons/ri';
 import { Link, useParams } from 'react-router-dom';
 
 import { Collapsable } from '../components/Collapsable';
@@ -32,7 +32,11 @@ import { useItemCounts } from '../hooks/useItemCounts.ts';
 import { getMessageName } from '../utils/data.ts';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-type RelatedDefinition<T = any> = ListWithLoadMoreProps<T> & { title: ReactNode; type: ItemType };
+type RelatedDefinition<T = any> = ListWithLoadMoreProps<T> & {
+  title: ReactNode;
+  type: ItemType;
+  sortHint?: string;
+};
 
 export const ItemView: FC = () => {
   const { enabled } = useEditionContext();
@@ -42,14 +46,12 @@ export const ItemView: FC = () => {
     if (!ITEM_TYPES_SET.has(inputType)) throw new Error(`Type ${inputType} is not handled yet.`);
     return inputType as ItemType;
   }, [inputType]);
-  const { loading, itemData, fetchRelations } = useLoadItemData(itemType, id);
+  const { loading, itemData, fetchRelations, relationSortHints } = useLoadItemData(itemType, id);
   const { itemCounts } = useItemCounts(itemType, id || '');
 
   const editionEnabled = useMemo(() => {
     return enabled && itemData && !itemData.deleted;
   }, [enabled, itemData]);
-
-  const fromMessageId = useMemo(() => (itemType === 'message' ? id : undefined), [itemType, id]);
 
   const relatedItems = useMemo(
     () =>
@@ -69,18 +71,19 @@ export const ItemView: FC = () => {
                   </span>
                 ),
                 total,
+                sortHint: relationSortHints.get(type),
                 fetch: fetchRelations.bind(null, type),
                 getItemKey: (data: NodeItem) => data.id,
                 renderItem: (data: NodeItem) => (
                   <div className={cx('mb-4', type === 'message' ? 'col-4' : 'col-2')}>
-                    <ItemCard data={data} itemType={type} fromMessageId={fromMessageId} />
+                    <ItemCard data={data} itemType={type} from={{ type: itemType, id: id! }} />
                   </div>
                 ),
               } as RelatedDefinition,
             ];
           })
         : [],
-    [itemData, fetchRelations, fromMessageId, itemCounts],
+    [itemData, fetchRelations, itemCounts, relationSortHints, id, itemType],
   );
 
   const name = !itemData
@@ -132,24 +135,37 @@ export const ItemView: FC = () => {
               key={index}
               title={related.title}
               className="mb-2 disabled"
-              disabled={related.total ? related.total < 1 : true}
+              disabled={!isNil(related.total) ? related.total < 1 : false}
             >
-              <div className="mb-3 d-flex gap-1">
-                {related.type !== inputType && (
-                  <Link
-                    to={`/explore/${related.type}?${inputType}|values=${id}#result`}
-                    className="btn btn-dark"
-                  >
-                    View in explore page
-                  </Link>
-                )}
-                {/* {editionEnabled && (
-                  <button className="btn btn-purple-300 with-icon">
-                    <RiAddCircleLine /> Add item
-                  </button>
-                )} */}
+              <div className="mb-3 d-flex justify-content-between">
+                <div className="d-flex gap-1">
+                  {/* Its is disabled for country because : 
+                    - we have a few number of countries which can be displayed here
+                    - countries are higghly connected (more than 10k link) so the dashboard will not work due to the nested children limitation
+                  */}
+                  {related.type !== inputType && related.type !== 'country' && (
+                    <Link
+                      to={`/explore/${related.type}?${inputType}|values=${id}#result`}
+                      className="btn btn-outline-dark"
+                    >
+                      View in explore page
+                    </Link>
+                  )}
+                  {editionEnabled && (
+                    <button className="btn btn-purple-300 with-icon">
+                      <RiAddCircleLine /> Add item
+                    </button>
+                  )}
+                </div>
+                <div className="d-flex gap-1 align-items-center">
+                  {related.sortHint && (
+                    <>
+                      <RiListSettingsLine /> {related.sortHint}
+                    </>
+                  )}
+                </div>
               </div>
-              <ListWithLoadMore className="row" {...omit(related, ['title'])} />
+              <ListWithLoadMore className="row" {...omit(related, ['title', 'sortHint'])} />
             </Collapsable>
           ))}
 

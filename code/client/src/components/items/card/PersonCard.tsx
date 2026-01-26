@@ -3,15 +3,19 @@ import { useMemo, type FC } from 'react';
 import { Link } from 'react-router-dom';
 
 import { Badge } from '../../../Badge.tsx';
+import type { ItemType } from '../../../core/consts.tsx';
 import { type PersonInlineFragment } from '../../../core/graphql';
 import { useItemCounts } from '../../../hooks/useItemCounts.ts';
 import { ItemDeleted } from '../ItemDeleted.tsx';
 import { ItemsCounts } from '../ItemsCounts';
 import { ItemVerified } from '../ItemVerified.tsx';
 
-export const PersonCard: FC<{ data: PersonInlineFragment }> = ({ data }) => {
+export const PersonCard: FC<{
+  data: PersonInlineFragment;
+  from?: { type: ItemType; id: string };
+}> = ({ data, from }) => {
   const { tags } = data;
-  const { itemCounts, loadingStatus } = useItemCounts('person', data.id);
+  const { itemCounts, loadingStatus } = useItemCounts('person', data.id, from);
   const cleanedTags = useMemo(() => filter(tags || [], (s) => !isNil(s)) as string[], [tags]);
 
   return (

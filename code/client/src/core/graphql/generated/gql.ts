@@ -34,6 +34,7 @@ type Documents = {
     "\n  mutation SetNodeVerified($type: DataItemType!, $id: ID!, $verified: Boolean!) {\n    result: setNodeVerified(type: $type, id: $id, verified: $verified) {\n      ... on Address {\n        ...AddressInline\n      }\n      ... on Company {\n        ...CompanyInline\n      }\n      ... on Country {\n        ...CountryInline\n      }\n      ... on Person {\n        ...PersonInline\n      }\n    }\n  }\n": typeof types.SetNodeVerifiedDocument,
     "\n  query GetAddressById($id: ID!) {\n    result: addresses(where: { id_EQ: $id }) {\n      id\n      name\n      otherNames\n      tags\n      verified\n      deleted\n    }\n  }\n": typeof types.GetAddressByIdDocument,
     "\n  query GetAddressItemsCount($id: ID!) {\n    result: addresses(where: { id_EQ: $id }) {\n      ...AddressItemsCounts\n    }\n  }\n": typeof types.GetAddressItemsCountDocument,
+    "\n  query GetAddressItemsCountWithCommons($id: ID!, $fromType: String!, $fromId: ID!) {\n    result: addresses(where: { id_EQ: $id }) {\n      ...AddressItemsCounts\n      commonCompaniesCount(type: $fromType, id: $fromId)\n    }\n  }\n": typeof types.GetAddressItemsCountWithCommonsDocument,
     "\n  query GetAddressCompanies($id: ID!, $skip: Int, $limit: Int) {\n    result: addresses(where: { id_EQ: $id }) {\n      companies(skip: $skip, limit: $limit) {\n        ...CompanyInline\n      }\n    }\n  }\n": typeof types.GetAddressCompaniesDocument,
     "\n  query GetAddressCountries($id: ID!, $skip: Int, $limit: Int) {\n    result: addresses(where: { id_EQ: $id }) {\n      countries(skip: $skip, limit: $limit) {\n        ...CountryInline\n      }\n    }\n  }\n": typeof types.GetAddressCountriesDocument,
     "\n  query GetAddressMessages($id: ID!, $skip: Int, $limit: Int) {\n    result: addresses(where: { id_EQ: $id }) {\n      messages(skip: $skip, limit: $limit) {\n        ...MessageInline\n      }\n    }\n  }\n": typeof types.GetAddressMessagesDocument,
@@ -41,6 +42,7 @@ type Documents = {
     "\n  query GetAddressAddresses($id: ID!, $skip: Int, $limit: Int) {\n    result: addresses(where: { id_EQ: $id }) {\n      addresses(skip: $skip, limit: $limit) {\n        ...AddressInline\n      }\n    }\n  }\n": typeof types.GetAddressAddressesDocument,
     "\n  query GetCompanyById($id: ID!) {\n    result: companies(where: { id_EQ: $id }) {\n      id\n      name\n      otherNames\n      tags\n      verified\n      deleted\n    }\n  }\n": typeof types.GetCompanyByIdDocument,
     "\n  query GetCompanyItemsCount($id: ID!) {\n    result: companies(where: { id_EQ: $id }) {\n      ...CompanyItemsCounts\n    }\n  }\n": typeof types.GetCompanyItemsCountDocument,
+    "\n  query GetCompanyItemsCountWithCommons($id: ID!, $fromType: String!, $fromId: ID!) {\n    result: companies(where: { id_EQ: $id }) {\n      ...CompanyItemsCounts\n      commonCompaniesCount(type: $fromType, id: $fromId)\n    }\n  }\n": typeof types.GetCompanyItemsCountWithCommonsDocument,
     "\n  query GetCompanyAddresses($id: ID!, $skip: Int, $limit: Int) {\n    result: companies(where: { id_EQ: $id }) {\n      addresses(skip: $skip, limit: $limit) {\n        ...AddressInline\n      }\n    }\n  }\n": typeof types.GetCompanyAddressesDocument,
     "\n  query GetCompanyCountries($id: ID!, $skip: Int, $limit: Int) {\n    result: companies(where: { id_EQ: $id }) {\n      countries(skip: $skip, limit: $limit) {\n        ...CountryInline\n      }\n    }\n  }\n": typeof types.GetCompanyCountriesDocument,
     "\n  query GetCompanyMessages($id: ID!, $skip: Int, $limit: Int) {\n    result: companies(where: { id_EQ: $id }) {\n      messages(skip: $skip, limit: $limit) {\n        ...MessageInline\n      }\n    }\n  }\n": typeof types.GetCompanyMessagesDocument,
@@ -49,6 +51,7 @@ type Documents = {
     "\n  query AggregateCompanies($filters: SearchFilters) {\n    people: aggregate(itemType: company, field: people, size: 20, filters: $filters) {\n      total\n      values {\n        label\n        id\n        count\n      }\n    }\n    addresses: aggregate(itemType: company, field: addresses, size: 20, filters: $filters) {\n      total\n      values {\n        label\n        id\n        count\n      }\n    }\n    countries: aggregate(itemType: company, field: countries, size: 20, filters: $filters) {\n      total\n      values {\n        label\n        id\n        count\n      }\n    }\n  }\n": typeof types.AggregateCompaniesDocument,
     "\n  query GetCountryById($id: ID!) {\n    result: countries(where: { id_EQ: $id }) {\n      id\n      name\n      otherNames\n      tags\n      verified\n      deleted\n    }\n  }\n": typeof types.GetCountryByIdDocument,
     "\n  query GetCountryItemsCounts($id: ID!) {\n    result: countries(where: { id_EQ: $id }) {\n      ...CountryItemsCounts\n    }\n  }\n": typeof types.GetCountryItemsCountsDocument,
+    "\n  query GetCountryItemsCountsWithCommons($id: ID!, $fromType: String!, $fromId: ID!) {\n    result: countries(where: { id_EQ: $id }) {\n      ...CountryItemsCounts\n      commonCompaniesCount(type: $fromType, id: $fromId)\n    }\n  }\n": typeof types.GetCountryItemsCountsWithCommonsDocument,
     "\n  query GetCountryCompanies($id: ID!, $skip: Int, $limit: Int) {\n    result: countries(where: { id_EQ: $id }) {\n      companies(skip: $skip, limit: $limit) {\n        ...CompanyInline\n      }\n    }\n  }\n": typeof types.GetCountryCompaniesDocument,
     "\n  query GetCountryAddresses($id: ID!, $skip: Int, $limit: Int) {\n    result: countries(where: { id_EQ: $id }) {\n      addresses(skip: $skip, limit: $limit) {\n        ...AddressInline\n      }\n    }\n  }\n": typeof types.GetCountryAddressesDocument,
     "\n  query GetCountryMessages($id: ID!, $skip: Int, $limit: Int) {\n    result: countries(where: { id_EQ: $id }) {\n      messages(skip: $skip, limit: $limit) {\n        ...MessageInline\n      }\n    }\n  }\n": typeof types.GetCountryMessagesDocument,
@@ -64,6 +67,7 @@ type Documents = {
     "\n  query GetMessagePeople($id: ID!, $skip: Int, $limit: Int) {\n    result: messages(where: { id_EQ: $id }) {\n      countries(skip: $skip, limit: $limit) {\n        ...CountryInline\n      }\n    }\n  }\n": typeof types.GetMessagePeopleDocument,
     "\n  query GetPersonById($id: ID!) {\n    result: people(where: { id_EQ: $id }) {\n      id\n      name\n      otherNames\n      tags\n      verified\n      deleted\n    }\n  }\n": typeof types.GetPersonByIdDocument,
     "\n  query GetPersonItemsCount($id: ID!) {\n    result: people(where: { id_EQ: $id }) {\n      ...PersonItemCounts\n    }\n  }\n": typeof types.GetPersonItemsCountDocument,
+    "\n  query GetPersonItemsCountWithCommon($id: ID!, $fromType: String!, $fromId: ID!) {\n    result: people(where: { id_EQ: $id }) {\n      ...PersonItemCounts\n      commonCompaniesCount(type: $fromType, id: $fromId)\n    }\n  }\n": typeof types.GetPersonItemsCountWithCommonDocument,
     "\n  query GetPersonCompanies($id: ID!, $skip: Int, $limit: Int) {\n    result: people(where: { id_EQ: $id }) {\n      companies(skip: $skip, limit: $limit) {\n        ...CompanyInline\n      }\n    }\n  }\n": typeof types.GetPersonCompaniesDocument,
     "\n  query GetPersonAddresses($id: ID!, $skip: Int, $limit: Int) {\n    result: people(where: { id_EQ: $id }) {\n      addresses(skip: $skip, limit: $limit) {\n        ...AddressInline\n      }\n    }\n  }\n": typeof types.GetPersonAddressesDocument,
     "\n  query GetPersonMessages($id: ID!, $skip: Int, $limit: Int) {\n    result: people(where: { id_EQ: $id }) {\n      messages(skip: $skip, limit: $limit) {\n        ...MessageInline\n      }\n    }\n  }\n": typeof types.GetPersonMessagesDocument,
@@ -95,6 +99,7 @@ const documents: Documents = {
     "\n  mutation SetNodeVerified($type: DataItemType!, $id: ID!, $verified: Boolean!) {\n    result: setNodeVerified(type: $type, id: $id, verified: $verified) {\n      ... on Address {\n        ...AddressInline\n      }\n      ... on Company {\n        ...CompanyInline\n      }\n      ... on Country {\n        ...CountryInline\n      }\n      ... on Person {\n        ...PersonInline\n      }\n    }\n  }\n": types.SetNodeVerifiedDocument,
     "\n  query GetAddressById($id: ID!) {\n    result: addresses(where: { id_EQ: $id }) {\n      id\n      name\n      otherNames\n      tags\n      verified\n      deleted\n    }\n  }\n": types.GetAddressByIdDocument,
     "\n  query GetAddressItemsCount($id: ID!) {\n    result: addresses(where: { id_EQ: $id }) {\n      ...AddressItemsCounts\n    }\n  }\n": types.GetAddressItemsCountDocument,
+    "\n  query GetAddressItemsCountWithCommons($id: ID!, $fromType: String!, $fromId: ID!) {\n    result: addresses(where: { id_EQ: $id }) {\n      ...AddressItemsCounts\n      commonCompaniesCount(type: $fromType, id: $fromId)\n    }\n  }\n": types.GetAddressItemsCountWithCommonsDocument,
     "\n  query GetAddressCompanies($id: ID!, $skip: Int, $limit: Int) {\n    result: addresses(where: { id_EQ: $id }) {\n      companies(skip: $skip, limit: $limit) {\n        ...CompanyInline\n      }\n    }\n  }\n": types.GetAddressCompaniesDocument,
     "\n  query GetAddressCountries($id: ID!, $skip: Int, $limit: Int) {\n    result: addresses(where: { id_EQ: $id }) {\n      countries(skip: $skip, limit: $limit) {\n        ...CountryInline\n      }\n    }\n  }\n": types.GetAddressCountriesDocument,
     "\n  query GetAddressMessages($id: ID!, $skip: Int, $limit: Int) {\n    result: addresses(where: { id_EQ: $id }) {\n      messages(skip: $skip, limit: $limit) {\n        ...MessageInline\n      }\n    }\n  }\n": types.GetAddressMessagesDocument,
@@ -102,6 +107,7 @@ const documents: Documents = {
     "\n  query GetAddressAddresses($id: ID!, $skip: Int, $limit: Int) {\n    result: addresses(where: { id_EQ: $id }) {\n      addresses(skip: $skip, limit: $limit) {\n        ...AddressInline\n      }\n    }\n  }\n": types.GetAddressAddressesDocument,
     "\n  query GetCompanyById($id: ID!) {\n    result: companies(where: { id_EQ: $id }) {\n      id\n      name\n      otherNames\n      tags\n      verified\n      deleted\n    }\n  }\n": types.GetCompanyByIdDocument,
     "\n  query GetCompanyItemsCount($id: ID!) {\n    result: companies(where: { id_EQ: $id }) {\n      ...CompanyItemsCounts\n    }\n  }\n": types.GetCompanyItemsCountDocument,
+    "\n  query GetCompanyItemsCountWithCommons($id: ID!, $fromType: String!, $fromId: ID!) {\n    result: companies(where: { id_EQ: $id }) {\n      ...CompanyItemsCounts\n      commonCompaniesCount(type: $fromType, id: $fromId)\n    }\n  }\n": types.GetCompanyItemsCountWithCommonsDocument,
     "\n  query GetCompanyAddresses($id: ID!, $skip: Int, $limit: Int) {\n    result: companies(where: { id_EQ: $id }) {\n      addresses(skip: $skip, limit: $limit) {\n        ...AddressInline\n      }\n    }\n  }\n": types.GetCompanyAddressesDocument,
     "\n  query GetCompanyCountries($id: ID!, $skip: Int, $limit: Int) {\n    result: companies(where: { id_EQ: $id }) {\n      countries(skip: $skip, limit: $limit) {\n        ...CountryInline\n      }\n    }\n  }\n": types.GetCompanyCountriesDocument,
     "\n  query GetCompanyMessages($id: ID!, $skip: Int, $limit: Int) {\n    result: companies(where: { id_EQ: $id }) {\n      messages(skip: $skip, limit: $limit) {\n        ...MessageInline\n      }\n    }\n  }\n": types.GetCompanyMessagesDocument,
@@ -110,6 +116,7 @@ const documents: Documents = {
     "\n  query AggregateCompanies($filters: SearchFilters) {\n    people: aggregate(itemType: company, field: people, size: 20, filters: $filters) {\n      total\n      values {\n        label\n        id\n        count\n      }\n    }\n    addresses: aggregate(itemType: company, field: addresses, size: 20, filters: $filters) {\n      total\n      values {\n        label\n        id\n        count\n      }\n    }\n    countries: aggregate(itemType: company, field: countries, size: 20, filters: $filters) {\n      total\n      values {\n        label\n        id\n        count\n      }\n    }\n  }\n": types.AggregateCompaniesDocument,
     "\n  query GetCountryById($id: ID!) {\n    result: countries(where: { id_EQ: $id }) {\n      id\n      name\n      otherNames\n      tags\n      verified\n      deleted\n    }\n  }\n": types.GetCountryByIdDocument,
     "\n  query GetCountryItemsCounts($id: ID!) {\n    result: countries(where: { id_EQ: $id }) {\n      ...CountryItemsCounts\n    }\n  }\n": types.GetCountryItemsCountsDocument,
+    "\n  query GetCountryItemsCountsWithCommons($id: ID!, $fromType: String!, $fromId: ID!) {\n    result: countries(where: { id_EQ: $id }) {\n      ...CountryItemsCounts\n      commonCompaniesCount(type: $fromType, id: $fromId)\n    }\n  }\n": types.GetCountryItemsCountsWithCommonsDocument,
     "\n  query GetCountryCompanies($id: ID!, $skip: Int, $limit: Int) {\n    result: countries(where: { id_EQ: $id }) {\n      companies(skip: $skip, limit: $limit) {\n        ...CompanyInline\n      }\n    }\n  }\n": types.GetCountryCompaniesDocument,
     "\n  query GetCountryAddresses($id: ID!, $skip: Int, $limit: Int) {\n    result: countries(where: { id_EQ: $id }) {\n      addresses(skip: $skip, limit: $limit) {\n        ...AddressInline\n      }\n    }\n  }\n": types.GetCountryAddressesDocument,
     "\n  query GetCountryMessages($id: ID!, $skip: Int, $limit: Int) {\n    result: countries(where: { id_EQ: $id }) {\n      messages(skip: $skip, limit: $limit) {\n        ...MessageInline\n      }\n    }\n  }\n": types.GetCountryMessagesDocument,
@@ -125,6 +132,7 @@ const documents: Documents = {
     "\n  query GetMessagePeople($id: ID!, $skip: Int, $limit: Int) {\n    result: messages(where: { id_EQ: $id }) {\n      countries(skip: $skip, limit: $limit) {\n        ...CountryInline\n      }\n    }\n  }\n": types.GetMessagePeopleDocument,
     "\n  query GetPersonById($id: ID!) {\n    result: people(where: { id_EQ: $id }) {\n      id\n      name\n      otherNames\n      tags\n      verified\n      deleted\n    }\n  }\n": types.GetPersonByIdDocument,
     "\n  query GetPersonItemsCount($id: ID!) {\n    result: people(where: { id_EQ: $id }) {\n      ...PersonItemCounts\n    }\n  }\n": types.GetPersonItemsCountDocument,
+    "\n  query GetPersonItemsCountWithCommon($id: ID!, $fromType: String!, $fromId: ID!) {\n    result: people(where: { id_EQ: $id }) {\n      ...PersonItemCounts\n      commonCompaniesCount(type: $fromType, id: $fromId)\n    }\n  }\n": types.GetPersonItemsCountWithCommonDocument,
     "\n  query GetPersonCompanies($id: ID!, $skip: Int, $limit: Int) {\n    result: people(where: { id_EQ: $id }) {\n      companies(skip: $skip, limit: $limit) {\n        ...CompanyInline\n      }\n    }\n  }\n": types.GetPersonCompaniesDocument,
     "\n  query GetPersonAddresses($id: ID!, $skip: Int, $limit: Int) {\n    result: people(where: { id_EQ: $id }) {\n      addresses(skip: $skip, limit: $limit) {\n        ...AddressInline\n      }\n    }\n  }\n": types.GetPersonAddressesDocument,
     "\n  query GetPersonMessages($id: ID!, $skip: Int, $limit: Int) {\n    result: people(where: { id_EQ: $id }) {\n      messages(skip: $skip, limit: $limit) {\n        ...MessageInline\n      }\n    }\n  }\n": types.GetPersonMessagesDocument,
@@ -233,6 +241,10 @@ export function graphql(source: "\n  query GetAddressItemsCount($id: ID!) {\n   
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
+export function graphql(source: "\n  query GetAddressItemsCountWithCommons($id: ID!, $fromType: String!, $fromId: ID!) {\n    result: addresses(where: { id_EQ: $id }) {\n      ...AddressItemsCounts\n      commonCompaniesCount(type: $fromType, id: $fromId)\n    }\n  }\n"): (typeof documents)["\n  query GetAddressItemsCountWithCommons($id: ID!, $fromType: String!, $fromId: ID!) {\n    result: addresses(where: { id_EQ: $id }) {\n      ...AddressItemsCounts\n      commonCompaniesCount(type: $fromType, id: $fromId)\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
 export function graphql(source: "\n  query GetAddressCompanies($id: ID!, $skip: Int, $limit: Int) {\n    result: addresses(where: { id_EQ: $id }) {\n      companies(skip: $skip, limit: $limit) {\n        ...CompanyInline\n      }\n    }\n  }\n"): (typeof documents)["\n  query GetAddressCompanies($id: ID!, $skip: Int, $limit: Int) {\n    result: addresses(where: { id_EQ: $id }) {\n      companies(skip: $skip, limit: $limit) {\n        ...CompanyInline\n      }\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
@@ -258,6 +270,10 @@ export function graphql(source: "\n  query GetCompanyById($id: ID!) {\n    resul
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  query GetCompanyItemsCount($id: ID!) {\n    result: companies(where: { id_EQ: $id }) {\n      ...CompanyItemsCounts\n    }\n  }\n"): (typeof documents)["\n  query GetCompanyItemsCount($id: ID!) {\n    result: companies(where: { id_EQ: $id }) {\n      ...CompanyItemsCounts\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query GetCompanyItemsCountWithCommons($id: ID!, $fromType: String!, $fromId: ID!) {\n    result: companies(where: { id_EQ: $id }) {\n      ...CompanyItemsCounts\n      commonCompaniesCount(type: $fromType, id: $fromId)\n    }\n  }\n"): (typeof documents)["\n  query GetCompanyItemsCountWithCommons($id: ID!, $fromType: String!, $fromId: ID!) {\n    result: companies(where: { id_EQ: $id }) {\n      ...CompanyItemsCounts\n      commonCompaniesCount(type: $fromType, id: $fromId)\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -290,6 +306,10 @@ export function graphql(source: "\n  query GetCountryById($id: ID!) {\n    resul
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  query GetCountryItemsCounts($id: ID!) {\n    result: countries(where: { id_EQ: $id }) {\n      ...CountryItemsCounts\n    }\n  }\n"): (typeof documents)["\n  query GetCountryItemsCounts($id: ID!) {\n    result: countries(where: { id_EQ: $id }) {\n      ...CountryItemsCounts\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query GetCountryItemsCountsWithCommons($id: ID!, $fromType: String!, $fromId: ID!) {\n    result: countries(where: { id_EQ: $id }) {\n      ...CountryItemsCounts\n      commonCompaniesCount(type: $fromType, id: $fromId)\n    }\n  }\n"): (typeof documents)["\n  query GetCountryItemsCountsWithCommons($id: ID!, $fromType: String!, $fromId: ID!) {\n    result: countries(where: { id_EQ: $id }) {\n      ...CountryItemsCounts\n      commonCompaniesCount(type: $fromType, id: $fromId)\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -350,6 +370,10 @@ export function graphql(source: "\n  query GetPersonById($id: ID!) {\n    result
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  query GetPersonItemsCount($id: ID!) {\n    result: people(where: { id_EQ: $id }) {\n      ...PersonItemCounts\n    }\n  }\n"): (typeof documents)["\n  query GetPersonItemsCount($id: ID!) {\n    result: people(where: { id_EQ: $id }) {\n      ...PersonItemCounts\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query GetPersonItemsCountWithCommon($id: ID!, $fromType: String!, $fromId: ID!) {\n    result: people(where: { id_EQ: $id }) {\n      ...PersonItemCounts\n      commonCompaniesCount(type: $fromType, id: $fromId)\n    }\n  }\n"): (typeof documents)["\n  query GetPersonItemsCountWithCommon($id: ID!, $fromType: String!, $fromId: ID!) {\n    result: people(where: { id_EQ: $id }) {\n      ...PersonItemCounts\n      commonCompaniesCount(type: $fromType, id: $fromId)\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

@@ -21,6 +21,15 @@ export const getPersonItemsCounts = graphql(`
   }
 `);
 
+export const getPersonItemsCountsWithCommons = graphql(`
+  query GetPersonItemsCountWithCommon($id: ID!, $fromType: String!, $fromId: ID!) {
+    result: people(where: { id_EQ: $id }) {
+      ...PersonItemCounts
+      commonCompaniesCount(type: $fromType, id: $fromId)
+    }
+  }
+`);
+
 export const getPersonCompanies = graphql(`
   query GetPersonCompanies($id: ID!, $skip: Int, $limit: Int) {
     result: people(where: { id_EQ: $id }) {

@@ -19,11 +19,11 @@ import { CountryCard } from './CountryCard.tsx';
 import { MessageCard } from './MessageCard.tsx';
 import { PersonCard } from './PersonCard.tsx';
 
-export const ItemCard: FC<{ itemType: ItemType; data: NodeItem; fromMessageId?: string }> = ({
-  itemType,
-  data,
-  fromMessageId,
-}) => {
+export const ItemCard: FC<{
+  itemType: ItemType;
+  data: NodeItem;
+  from?: { type: ItemType; id: string };
+}> = ({ itemType, data, from }) => {
   const { enabled } = useEditionContext();
 
   if (data.__typename !== ITEM_TYPE_LABELS[itemType])
@@ -34,16 +34,16 @@ export const ItemCard: FC<{ itemType: ItemType; data: NodeItem; fromMessageId?: 
   let content: ReactNode = null;
   switch (itemType) {
     case 'address':
-      content = <AddressCard data={data as AddressInlineFragment} />;
+      content = <AddressCard data={data as AddressInlineFragment} from={from} />;
       break;
     case 'company':
-      content = <CompanyCard data={data as CompanyInlineFragment} />;
+      content = <CompanyCard data={data as CompanyInlineFragment} from={from} />;
       break;
     case 'country':
-      content = <CountryCard data={data as CountryInlineFragment} />;
+      content = <CountryCard data={data as CountryInlineFragment} from={from} />;
       break;
     case 'person':
-      content = <PersonCard data={data as PersonInlineFragment} />;
+      content = <PersonCard data={data as PersonInlineFragment} from={from} />;
       break;
     case 'message':
       content = <MessageCard data={data as MessageInlineFragment} />;
@@ -63,7 +63,7 @@ export const ItemCard: FC<{ itemType: ItemType; data: NodeItem; fromMessageId?: 
               itemType={itemType}
               id={data.id}
               label={getItemName(data)}
-              fromMessageId={fromMessageId}
+              fromMessageId={from && from.type === 'message' ? from.id : undefined}
             />
           </div>
         )}

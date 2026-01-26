@@ -1,16 +1,20 @@
-import { useQuery } from '@apollo/client';
-import { useEffect, useMemo, useState } from 'react';
+import { useLazyQuery } from '@apollo/client';
+import { useEffect, useState } from 'react';
 
-import { ItemType } from '../core/consts';
+import { ITEM_TYPE_LABELS, ItemType } from '../core/consts';
 import {
   AddressItemsCountsFragment,
   CompanyItemsCountsFragment,
   CountryItemsCountsFragment,
   getAddressItemsCounts,
+  getAddressItemsCountsWithCommons,
   getCompanyItemsCounts,
+  getCompanyItemsCountsWithCommons,
   getCountryItemsCounts,
+  getCountryItemsCountsWithCommons,
   getMessageItemsCounts,
   getPersonItemsCounts,
+  getPersonItemsCountsWithCommons,
   MessageItemsCountsFragment,
   PersonItemCountsFragment,
 } from '../core/graphql';
@@ -24,38 +28,58 @@ const QUERIES = {
   message: getMessageItemsCounts,
 } as const;
 
+const QUERIES_WITH_COMMONS = {
+  company: getCompanyItemsCountsWithCommons,
+  address: getAddressItemsCountsWithCommons,
+  country: getCountryItemsCountsWithCommons,
+  person: getPersonItemsCountsWithCommons,
+  message: getMessageItemsCounts,
+} as const;
+
+type Graphqlresponse =
+  | { result: Array<CompanyItemsCountsFragment & { commonCompaniesCount?: number }> }
+  | { result: Array<AddressItemsCountsFragment & { commonCompaniesCount?: number }> }
+  | { result: Array<CountryItemsCountsFragment & { commonCompaniesCount?: number }> }
+  | { result: Array<PersonItemCountsFragment & { commonCompaniesCount?: number }> }
+  | { result: Array<MessageItemsCountsFragment> };
 /**
  * Hook to retrieve item relations counts.
  */
-export const useItemCounts = (type: ItemType, id: string) => {
-  const { loading, error, data, refetch } = useQuery<
-    | { result: CompanyItemsCountsFragment[] }
-    | { result: AddressItemsCountsFragment[] }
-    | { result: CountryItemsCountsFragment[] }
-    | { result: PersonItemCountsFragment[] }
-    | { result: MessageItemsCountsFragment[] }
-  >(QUERIES[type], {
-    variables: { id },
-  });
+export const useItemCounts = (
+  type: ItemType,
+  id: string,
+  from?: { type: ItemType; id: string },
+) => {
+  const [fetchCounts] = useLazyQuery<Graphqlresponse>(QUERIES[type], {});
+
+  const [fetchCountsWithCommons] = useLazyQuery<Graphqlresponse>(QUERIES_WITH_COMMONS[type], {});
+
   const [loadingStatus, setLoadingStatus] = useState<AsyncStatusType>('idle');
-  const itemCounts = useMemo(() => data?.result[0] || null, [data]);
+  const [itemCounts, setItemCounts] = useState<null | Graphqlresponse['result'][0]>(null);
 
   useEffect(() => {
-    if (loading) {
+    const exec = async () => {
       setLoadingStatus('loading');
-    } else if (data) {
-      setLoadingStatus('success');
-    } else if (error) {
-      setLoadingStatus('error');
-      console.error(error);
-    } else {
-      setLoadingStatus('idle');
-    }
-  }, [error, loading, data]);
+      try {
+        const response = await (from
+          ? fetchCountsWithCommons({
+              variables: { id, fromType: ITEM_TYPE_LABELS[from.type], fromId: from.id },
+            })
+          : fetchCounts({ variables: { id } }));
+
+        if (!response.data) throw new Error(`Bad count result: ${JSON.stringify(response)}`);
+        setItemCounts(response.data.result[0]);
+        setLoadingStatus('success');
+      } catch (error) {
+        setLoadingStatus('error');
+        console.error(error);
+      }
+    };
+    exec();
+  }, [fetchCounts, fetchCountsWithCommons, type, id, from]);
 
   return {
     loadingStatus,
     itemCounts,
-    refetch,
   };
 };

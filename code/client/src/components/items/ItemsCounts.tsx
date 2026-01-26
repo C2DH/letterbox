@@ -23,6 +23,7 @@ export const ItemsCounts: FC<{
     peopleCount: number;
     countriesCount: number;
     messagesCount: number;
+    commonCompaniesCount?: number;
   }>;
 }> = ({ itemType, data, loadingStatus }) => {
   return (
@@ -39,6 +40,7 @@ export const ItemsCounts: FC<{
         .filter(({ type }) => type !== itemType)
         .map(({ field, type }) => {
           const value = data && field in data ? data[field] || 0 : null;
+          const displayCommonCount = type === 'company' && !isNil(data?.commonCompaniesCount);
           if (value !== null || loadingStatus !== undefined)
             return (
               <li
@@ -46,12 +48,18 @@ export const ItemsCounts: FC<{
                 className={cx(
                   'list-inline-item pe-1 with-icon',
                   !ITEM_TYPES_AFFINITIES[itemType].has(type) && 'text-muted',
+                  displayCommonCount && 'fw-bold',
                 )}
                 title={`${value?.toLocaleString(APP_LANGUAGE) || '?'} ${value === null || value > 1 ? ITEM_TYPE_LABELS_PLURAL[type] : ITEM_TYPE_LABELS[type]}`.toLowerCase()}
               >
                 {loadingStatus === 'loading' && <Spinner className="spinner-border-sm" />}
                 {loadingStatus === 'error' && <>!</>}
-                {loadingStatus === 'success' && !isNil(value) && <>{shortenNumber(value)}</>}{' '}
+                {loadingStatus === 'success' && !isNil(value) && (
+                  <>
+                    {displayCommonCount && <>{shortenNumber(data.commonCompaniesCount!)}/</>}
+                    {shortenNumber(value)}
+                  </>
+                )}{' '}
                 <ItemIcon type={type} />
               </li>
             );

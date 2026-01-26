@@ -21,6 +21,15 @@ export const getAddressItemsCounts = graphql(`
   }
 `);
 
+export const getAddressItemsCountsWithCommons = graphql(`
+  query GetAddressItemsCountWithCommons($id: ID!, $fromType: String!, $fromId: ID!) {
+    result: addresses(where: { id_EQ: $id }) {
+      ...AddressItemsCounts
+      commonCompaniesCount(type: $fromType, id: $fromId)
+    }
+  }
+`);
+
 export const getAddressCompanies = graphql(`
   query GetAddressCompanies($id: ID!, $skip: Int, $limit: Int) {
     result: addresses(where: { id_EQ: $id }) {

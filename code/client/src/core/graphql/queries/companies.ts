@@ -21,6 +21,15 @@ export const getCompanyItemsCounts = graphql(`
   }
 `);
 
+export const getCompanyItemsCountsWithCommons = graphql(`
+  query GetCompanyItemsCountWithCommons($id: ID!, $fromType: String!, $fromId: ID!) {
+    result: companies(where: { id_EQ: $id }) {
+      ...CompanyItemsCounts
+      commonCompaniesCount(type: $fromType, id: $fromId)
+    }
+  }
+`);
+
 export const getCompanyAddresses = graphql(`
   query GetCompanyAddresses($id: ID!, $skip: Int, $limit: Int) {
     result: companies(where: { id_EQ: $id }) {

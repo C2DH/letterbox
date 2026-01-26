@@ -21,6 +21,7 @@ export type Address = {
   __typename?: 'Address';
   addresses: Array<Address>;
   addressesCount: Scalars['Int']['output'];
+  commonCompaniesCount: Scalars['Int']['output'];
   companies: Array<Company>;
   companiesCount: Scalars['Int']['output'];
   countries: Array<Country>;
@@ -41,6 +42,12 @@ export type Address = {
 export type AddressAddressesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   skip?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type AddressCommonCompaniesCountArgs = {
+  id: Scalars['ID']['input'];
+  type: Scalars['String']['input'];
 };
 
 
@@ -107,6 +114,7 @@ export type Company = {
   __typename?: 'Company';
   addresses: Array<Address>;
   addressesCount: Scalars['Int']['output'];
+  commonCompaniesCount: Scalars['Int']['output'];
   companies: Array<Company>;
   companiesCount: Scalars['Int']['output'];
   countries: Array<Country>;
@@ -128,6 +136,12 @@ export type Company = {
 export type CompanyAddressesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   skip?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type CompanyCommonCompaniesCountArgs = {
+  id: Scalars['ID']['input'];
+  type: Scalars['String']['input'];
 };
 
 
@@ -169,6 +183,7 @@ export type Country = {
   __typename?: 'Country';
   addresses: Array<Address>;
   addressesCount: Scalars['Int']['output'];
+  commonCompaniesCount: Scalars['Int']['output'];
   companies: Array<Company>;
   companiesCount: Scalars['Int']['output'];
   countries: Array<Country>;
@@ -189,6 +204,12 @@ export type Country = {
 export type CountryAddressesArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   skip?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type CountryCommonCompaniesCountArgs = {
+  id: Scalars['ID']['input'];
+  type: Scalars['String']['input'];
 };
 
 
@@ -455,7 +476,8 @@ export type PersonAddressesArgs = {
 
 
 export type PersonCommonCompaniesCountArgs = {
-  personId: Scalars['ID']['input'];
+  id: Scalars['ID']['input'];
+  type: Scalars['String']['input'];
 };
 
 
@@ -704,6 +726,7 @@ export type ResolversParentTypes = {
 export type AddressResolvers<ContextType = any, ParentType extends ResolversParentTypes['Address'] = ResolversParentTypes['Address']> = {
   addresses?: Resolver<Array<ResolversTypes['Address']>, ParentType, ContextType, RequireFields<AddressAddressesArgs, 'limit' | 'skip'>>;
   addressesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  commonCompaniesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType, RequireFields<AddressCommonCompaniesCountArgs, 'id' | 'type'>>;
   companies?: Resolver<Array<ResolversTypes['Company']>, ParentType, ContextType, RequireFields<AddressCompaniesArgs, 'limit' | 'skip'>>;
   companiesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   countries?: Resolver<Array<ResolversTypes['Country']>, ParentType, ContextType, RequireFields<AddressCountriesArgs, 'limit' | 'skip'>>;
@@ -737,6 +760,7 @@ export type AggregateValueResolvers<ContextType = any, ParentType extends Resolv
 export type CompanyResolvers<ContextType = any, ParentType extends ResolversParentTypes['Company'] = ResolversParentTypes['Company']> = {
   addresses?: Resolver<Array<ResolversTypes['Address']>, ParentType, ContextType, RequireFields<CompanyAddressesArgs, 'limit' | 'skip'>>;
   addressesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  commonCompaniesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType, RequireFields<CompanyCommonCompaniesCountArgs, 'id' | 'type'>>;
   companies?: Resolver<Array<ResolversTypes['Company']>, ParentType, ContextType, RequireFields<CompanyCompaniesArgs, 'limit' | 'skip'>>;
   companiesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   countries?: Resolver<Array<ResolversTypes['Country']>, ParentType, ContextType, RequireFields<CompanyCountriesArgs, 'limit' | 'skip'>>;
@@ -764,6 +788,7 @@ export type CountResultResolvers<ContextType = any, ParentType extends Resolvers
 export type CountryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Country'] = ResolversParentTypes['Country']> = {
   addresses?: Resolver<Array<ResolversTypes['Address']>, ParentType, ContextType, RequireFields<CountryAddressesArgs, 'limit' | 'skip'>>;
   addressesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  commonCompaniesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType, RequireFields<CountryCommonCompaniesCountArgs, 'id' | 'type'>>;
   companies?: Resolver<Array<ResolversTypes['Company']>, ParentType, ContextType, RequireFields<CountryCompaniesArgs, 'limit' | 'skip'>>;
   companiesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   countries?: Resolver<Array<ResolversTypes['Country']>, ParentType, ContextType, RequireFields<CountryCountriesArgs, 'limit' | 'skip'>>;
@@ -849,7 +874,7 @@ export type PendingModificationsIndexationReportResolvers<ContextType = any, Par
 export type PersonResolvers<ContextType = any, ParentType extends ResolversParentTypes['Person'] = ResolversParentTypes['Person']> = {
   addresses?: Resolver<Array<ResolversTypes['Address']>, ParentType, ContextType, RequireFields<PersonAddressesArgs, 'limit' | 'skip'>>;
   addressesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  commonCompaniesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType, RequireFields<PersonCommonCompaniesCountArgs, 'personId'>>;
+  commonCompaniesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType, RequireFields<PersonCommonCompaniesCountArgs, 'id' | 'type'>>;
   companies?: Resolver<Array<ResolversTypes['Company']>, ParentType, ContextType, RequireFields<PersonCompaniesArgs, 'limit' | 'skip'>>;
   companiesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   countries?: Resolver<Array<ResolversTypes['Country']>, ParentType, ContextType, RequireFields<PersonCountriesArgs, 'limit' | 'skip'>>;
