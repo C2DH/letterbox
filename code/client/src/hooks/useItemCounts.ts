@@ -18,7 +18,7 @@ import {
   MessageItemsCountsFragment,
   PersonItemCountsFragment,
 } from '../core/graphql';
-import type { AsyncStatusType } from '../types';
+import type { AsyncStatus } from '../types';
 
 const QUERIES = {
   company: getCompanyItemsCounts,
@@ -54,12 +54,12 @@ export const useItemCounts = (
 
   const [fetchCountsWithCommons] = useLazyQuery<Graphqlresponse>(QUERIES_WITH_COMMONS[type], {});
 
-  const [loadingStatus, setLoadingStatus] = useState<AsyncStatusType>('idle');
+  const [loadingStatus, setLoadingStatus] = useState<AsyncStatus>({ type: 'idle' });
   const [itemCounts, setItemCounts] = useState<null | Graphqlresponse['result'][0]>(null);
 
   useEffect(() => {
     const exec = async () => {
-      setLoadingStatus('loading');
+      setLoadingStatus({ type: 'loading' });
       try {
         const response = await (from
           ? fetchCountsWithCommons({
@@ -69,9 +69,9 @@ export const useItemCounts = (
 
         if (!response.data) throw new Error(`Bad count result: ${JSON.stringify(response)}`);
         setItemCounts(response.data.result[0]);
-        setLoadingStatus('success');
+        setLoadingStatus({ type: 'success' });
       } catch (error) {
-        setLoadingStatus('error');
+        setLoadingStatus({ type: 'error' });
         console.error(error);
       }
     };

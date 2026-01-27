@@ -1,9 +1,9 @@
-import { LoaderFill } from '@ouestware/loaders';
+import { LoaderFill, Spinner } from '@ouestware/loaders';
 import cx from 'classnames';
 import { isNil, omit } from 'lodash';
 import { ReactNode, useMemo, type FC } from 'react';
 import { Helmet } from 'react-helmet';
-import { RiAddCircleLine, RiFile3Line, RiListSettingsLine, RiPriceTag3Line } from 'react-icons/ri';
+import { RiFile3Line, RiListSettingsLine, RiPriceTag3Line } from 'react-icons/ri';
 import { Link, useParams } from 'react-router-dom';
 
 import { Collapsable } from '../components/Collapsable';
@@ -47,7 +47,7 @@ export const ItemView: FC = () => {
     return inputType as ItemType;
   }, [inputType]);
   const { loading, itemData, fetchRelations, relationSortHints } = useLoadItemData(itemType, id);
-  const { itemCounts } = useItemCounts(itemType, id || '');
+  const { loadingStatus: countLoadingStatus, itemCounts } = useItemCounts(itemType, id || '');
 
   const editionEnabled = useMemo(() => {
     return enabled && itemData && !itemData.deleted;
@@ -56,34 +56,41 @@ export const ItemView: FC = () => {
   const relatedItems = useMemo(
     () =>
       itemData
-        ? ITEM_TYPES.flatMap((type) => {
-            const countKey = ITEM_TYPE_TO_COUNT_FIELD[type];
-            const total =
-              itemCounts !== null ? itemCounts[countKey as keyof typeof itemCounts] : undefined;
+        ? ITEM_TYPES
+            // For message page, don't display the message section
+            // A messag can't be linked to an other message
+            .filter((iType) => (itemType === 'message' ? iType !== 'message' : true))
+            .flatMap((type) => {
+              const countKey = ITEM_TYPE_TO_COUNT_FIELD[type];
+              const total =
+                itemCounts !== null ? itemCounts[countKey as keyof typeof itemCounts] : undefined;
 
-            return [
-              {
-                type,
-                title: (
-                  <span className="fs-2">
-                    <ItemIcon type={type} /> {ITEM_TYPE_LABELS_PLURAL[type]}{' '}
-                    {!isNil(total) && `(${total})`}
-                  </span>
-                ),
-                total,
-                sortHint: relationSortHints.get(type),
-                fetch: fetchRelations.bind(null, type),
-                getItemKey: (data: NodeItem) => data.id,
-                renderItem: (data: NodeItem) => (
-                  <div className={cx('mb-4', type === 'message' ? 'col-4' : 'col-2')}>
-                    <ItemCard data={data} itemType={type} from={{ type: itemType, id: id! }} />
-                  </div>
-                ),
-              } as RelatedDefinition,
-            ];
-          })
+              return [
+                {
+                  type,
+                  title: (
+                    <span className="fs-2">
+                      <ItemIcon type={type} /> {ITEM_TYPE_LABELS_PLURAL[type]}{' '}
+                      {countLoadingStatus.type === 'loading' && (
+                        <Spinner className="spinner-border-sm" />
+                      )}
+                      {!isNil(total) && `(${total})`}
+                    </span>
+                  ),
+                  total,
+                  sortHint: relationSortHints.get(type),
+                  fetch: fetchRelations.bind(null, type),
+                  getItemKey: (data: NodeItem) => data.id,
+                  renderItem: (data: NodeItem) => (
+                    <div className={cx('mb-4', type === 'message' ? 'col-4' : 'col-2')}>
+                      <ItemCard data={data} itemType={type} from={{ type: itemType, id: id! }} />
+                    </div>
+                  ),
+                } as RelatedDefinition,
+              ];
+            })
         : [],
-    [itemData, fetchRelations, itemCounts, relationSortHints, id, itemType],
+    [itemData, fetchRelations, itemCounts, relationSortHints, id, itemType, countLoadingStatus],
   );
 
   const name = !itemData
@@ -151,11 +158,11 @@ export const ItemView: FC = () => {
                       View in explore page
                     </Link>
                   )}
-                  {editionEnabled && (
+                  {/* {editionEnabled && (
                     <button className="btn btn-purple-300 with-icon">
                       <RiAddCircleLine /> Add item
                     </button>
-                  )}
+                  )} */}
                 </div>
                 <div className="d-flex gap-1 align-items-center">
                   {related.sortHint && (

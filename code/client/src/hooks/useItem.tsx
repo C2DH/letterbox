@@ -54,11 +54,11 @@ export const QUERIES = {
     getItemById: getCompanyById,
     itemsCounts: getCompanyItemsCounts,
     relations: {
-      address: { query: getCompanyAddresses, sortHint: SORT_HINT_BY_NAME },
+      address: { query: getCompanyAddresses, sortHint: SORT_HINT_COMMON },
       company: { query: getCompanyCompanies, sortHint: SORT_HINT_BY_NAME },
-      country: { query: getCompanyCountries, sortHint: SORT_HINT_BY_NAME },
+      country: { query: getCompanyCountries, sortHint: SORT_HINT_COMMON },
       message: { query: getCompanyMessages, sortHint: SORT_HINT_BY_DATE },
-      person: { query: getCompanyPeople, sortHint: SORT_HINT_BY_NAME },
+      person: { query: getCompanyPeople, sortHint: SORT_HINT_COMMON },
     },
   },
   address: {

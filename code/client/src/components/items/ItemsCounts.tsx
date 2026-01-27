@@ -11,12 +11,12 @@ import {
   ItemIcon,
   ItemType,
 } from '../../core/consts';
-import type { AsyncStatusType } from '../../types.ts';
+import type { AsyncStatus } from '../../types.ts';
 import { shortenNumber } from '../../utils/number.ts';
 
 export const ItemsCounts: FC<{
   itemType: ItemType;
-  loadingStatus?: AsyncStatusType;
+  loadingStatus?: AsyncStatus;
   data: null | Partial<{
     companiesCount: number;
     addressesCount: number;
@@ -52,9 +52,9 @@ export const ItemsCounts: FC<{
                 )}
                 title={`${value?.toLocaleString(APP_LANGUAGE) || '?'} ${value === null || value > 1 ? ITEM_TYPE_LABELS_PLURAL[type] : ITEM_TYPE_LABELS[type]}`.toLowerCase()}
               >
-                {loadingStatus === 'loading' && <Spinner className="spinner-border-sm" />}
-                {loadingStatus === 'error' && <>!</>}
-                {loadingStatus === 'success' && !isNil(value) && (
+                {loadingStatus!.type === 'loading' && <Spinner className="spinner-border-sm" />}
+                {loadingStatus!.type === 'error' && <>!</>}
+                {loadingStatus!.type === 'success' && !isNil(value) && (
                   <>
                     {displayCommonCount && <>{shortenNumber(data.commonCompaniesCount!)}/</>}
                     {shortenNumber(value)}

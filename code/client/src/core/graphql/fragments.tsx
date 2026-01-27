@@ -54,6 +54,7 @@ export const CountryInline = graphql(`
 export const CountryItemsCounts = graphql(`
   fragment CountryItemsCounts on Country {
     addressesCount
+    countriesCount
     companiesCount
     messagesCount
     peopleCount

@@ -19,7 +19,7 @@ type Documents = {
     "\n  fragment CompanyInline on Company {\n    id\n    name\n    years\n    tags\n    deleted\n    verified\n  }\n": typeof types.CompanyInlineFragmentDoc,
     "\n  fragment CompanyItemsCounts on Company {\n    addressesCount\n    countriesCount\n    messagesCount\n    peopleCount\n    companiesCount\n  }\n": typeof types.CompanyItemsCountsFragmentDoc,
     "\n  fragment CountryInline on Country {\n    id\n    name\n    tags\n    deleted\n    verified\n  }\n": typeof types.CountryInlineFragmentDoc,
-    "\n  fragment CountryItemsCounts on Country {\n    addressesCount\n    companiesCount\n    messagesCount\n    peopleCount\n  }\n": typeof types.CountryItemsCountsFragmentDoc,
+    "\n  fragment CountryItemsCounts on Country {\n    addressesCount\n    countriesCount\n    companiesCount\n    messagesCount\n    peopleCount\n  }\n": typeof types.CountryItemsCountsFragmentDoc,
     "\n  fragment MessageInline on Message {\n    id\n    year\n    message\n    addresses(limit: 5) {\n      id\n      name\n    }\n    companies(limit: 5) {\n      id\n      name\n    }\n    countries(limit: 5) {\n      id\n      name\n    }\n    people(limit: 5) {\n      id\n      name\n    }\n    tags\n    deleted\n    verified\n    filename\n    pageNumber\n  }\n": typeof types.MessageInlineFragmentDoc,
     "\n  fragment MessageItemsCounts on Message {\n    addressesCount\n    companiesCount\n    countriesCount\n    peopleCount\n  }\n": typeof types.MessageItemsCountsFragmentDoc,
     "\n  fragment PersonInline on Person {\n    id\n    name\n    tags\n    deleted\n    verified\n  }\n": typeof types.PersonInlineFragmentDoc,
@@ -84,7 +84,7 @@ const documents: Documents = {
     "\n  fragment CompanyInline on Company {\n    id\n    name\n    years\n    tags\n    deleted\n    verified\n  }\n": types.CompanyInlineFragmentDoc,
     "\n  fragment CompanyItemsCounts on Company {\n    addressesCount\n    countriesCount\n    messagesCount\n    peopleCount\n    companiesCount\n  }\n": types.CompanyItemsCountsFragmentDoc,
     "\n  fragment CountryInline on Country {\n    id\n    name\n    tags\n    deleted\n    verified\n  }\n": types.CountryInlineFragmentDoc,
-    "\n  fragment CountryItemsCounts on Country {\n    addressesCount\n    companiesCount\n    messagesCount\n    peopleCount\n  }\n": types.CountryItemsCountsFragmentDoc,
+    "\n  fragment CountryItemsCounts on Country {\n    addressesCount\n    countriesCount\n    companiesCount\n    messagesCount\n    peopleCount\n  }\n": types.CountryItemsCountsFragmentDoc,
     "\n  fragment MessageInline on Message {\n    id\n    year\n    message\n    addresses(limit: 5) {\n      id\n      name\n    }\n    companies(limit: 5) {\n      id\n      name\n    }\n    countries(limit: 5) {\n      id\n      name\n    }\n    people(limit: 5) {\n      id\n      name\n    }\n    tags\n    deleted\n    verified\n    filename\n    pageNumber\n  }\n": types.MessageInlineFragmentDoc,
     "\n  fragment MessageItemsCounts on Message {\n    addressesCount\n    companiesCount\n    countriesCount\n    peopleCount\n  }\n": types.MessageItemsCountsFragmentDoc,
     "\n  fragment PersonInline on Person {\n    id\n    name\n    tags\n    deleted\n    verified\n  }\n": types.PersonInlineFragmentDoc,
@@ -181,7 +181,7 @@ export function graphql(source: "\n  fragment CountryInline on Country {\n    id
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  fragment CountryItemsCounts on Country {\n    addressesCount\n    companiesCount\n    messagesCount\n    peopleCount\n  }\n"): (typeof documents)["\n  fragment CountryItemsCounts on Country {\n    addressesCount\n    companiesCount\n    messagesCount\n    peopleCount\n  }\n"];
+export function graphql(source: "\n  fragment CountryItemsCounts on Country {\n    addressesCount\n    countriesCount\n    companiesCount\n    messagesCount\n    peopleCount\n  }\n"): (typeof documents)["\n  fragment CountryItemsCounts on Country {\n    addressesCount\n    countriesCount\n    companiesCount\n    messagesCount\n    peopleCount\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
