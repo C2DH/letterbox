@@ -51,19 +51,19 @@ export function filtersStateToSearchFilters(
       { gqlField: 'addresses', field: 'address' },
       { gqlField: 'companies', field: 'company' },
       { gqlField: 'countries', field: 'country' },
-      { gqlField: 'people', field: 'people' },
+      { gqlField: 'people', field: 'person' },
     ] as const
   ).forEach(({ gqlField, field }) => {
     const filter = filters[field];
     // If we have a keyword filter (ie some selected element)
     // which type differ from the current type (ie. on companies explore page, filter on companies is disabled, but not the content one )
-    if (filter && filter.type === 'keywords' && field !== itemType) {
+    if (filter && filter.type === 'keywords' && field !== itemType)
       res[gqlField] = {
         type: FilterTypes.Keywords,
         values: filter.values,
       };
-    }
   });
 
+  console.log(filters, res);
   return res;
 }
