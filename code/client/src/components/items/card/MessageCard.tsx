@@ -82,7 +82,7 @@ export const MessageCard: FC<{ data: MessageInlineFragment }> = ({ data }) => {
                 </span>
               ),
             )}
-            {loadingStatus === 'loading' && <Spinner className="spinner-border-sm" />}
+            {loadingStatus.type === 'loading' && <Spinner className="spinner-border-sm" />}
             {!!remaining && (
               <span className="text-muted">
                 and {remaining} other{' '}
