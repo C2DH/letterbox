@@ -114,7 +114,7 @@ export type Company = {
   __typename?: 'Company';
   addresses: Array<Address>;
   addressesCount: Scalars['Int']['output'];
-  commonCompaniesCount: Scalars['Int']['output'];
+  commonMessagesCount: Scalars['Int']['output'];
   companies: Array<Company>;
   companiesCount: Scalars['Int']['output'];
   countries: Array<Country>;
@@ -139,7 +139,7 @@ export type CompanyAddressesArgs = {
 };
 
 
-export type CompanyCommonCompaniesCountArgs = {
+export type CompanyCommonMessagesCountArgs = {
   id: Scalars['ID']['input'];
   type: Scalars['String']['input'];
 };
@@ -760,7 +760,7 @@ export type AggregateValueResolvers<ContextType = any, ParentType extends Resolv
 export type CompanyResolvers<ContextType = any, ParentType extends ResolversParentTypes['Company'] = ResolversParentTypes['Company']> = {
   addresses?: Resolver<Array<ResolversTypes['Address']>, ParentType, ContextType, RequireFields<CompanyAddressesArgs, 'limit' | 'skip'>>;
   addressesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  commonCompaniesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType, RequireFields<CompanyCommonCompaniesCountArgs, 'id' | 'type'>>;
+  commonMessagesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType, RequireFields<CompanyCommonMessagesCountArgs, 'id' | 'type'>>;
   companies?: Resolver<Array<ResolversTypes['Company']>, ParentType, ContextType, RequireFields<CompanyCompaniesArgs, 'limit' | 'skip'>>;
   companiesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   countries?: Resolver<Array<ResolversTypes['Country']>, ParentType, ContextType, RequireFields<CompanyCountriesArgs, 'limit' | 'skip'>>;

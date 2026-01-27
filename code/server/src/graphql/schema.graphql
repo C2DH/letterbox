@@ -43,20 +43,21 @@ type Address
       statement: """
       MATCH (this)<-[r1]-(m:Message)-[r2]->(n:$($type) {id: $id})
       OPTIONAL MATCH (m)-[r3]->(c:Company)
-      WHERE  id(this) <> id(n) AND NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false)
+        WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false) AND NOT coalesce(r3.deleted, false) AND NOT coalesce(c.deleted, false)
       RETURN count(DISTINCT c) AS result
       """
     )
 
   #
   # Message relationships
+  # Sort is done by date
   #
   messagesCount: Int!
     @cypher(
       columnName: "result"
       statement: """
       MATCH (this)<-[r]-(n:Message)
-      WHERE NOT coalesce(r.deleted, false)
+      WHERE NOT coalesce(r.deleted, false) AND NOT coalesce(n.deleted, false)
       RETURN COUNT(DISTINCT n) AS result
       """
     )
@@ -65,7 +66,7 @@ type Address
       columnName: "result"
       statement: """
       MATCH (this)<-[r]-(n:Message)
-      WHERE NOT coalesce(r.deleted, false)
+      WHERE NOT coalesce(r.deleted, false) AND NOT coalesce(n.deleted, false)
       RETURN DISTINCT n AS result
       ORDER BY result.year ASC, result.id ASC
       SKIP $skip
@@ -75,6 +76,7 @@ type Address
 
   #
   # Company relationships
+  # Sort is done by number of common messages
   #
   companiesCount: Int!
     @cypher(
@@ -89,10 +91,8 @@ type Address
     @cypher(
       columnName: "result"
       statement: """
-      MATCH (this)<-[r1]-(m:Message)-[r2]->(n:Company)
-      WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false) AND NOT coalesce(n.deleted, false)
-      OPTIONAL MATCH (m)-[r3]->(c:Company) WHERE NOT coalesce(r3.deleted, false) AND NOT coalesce(c.deleted, false)
-      RETURN n AS result, count(DISTINCT c) AS score
+      MATCH (this)<-[r1]-(m:Message)-[r2]->(n:Company) WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false) AND NOT coalesce(n.deleted, false)
+      RETURN n AS result, count(DISTINCT m) AS score
       ORDER BY score DESC, result.name ASC
       SKIP $skip
       LIMIT $limit
@@ -101,6 +101,7 @@ type Address
 
   #
   # Country relationships
+  # Sort is done by number of common companies
   #
   countriesCount: Int!
     @cypher(
@@ -115,8 +116,7 @@ type Address
     @cypher(
       columnName: "result"
       statement: """
-      MATCH (this)<-[r1]-(m:Message)-[r2]->(n:Country)
-      WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false) AND NOT coalesce(n.deleted, false)
+      MATCH (this)<-[r1]-(m:Message)-[r2]->(n:Country) WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false) AND NOT coalesce(n.deleted, false)
       OPTIONAL MATCH (m)-[r3]->(c:Company) WHERE NOT coalesce(r3.deleted, false) AND NOT coalesce(c.deleted, false)
       RETURN n AS result, count(DISTINCT c) AS score
       ORDER BY score DESC, result.name ASC
@@ -127,6 +127,7 @@ type Address
 
   #
   # People relationships
+  # Sort is done by number of common companies
   #
   peopleCount: Int!
     @cypher(
@@ -141,8 +142,7 @@ type Address
     @cypher(
       columnName: "result"
       statement: """
-      MATCH (this)<-[r1]-(m:Message)-[r2]->(n:Person)
-      WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false) AND NOT coalesce(n.deleted, false)
+      MATCH (this)<-[r1]-(m:Message)-[r2]->(n:Person) WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false) AND NOT coalesce(n.deleted, false)
       OPTIONAL MATCH (m)-[r3]->(c:Company) WHERE NOT coalesce(r3.deleted, false) AND NOT coalesce(c.deleted, false)
       RETURN n AS result, count(DISTINCT c) AS score
       ORDER BY score DESC, result.name ASC
@@ -152,6 +152,7 @@ type Address
     )
   #
   # Address relationships
+  # Sort is done by number of common companies
   #
   addressesCount: Int!
     @cypher(
@@ -166,8 +167,7 @@ type Address
     @cypher(
       columnName: "result"
       statement: """
-      MATCH (this)<-[r1]-(m:Message)-[r2]->(n:Address)
-      WHERE id(this) <> id(n) AND NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false)
+      MATCH (this)<-[r1]-(m:Message)-[r2]->(n:Address) WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false) AND NOT coalesce(n.deleted, false)
       OPTIONAL MATCH (m)-[r3]->(c:Company) WHERE NOT coalesce(r3.deleted, false) AND NOT coalesce(c.deleted, false)
       RETURN n AS result, count(DISTINCT c) AS score
       ORDER BY score DESC, result.name ASC
@@ -193,19 +193,19 @@ type Company
   verified: Boolean
   deleted: Boolean
 
-  commonCompaniesCount(id: ID!, type: String!): Int!
+  commonMessagesCount(id: ID!, type: String!): Int!
     @cypher(
       columnName: "result"
       statement: """
       MATCH (this)<-[r1]-(m:Message)-[r2]->(n:$($type) {id: $id})
-      OPTIONAL MATCH (m)-[r3]->(c:Company)
-      WHERE  id(this) <> id(n) AND NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false)
-      RETURN count(DISTINCT c) AS result
+      WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false) AND NOT coalesce(n.deleted, false)
+      RETURN count(DISTINCT m) AS result
       """
     )
 
   #
   # Message relationships
+  # Sort is done by date
   #
   messagesCount: Int!
     @cypher(
@@ -231,6 +231,7 @@ type Company
 
   #
   # Address relationships
+  # Sort is done by number of common companies
   #
   addressesCount: Int!
     @cypher(
@@ -245,8 +246,7 @@ type Company
     @cypher(
       columnName: "result"
       statement: """
-      MATCH (this)<-[r1]-(m:Message)-[r2]->(n:Address)
-      WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false)
+      MATCH (this)<-[r1]-(m:Message)-[r2]->(n:Address) WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false) AND NOT coalesce(n.deleted, false)
       OPTIONAL MATCH (m)-[r3]->(c:Company) WHERE NOT coalesce(r3.deleted, false) AND NOT coalesce(c.deleted, false)
       RETURN n AS result, count(DISTINCT c) AS score
       ORDER BY score DESC, result.name ASC
@@ -257,6 +257,7 @@ type Company
 
   #
   # Country relationships
+  # Sort is done by number of common companies
   #
   countriesCount: Int!
     @cypher(
@@ -271,8 +272,7 @@ type Company
     @cypher(
       columnName: "result"
       statement: """
-      MATCH (this)<-[r1]-(m:Message)-[r2]->(n:Country)
-      WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false) AND NOT coalesce(n.deleted, false)
+      MATCH (this)<-[r1]-(m:Message)-[r2]->(n:Country) WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false) AND NOT coalesce(n.deleted, false)
       OPTIONAL MATCH (m)-[r3]->(c:Company) WHERE NOT coalesce(r3.deleted, false) AND NOT coalesce(c.deleted, false)
       RETURN n AS result, count(DISTINCT c) AS score
       ORDER BY score DESC, result.name ASC
@@ -283,6 +283,7 @@ type Company
 
   #
   # People relationships
+  # Sort is done by number of common companies
   #
   peopleCount: Int!
     @cypher(
@@ -308,6 +309,7 @@ type Company
     )
   #
   # Company relationships
+  # Sort is done by number of common messages
   #
   companiesCount: Int!
     @cypher(
@@ -322,10 +324,8 @@ type Company
     @cypher(
       columnName: "result"
       statement: """
-      MATCH (this)<-[r1]-(m:Message)-[r2]->(n:Company)
-      WHERE id(this) <> id(n) AND NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false) AND NOT coalesce(n.deleted, false)
-      OPTIONAL MATCH (m)-[r3]->(c:Company) WHERE NOT coalesce(r3.deleted, false) AND NOT coalesce(c.deleted, false)
-      RETURN n AS result, count(DISTINCT c) AS score
+      MATCH (this)<-[r1]-(m:Message)-[r2]->(n:Company) WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false) AND NOT coalesce(n.deleted, false)
+      RETURN n AS result, count(DISTINCT m) AS score
       ORDER BY score DESC, result.name ASC
       SKIP $skip
       LIMIT $limit
@@ -376,6 +376,7 @@ type Country
 
   #
   # Message relationships
+  # Sort is done by date
   #
   messagesCount: Int!
     @cypher(
@@ -401,6 +402,7 @@ type Country
 
   #
   # Address relationships
+  # Sort is done by number of common companies
   #
   addressesCount: Int!
     @cypher(
@@ -415,8 +417,7 @@ type Country
     @cypher(
       columnName: "result"
       statement: """
-      MATCH (this)<-[r1]-(m:Message)-[r2]->(n:Address)
-      WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false)
+      MATCH (this)<-[r1]-(m:Message)-[r2]->(n:Address) WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false) AND NOT coalesce(n.deleted, false)
       OPTIONAL MATCH (m)-[r3]->(c:Company) WHERE NOT coalesce(r3.deleted, false) AND NOT coalesce(c.deleted, false)
       RETURN n AS result, count(DISTINCT c) AS score
       ORDER BY score DESC, result.name ASC
@@ -427,13 +428,13 @@ type Country
 
   #
   # Company relationships
+  # Sort is done by number of common messages
   #
   companiesCount: Int!
     @cypher(
       columnName: "result"
       statement: """
-      MATCH (this)<-[r1]-(:Message)-[r2]->(n:Company)
-      WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false) AND NOT coalesce(n.deleted, false)
+      MATCH (this)<-[r1]-(:Message)-[r2]->(n:Company) WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false) AND NOT coalesce(n.deleted, false)
       RETURN COUNT(DISTINCT n) AS result
       """
     )
@@ -441,10 +442,8 @@ type Country
     @cypher(
       columnName: "result"
       statement: """
-      MATCH (this)<-[r1]-(m:Message)-[r2]->(n:Company)
-      WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false) AND NOT coalesce(n.deleted, false)
-      OPTIONAL MATCH (m)-[r3]->(c:Company) WHERE NOT coalesce(r3.deleted, false) AND NOT coalesce(c.deleted, false) AND id(c) <> id(n)
-      RETURN n AS result, count(DISTINCT c) AS score
+      MATCH (this)<-[r1]-(m:Message)-[r2]->(n:Company) WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false) AND NOT coalesce(n.deleted, false)
+      RETURN n AS result, count(DISTINCT m) AS score
       ORDER BY score DESC, result.name ASC
       SKIP $skip
       LIMIT $limit
@@ -453,6 +452,7 @@ type Country
 
   #
   # People relationships
+  # Sort is done by number of common companies
   #
   peopleCount: Int!
     @cypher(
@@ -467,8 +467,7 @@ type Country
     @cypher(
       columnName: "result"
       statement: """
-      MATCH (this)<-[r1]-(m:Message)-[r2]->(n:Person)
-      WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false) AND NOT coalesce(n.deleted, false)
+      MATCH (this)<-[r1]-(m:Message)-[r2]->(n:Person) WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false) AND NOT coalesce(n.deleted, false)
       OPTIONAL MATCH (m)-[r3]->(c:Company) WHERE NOT coalesce(r3.deleted, false) AND NOT coalesce(c.deleted, false)
       RETURN n AS result, count(DISTINCT c) AS score
       ORDER BY score DESC, result.name ASC
@@ -478,13 +477,14 @@ type Country
     )
   #
   # Country relationships
+  # Sort is done by number of common companies
   #
   countriesCount: Int!
     @cypher(
       columnName: "result"
       statement: """
       MATCH (this)<-[r1]-(:Message)-[r2]->(n:Country)
-      WHERE id(this) <> id(n) AND NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false) AND NOT coalesce(n.deleted, false)
+      WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false) AND NOT coalesce(n.deleted, false)
       RETURN COUNT(DISTINCT n) AS result
       """
     )
@@ -492,8 +492,7 @@ type Country
     @cypher(
       columnName: "result"
       statement: """
-      MATCH (this)<-[r1]-(m:Message)-[r2]->(n:Country)
-      WHERE  id(this) <> id(n) AND NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false) AND NOT coalesce(n.deleted, false)
+      MATCH (this)<-[r1]-(m:Message)-[r2]->(n:Country) WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false) AND NOT coalesce(n.deleted, false)
       OPTIONAL MATCH (m)-[r3]->(c:Company) WHERE NOT coalesce(r3.deleted, false) AND NOT coalesce(c.deleted, false)
       RETURN n AS result, count(DISTINCT c) AS score
       ORDER BY score DESC, result.name ASC
@@ -530,6 +529,7 @@ type Message
 
   #
   # Address relationships
+  # Sort is done by name
   #
   addressesCount: Int!
     @cypher(
@@ -555,6 +555,7 @@ type Message
 
   #
   # Company relationships
+  # Sort is done by name
   #
   companiesCount: Int!
     @cypher(
@@ -580,6 +581,7 @@ type Message
 
   #
   # Country relationships
+  # Sort is done by name
   #
   countriesCount: Int!
     @cypher(
@@ -605,6 +607,7 @@ type Message
 
   #
   # People relationships
+  # Sort is done by name
   #
   peopleCount: Int!
     @cypher(
@@ -658,6 +661,7 @@ type Person
 
   #
   # Message relationships
+  # Sort is done by date
   #
   messagesCount: Int!
     @cypher(
@@ -683,6 +687,7 @@ type Person
 
   #
   # Address relationships
+  # Sort is done by number of common companies
   #
   addressesCount: Int!
     @cypher(
@@ -697,8 +702,7 @@ type Person
     @cypher(
       columnName: "result"
       statement: """
-      MATCH (this)<-[r1]-(m:Message)-[r2]->(n:Address)
-      WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false) AND NOT coalesce(n.deleted, false)
+      MATCH (this)<-[r1]-(m:Message)-[r2]->(n:Address) WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false) AND NOT coalesce(n.deleted, false)
       OPTIONAL MATCH (m)-[r3]->(c:Company) WHERE NOT coalesce(r3.deleted, false) AND NOT coalesce(c.deleted, false)
       RETURN n AS result, count(DISTINCT c) AS score
       ORDER BY score DESC, result.name ASC
@@ -709,6 +713,7 @@ type Person
 
   #
   # Company relationships
+  # Sort is done by number of common messages
   #
   companiesCount: Int!
     @cypher(
@@ -723,10 +728,8 @@ type Person
     @cypher(
       columnName: "result"
       statement: """
-      MATCH (this)<-[r1]-(m:Message)-[r2]->(n:Company)
-      WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false) AND NOT coalesce(n.deleted, false)
-      OPTIONAL MATCH (m)-[r3]->(c:Company) WHERE NOT coalesce(r3.deleted, false) AND NOT coalesce(c.deleted, false) AND id(c) <> id(n)
-      RETURN DISTINCT n AS result, count(DISTINCT c) AS score
+      MATCH (this)<-[r1]-(m:Message)-[r2]->(n:Company) WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false) AND NOT coalesce(n.deleted, false)
+      RETURN DISTINCT n AS result, count(DISTINCT m) AS score
       ORDER BY score DESC, result.name ASC
       SKIP $skip
       LIMIT $limit
@@ -735,6 +738,7 @@ type Person
 
   #
   # Country relationships
+  # Sort is done by number of common companies
   #
   countriesCount: Int!
     @cypher(
@@ -761,6 +765,7 @@ type Person
 
   #
   # People relationships
+  # Sort is done by number of common companies
   #
   peopleCount: Int!
     @cypher(
@@ -775,8 +780,7 @@ type Person
     @cypher(
       columnName: "result"
       statement: """
-      MATCH (this)<-[r1]-(m:Message)-[r2]->(n:Person)
-      WHERE  id(this) <> id(n) AND NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false) AND NOT coalesce(n.deleted, false)
+      MATCH (this)<-[r1]-(m:Message)-[r2]->(n:Person) WHERE NOT coalesce(r1.deleted, false) AND NOT coalesce(r2.deleted, false) AND NOT coalesce(n.deleted, false)
       OPTIONAL MATCH (m)-[r3]->(c:Company) WHERE NOT coalesce(r3.deleted, false) AND NOT coalesce(c.deleted, false)
       RETURN n AS result, count(DISTINCT c) AS score
       ORDER BY score DESC, result.name ASC

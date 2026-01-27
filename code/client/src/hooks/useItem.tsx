@@ -45,7 +45,8 @@ import {
   PersonItemCountsFragment,
 } from '../core/graphql';
 
-const SORT_HINT_COMMON = 'Companies in common (desc), name (asc)';
+const SORT_HINT_COMMON_COMPANIES = 'Companies in common (desc), name (asc)';
+const SORT_HINT_COMMON_MESSAGES = 'Messages in common (desc), name (asc)';
 const SORT_HINT_BY_NAME = 'Name (asc)';
 const SORT_HINT_BY_DATE = 'Date (asc)';
 
@@ -54,33 +55,33 @@ export const QUERIES = {
     getItemById: getCompanyById,
     itemsCounts: getCompanyItemsCounts,
     relations: {
-      address: { query: getCompanyAddresses, sortHint: SORT_HINT_COMMON },
-      company: { query: getCompanyCompanies, sortHint: SORT_HINT_BY_NAME },
-      country: { query: getCompanyCountries, sortHint: SORT_HINT_COMMON },
+      address: { query: getCompanyAddresses, sortHint: SORT_HINT_COMMON_COMPANIES },
+      company: { query: getCompanyCompanies, sortHint: SORT_HINT_COMMON_MESSAGES },
+      country: { query: getCompanyCountries, sortHint: SORT_HINT_COMMON_COMPANIES },
       message: { query: getCompanyMessages, sortHint: SORT_HINT_BY_DATE },
-      person: { query: getCompanyPeople, sortHint: SORT_HINT_COMMON },
+      person: { query: getCompanyPeople, sortHint: SORT_HINT_COMMON_COMPANIES },
     },
   },
   address: {
     getItemById: getAddressById,
     itemsCounts: getAddressItemsCounts,
     relations: {
-      address: { query: getAddressAddresses, sortHint: SORT_HINT_COMMON },
-      company: { query: getAddressCompanies, sortHint: SORT_HINT_COMMON },
-      country: { query: getAddressCountries, sortHint: SORT_HINT_COMMON },
+      address: { query: getAddressAddresses, sortHint: SORT_HINT_COMMON_COMPANIES },
+      company: { query: getAddressCompanies, sortHint: SORT_HINT_COMMON_MESSAGES },
+      country: { query: getAddressCountries, sortHint: SORT_HINT_COMMON_COMPANIES },
       message: { query: getAddressMessages, sortHint: SORT_HINT_BY_DATE },
-      person: { query: getAddressPeople, sortHint: SORT_HINT_COMMON },
+      person: { query: getAddressPeople, sortHint: SORT_HINT_COMMON_COMPANIES },
     },
   },
   country: {
     getItemById: getCountryById,
     itemsCounts: getCountryItemsCounts,
     relations: {
-      address: { query: getCountryAddresses, sortHint: SORT_HINT_COMMON },
-      company: { query: getCountryCompanies, sortHint: SORT_HINT_COMMON },
-      country: { query: getCountryCountries, sortHint: SORT_HINT_COMMON },
+      address: { query: getCountryAddresses, sortHint: SORT_HINT_COMMON_COMPANIES },
+      company: { query: getCountryCompanies, sortHint: SORT_HINT_COMMON_MESSAGES },
+      country: { query: getCountryCountries, sortHint: SORT_HINT_COMMON_COMPANIES },
       message: { query: getCountryMessages, sortHint: SORT_HINT_BY_DATE },
-      person: { query: getCountryPeople, sortHint: SORT_HINT_COMMON },
+      person: { query: getCountryPeople, sortHint: SORT_HINT_COMMON_COMPANIES },
     },
   },
   person: {
@@ -89,15 +90,15 @@ export const QUERIES = {
     relations: {
       address: {
         query: getPersonAddresses,
-        sortHint: SORT_HINT_COMMON,
+        sortHint: SORT_HINT_COMMON_COMPANIES,
       },
       company: {
         query: getPersonCompanies,
-        sortHint: SORT_HINT_COMMON,
+        sortHint: SORT_HINT_COMMON_MESSAGES,
       },
-      country: { query: getPersonCountries, sortHint: SORT_HINT_COMMON },
+      country: { query: getPersonCountries, sortHint: SORT_HINT_COMMON_COMPANIES },
       message: { query: getPersonMessages, sortHint: SORT_HINT_BY_DATE },
-      person: { query: getPersonPeople, sortHint: SORT_HINT_COMMON },
+      person: { query: getPersonPeople, sortHint: SORT_HINT_COMMON_COMPANIES },
     },
   },
   message: {

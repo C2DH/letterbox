@@ -23,7 +23,7 @@ export const ItemsCounts: FC<{
     peopleCount: number;
     countriesCount: number;
     messagesCount: number;
-    commonCompaniesCount?: number;
+    commonCount?: number;
   }>;
 }> = ({ itemType, data, loadingStatus }) => {
   return (
@@ -40,7 +40,11 @@ export const ItemsCounts: FC<{
         .filter(({ type }) => type !== itemType)
         .map(({ field, type }) => {
           const value = data && field in data ? data[field] || 0 : null;
-          const displayCommonCount = type === 'company' && !isNil(data?.commonCompaniesCount);
+          let displayCommonCount = false;
+          if (!isNil(data?.commonCount)) {
+            if (itemType === 'company' && type === 'message') displayCommonCount = true;
+            else if (type === 'company') displayCommonCount = true;
+          }
           if (value !== null || loadingStatus !== undefined)
             return (
               <li
@@ -56,7 +60,7 @@ export const ItemsCounts: FC<{
                 {loadingStatus!.type === 'error' && <>!</>}
                 {loadingStatus!.type === 'success' && !isNil(value) && (
                   <>
-                    {displayCommonCount && <>{shortenNumber(data.commonCompaniesCount!)}/</>}
+                    {displayCommonCount && <>{shortenNumber(data!.commonCount!)}/</>}
                     {shortenNumber(value)}
                   </>
                 )}{' '}

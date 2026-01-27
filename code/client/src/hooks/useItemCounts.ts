@@ -37,10 +37,10 @@ const QUERIES_WITH_COMMONS = {
 } as const;
 
 type Graphqlresponse =
-  | { result: Array<CompanyItemsCountsFragment & { commonCompaniesCount?: number }> }
-  | { result: Array<AddressItemsCountsFragment & { commonCompaniesCount?: number }> }
-  | { result: Array<CountryItemsCountsFragment & { commonCompaniesCount?: number }> }
-  | { result: Array<PersonItemCountsFragment & { commonCompaniesCount?: number }> }
+  | { result: Array<CompanyItemsCountsFragment & { commonCount?: number }> }
+  | { result: Array<AddressItemsCountsFragment & { commonCount?: number }> }
+  | { result: Array<CountryItemsCountsFragment & { commonCount?: number }> }
+  | { result: Array<PersonItemCountsFragment & { commonCount?: number }> }
   | { result: Array<MessageItemsCountsFragment> };
 /**
  * Hook to retrieve item relations counts.

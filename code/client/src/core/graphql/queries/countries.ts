@@ -25,7 +25,7 @@ export const getCountryItemsCountsWithCommons = graphql(`
   query GetCountryItemsCountsWithCommons($id: ID!, $fromType: String!, $fromId: ID!) {
     result: countries(where: { id_EQ: $id }) {
       ...CountryItemsCounts
-      commonCompaniesCount(type: $fromType, id: $fromId)
+      commonCount: commonCompaniesCount(type: $fromType, id: $fromId)
     }
   }
 `);

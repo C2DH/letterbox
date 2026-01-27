@@ -25,7 +25,7 @@ export const getCompanyItemsCountsWithCommons = graphql(`
   query GetCompanyItemsCountWithCommons($id: ID!, $fromType: String!, $fromId: ID!) {
     result: companies(where: { id_EQ: $id }) {
       ...CompanyItemsCounts
-      commonCompaniesCount(type: $fromType, id: $fromId)
+      commonCount: commonMessagesCount(type: $fromType, id: $fromId)
     }
   }
 `);
