@@ -31,7 +31,14 @@ type ListProps = InfiniteScrollProps<NodeItem, { itemType: ItemType }>;
 
 const ItemComponent: ListProps['element'] = ({ itemType, data }) => {
   return (
-    <article className={cx('mb-4', itemType === 'message' ? 'col-4' : 'col-2')}>
+    <article
+      className={cx(
+        'card-item mb-4',
+        itemType === 'message'
+          ? 'col-sm-6 col-md-6 col-lg-4 col-xl-2'
+          : 'col-sm-6 col-md-4 col-lg-3 col-xl-2',
+      )}
+    >
       <ItemCard data={data} itemType={itemType} />
     </article>
   );

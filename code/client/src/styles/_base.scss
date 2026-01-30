@@ -65,3 +65,27 @@
 .w-fit-content {
   width: fit-content;
 }
+.card-item {
+  display: flex;
+  align-items: stretch;
+
+  .card {
+    flex-grow: 1;
+  }
+
+  .card-body {
+    .card-title a {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -moz-box-orient: vertical;
+      -ms-box-orient: vertical;
+      box-orient: vertical;
+      -webkit-line-clamp: 3;
+      -moz-line-clamp: 3;
+      -ms-line-clamp: 3;
+      line-clamp: 3;
+    }
+  }
+}

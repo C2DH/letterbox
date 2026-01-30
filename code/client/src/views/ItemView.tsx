@@ -82,7 +82,14 @@ export const ItemView: FC = () => {
                   fetch: fetchRelations.bind(null, type),
                   getItemKey: (data: NodeItem) => data.id,
                   renderItem: (data: NodeItem) => (
-                    <div className={cx('mb-4', type === 'message' ? 'col-4' : 'col-2')}>
+                    <div
+                      className={cx(
+                        'card-item mb-4',
+                        type === 'message'
+                          ? 'col-sm-6 col-md-6 col-lg-4 col-xl-3'
+                          : 'col-sm-6 col-md-4 col-lg-3 col-xl-2',
+                      )}
+                    >
                       <ItemCard data={data} itemType={type} from={{ type: itemType, id: id! }} />
                     </div>
                   ),
