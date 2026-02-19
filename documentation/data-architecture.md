@@ -62,6 +62,8 @@ The People index mapping
 }
 ```
 
+Cooccurrences items (addresses, companies, countries in the people example) are stored as a concatenation of id and label to allow aggregations on homonyms (same labels different ids).
+
 ## Sync Data: Edition versus Search
 
 Having two ways to store the data brings synchronization issues.
