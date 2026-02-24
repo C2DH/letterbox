@@ -99,6 +99,11 @@ Till this process is not done, the search engine data state is out of sync. We a
 - we can only store the first 10k cooccurrences (nested size limit in ElasticSearch)
 - sort on total number of cooccurrence (not on filtered messages)
 
+## Missing features
+
+- data mass edition: deduplication, complicated split/detach
+- visualisation and analysis
+
 ## Performance
 
 As stated upper in this document, the main issues regarding performance are linked to the very high cardinality of the data: there are many messages (3,083,906) and very linked.
