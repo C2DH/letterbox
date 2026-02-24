@@ -11,7 +11,7 @@ import {
 import { InfiniteScroll } from '@ouestware/infinite-scroll';
 import { Spinner } from '@ouestware/loaders';
 import cx from 'classnames';
-import { keyBy, pick, without } from 'lodash';
+import { keyBy, omit, pick, without } from 'lodash';
 import { FC, useCallback, useMemo, useState } from 'react';
 import { IconType } from 'react-icons';
 import { RiDownloadLine, RiFilterLine, RiFilterOffLine, RiShareBoxLine } from 'react-icons/ri';
@@ -254,7 +254,8 @@ export const ItemFacet: FC<{ itemType: ItemType; selectedType: ItemType }> = ({
 
   const fnAutocomplete = useMemo(() => {
     return facet.type === 'keywords' && facet.autocomplete && autocomplete
-      ? (inputValue: string) => autocomplete(facet, state, inputValue)
+      ? (inputValue: string) =>
+          autocomplete(facet, { ...state, filters: omit(state.filters, facet.id) }, inputValue)
       : undefined;
   }, [facet, autocomplete, state]);
 
@@ -281,7 +282,7 @@ export const ItemFacet: FC<{ itemType: ItemType; selectedType: ItemType }> = ({
       onChange: (values) =>
         onChange({
           type: 'keywords',
-          values: values || [],
+          values: [...((filter as KeywordsFilter | undefined)?.values || []), ...(values || [])],
         }),
       autocomplete: fnAutocomplete,
       loadHistogramData: fnLoadHistogram,
@@ -293,12 +294,19 @@ export const ItemFacet: FC<{ itemType: ItemType; selectedType: ItemType }> = ({
     [filter, fnAutocomplete, fnLoadHistogram, onChange],
   );
   const { selectProps } = useInputKeywords<ItemValue>(inputKeywordsProps);
-  const histogramProps = pick(inputKeywordsProps, [
-    'loadHistogramData',
-    'values',
-    'onChange',
-    'paginate',
-  ]) as KeywordsFacetSimpleHistogramProps<ItemValue>;
+  const histogramProps = {
+    ...(pick(inputKeywordsProps, [
+      'loadHistogramData',
+      'values',
+      'onChange',
+      'paginate',
+    ]) as KeywordsFacetSimpleHistogramProps<ItemValue>),
+    onChange: (values: string[] | undefined) =>
+      onChange({
+        type: 'keywords',
+        values: values || [],
+      }),
+  };
   const histogramData = useKeywordsFacetSimpleHistogram(histogramProps);
 
   /**
