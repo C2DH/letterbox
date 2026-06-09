@@ -52,7 +52,7 @@ NEO4J_URL=bolt://neo4j:${NEO4J_PORT_BOLT}
 VITE_PDF_URL=http://localhost/pdf/
 ```
 
-By modifying those variables you can decide to spread the databases services on multiple machines. The PDF repository can also be set-up on a remote machhine. In that case make sure that the web server serving the PDF files allow CROSS Domain requests from the client domain.
+By modifying those variables you can decide to spread the databases services on multiple machines. The PDF repository can also be set-up on a remote machine. In that case make sure that the web server serving the PDF files allow CROSS Domain requests from the client domain.
 
 **Auth**
 
@@ -114,6 +114,235 @@ npm run init
 ### PDF files
 
 If the PDF files need to be served directly by the docker client nginx, you have to place those files into `docker/nginx/data/pdf` without any subfolders.
+
+## Production on debian (without docker)
+
+To deploy for production one can install all required services without docker directly on the host.
+
+### install and configure Firewall
+
+```bash
+apt install ufw
+ufw enable
+ufw default deny incoming
+ufw default allow outgoing
+ufw allow ssh
+ufw allow 'Nginx Full'
+```
+
+See [Official documentation](https://wiki.debian.org/Uncomplicated%20Firewall%20%28ufw%29)
+
+### Create a dedicated folder and user account for the app
+
+```bash
+# home directory
+mkdir /data/letterbox
+# app code
+mkdir /data/letterbox/app
+mkdir /data/letterbox/data
+useradd letterbox
+# remove the possibility to open a session by removing bash and add home folder as /data/letterbox
+vi /etc/passwd
+chown letterbox:letterbox /data/letterbox
+su letterbox
+git clone https://github.com/C2DH/letterbox.git /data/letterbox/app
+```
+
+### Install & configure Neo4J
+
+#### install
+
+Follow [official documentation from Neo4J](https://neo4j.com/docs/operations-manual/current/installation/linux/debian/) to install the database on a debian system
+
+Check the neo4j version in the docker file.
+
+Add the apoc plugin : [https://neo4j.com/docs/apoc/current/installation/#apoc](https://neo4j.com/docs/apoc/current/installation/#apoc)
+
+#### configure
+
+To configure, edit `/etc/neo4j/neo4j.conf`. For Letterbox it's important to give enough memory by augmenting
+
+```bash
+    server.memory.heap.max_size=4096m
+    server.memory.pagecache.size=20g
+```
+
+#### restore database
+
+If your need to restore a previous neo4j database data folder, untar the files in `/var/lib/neo4j/data`.
+Do that before starting neo4j service.
+
+### Install & configure ElasticSearch
+
+#### install ElasticSearch
+
+[https://www.elastic.co/docs/deploy-manage/deploy/self-managed/install-elasticsearch-with-debian-package](https://www.elastic.co/docs/deploy-manage/deploy/self-managed/install-elasticsearch-with-debian-package)
+
+### configure
+
+in `elasticsearch.yaml`
+
+```yaml
+discovery.type=single-node
+xpack.security.enabled=false
+```
+
+in `jvm.options`
+
+```
+-Xms4g -Xmx4g
+```
+
+### Server and client apps
+
+#### Install
+
+Install node using nvm as recommended in [official documentation](https://nodejs.org/en/download)
+
+Then install dependencies and build
+
+```bash
+cd code
+npm install
+npm run build
+```
+
+#### Configure
+
+Create env variables in the `~/.bash_profile` script:
+
+```bash
+#
+# Neo4j configuration
+#
+NEO4J_VERSION=5-community
+
+NEO4J_LOGIN=neo4j
+NEO4J_PASSWORD=l3tm31n!
+
+#
+# ES configuration
+#
+ELASTICSEARCH_MAX_PARALLEL_UPDATE=2
+
+
+#
+# Project configuration
+#
+CLIENT_PORT=5173
+SERVER_PORT=4000
+
+#
+# Application config
+#
+ELASTICSEARCH_URL=http://localhost:9200
+NEO4J_URL=bolt://localhost:7687
+DATA_FOLDER=/data/letterbox/data
+
+#
+# Client
+#
+VITE_PDF_URL=/pdf/
+```
+
+#### install and configure pm2
+
+```bash
+npm install pm2@latest -g
+```
+
+### Install and configure nginx
+
+See [official install documentation](https://nginx.org/en/linux_packages.html#Debian).
+
+For configuration use something like:
+
+```nginx
+upstream server {
+  server localhost:4000;
+}
+
+server {
+    listen 80;
+    server_name {CUSTOM_DOMAIN};
+    root /var/www/html;
+    return 301 https://{CUSTOM_DOMAIN}$request_uri;
+}
+
+server {
+  listen 443 ssl;
+  server_name {CUSTOM_DOMAIN};
+
+  # SSL configuration: managed automatically by certbot
+
+  # basic auth
+  auth_basic  "Restricted Access";
+  auth_basic_user_file /data/letterbox/.htpasswd;
+
+
+  client_max_body_size 50M;
+
+  location /graphql {
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $http_x_forwarded_proto;
+    proxy_set_header Host $http_host;
+    proxy_set_header X-NginX-Proxy true;
+    proxy_set_header Cookie $http_cookie;
+    proxy_read_timeout 15m;
+    proxy_connect_timeout 15m;
+    proxy_pass http://server;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "upgrade";
+  }
+
+  location /pdf/ {
+    root /data/letterbox/data;
+  }
+
+  location / {
+    root /data/letterbox/app/client/dist;
+    try_files $uri $uri/ /index.html;
+  }
+}
+
+```
+
+add SSL with certbot : https://certbot.eff.org/instructions?ws=nginx&os=snap
+
+```bash
+
+snap install --classic certbot
+ln -s /snap/bin/certbot /usr/bin/certbot
+
+certbot --nginx -d {CUSTOM_DOMAIN}
+nginx -s reload
+```
+
+Create user accounts for basic auth
+
+```bash
+htpasswd -c /data/letterbox/.htpasswd user1
+```
+
+### Start the app
+
+Start the API
+
+```bash
+cd ~
+pm2 start app/code/server/build/index.js --name API
+pm2 startup systemd
+pm2 save
+```
+
+Index the Neo4J data into ElasticSearch
+
+```bash
+cd ~/code/server
+npm run dataset:index
+```
 
 ## Development
 
