@@ -16,13 +16,13 @@
     "dataset:import-tags": "tsx src/bin/dataset-import-tags"
   },
   "dependencies": {
-    "@apollo/server": "^4.11.3",
+    "@apollo/server": "^4.13.0",
     "@elastic/elasticsearch": "^8.17.0",
     "@graphql-tools/delegate": "^10.2.13",
     "@graphql-tools/utils": "^10.7.2",
     "@graphql-tools/wrap": "^10.0.31",
     "@hapi/boom": "^10.0.1",
-    "@neo4j/graphql": "^6.3.0",
+    "@neo4j/graphql": "^6.6.4",
     "@ouestware/async": "^0.0.1-alpha.3",
     "@ouestware/facets": "^0.0.1-alpha.4",
     "@ouestware/facets-server": "^0.0.1-alpha.5",
