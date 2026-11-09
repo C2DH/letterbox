@@ -1,4 +1,4 @@
-import { useApolloClient, useQuery } from '@apollo/client';
+import { useApolloClient, useQuery } from '@apollo/client/react';
 import { useCallback, useMemo } from 'react';
 
 import { ITEM_TYPE_TO_FIELD, ItemType } from '../core/consts';

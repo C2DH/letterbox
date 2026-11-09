@@ -13,8 +13,8 @@
     "compile": "tsc -b"
   },
   "dependencies": {
-    "@apollo/client": "^3.13.4",
-    "@graphql-codegen/typescript-react-apollo": "^4.3.2",
+    "@apollo/client": "^4.3.7",
+    "@graphql-codegen/typescript-react-apollo": "^5.0.0",
     "@ouestware/facets": "^0.0.1-alpha.7",
     "@ouestware/facets-client": "^0.0.1-alpha.21",
     "@ouestware/hooks": "^0.0.1-alpha.6",

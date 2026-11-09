@@ -1,4 +1,4 @@
-import { useLazyQuery, useMutation } from '@apollo/client';
+import { useLazyQuery, useMutation } from '@apollo/client/react';
 import { isNil } from 'lodash';
 import { FC, useCallback, useState } from 'react';
 import { Props } from 'react-select';

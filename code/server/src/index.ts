@@ -34,9 +34,7 @@ async function initServer() {
     await dataset.releaseIndexingPendingModificationLockNode();
 
     // Start the server
-    server.listen(config.server.port, () =>
-      log.info(`Server listening at http://localhost:${config.server.port}`),
-    );
+    server.listen(config.server.port, () => log.info(`Server listening at http://localhost:${config.server.port}`));
   } catch (error) {
     log.error('Error while starting the server', error);
   }

@@ -1,4 +1,4 @@
-import { useApolloClient } from '@apollo/client';
+import { useApolloClient } from '@apollo/client/react';
 import { DateFilter } from '@ouestware/facets';
 import { useFacetsContext } from '@ouestware/facets-client';
 import { getAsyncMemoData, useAsyncMemo } from '@ouestware/hooks';
@@ -100,7 +100,7 @@ export const Timeline: FC<{
   );
   const data = useMemo(() => getAsyncMemoData(dataState), [dataState]);
   const timelineData = useMemo(() => {
-    if (!data) return null;
+    if (!data || !data.data) return null;
 
     return {
       maxCount: max(data.data.aggregate.values.map(({ count }) => count)) || 0,

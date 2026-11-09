@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client/react';
 import { useNotifications } from '@ouestware/notifications';
 import { useCallback, useEffect, useMemo } from 'react';
 
