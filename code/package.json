@@ -44,5 +44,10 @@
   "dependencies": {
     "@ouestware/type-utils": "^0.0.1-alpha.3",
     "lodash": "^4.18.1"
+  },
+  "allowScripts": {
+    "esbuild": true,
+    "@apollo/protobufjs": true,
+    "@parcel/watcher": true
   }
 }
