@@ -1,4 +1,4 @@
-import { useApolloClient } from '@apollo/client';
+import { useApolloClient } from '@apollo/client/react';
 import { FiltersState, KeywordsFacet, searchToState, stateToSearch } from '@ouestware/facets';
 import { FacetsRoot } from '@ouestware/facets-client';
 import cx from 'classnames';
@@ -51,10 +51,7 @@ export const Explore: FC = () => {
       const field = (ITEM_TYPE_TO_FIELD as unknown as Record<string, AggregationFields>)[facet.id];
       if (!field) throw new Error(`${facet.id} is not a valid field.`);
       const itemType = ITEM_TYPES_SET.has(facet.id) ? (facet.id as ItemType) : null;
-      const {
-        data: { aggregate },
-        error,
-      } = await client.query({
+      const { data, error } = await client.query({
         query: aggregateItems,
         variables: {
           itemType: ITEM_TYPE_TO_DATA_TYPE[selectedType],
@@ -66,6 +63,7 @@ export const Explore: FC = () => {
         fetchPolicy: 'no-cache',
       });
       if (error) throw error;
+      const aggregate = data?.aggregate;
       if (!aggregate) throw new Error('No proper data was received from searchCompanies.');
 
       return {

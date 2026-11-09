@@ -1,4 +1,4 @@
-import { useApolloClient } from '@apollo/client';
+import { useApolloClient } from '@apollo/client/react';
 import { useFacetsContext } from '@ouestware/facets-client';
 import { InfiniteScroll, InfiniteScrollProps } from '@ouestware/infinite-scroll';
 import { useNotifications } from '@ouestware/notifications';
@@ -63,10 +63,7 @@ export const ItemsList: FC<{ itemType: ItemType }> = ({ itemType }) => {
             sortBy.push({ direction: EsSortDirection.Desc, field: 'companiesCount' });
             break;
         }
-        const {
-          data: { search },
-          error,
-        } = await client.query({
+        const { data, error } = await client.query({
           query: searchItems,
           variables: {
             itemType: ITEM_TYPE_TO_DATA_TYPE[itemType],
@@ -78,6 +75,8 @@ export const ItemsList: FC<{ itemType: ItemType }> = ({ itemType }) => {
           fetchPolicy: 'no-cache',
         });
         if (error) throw error;
+
+        const search = data?.search;
         if (!search) throw new Error('No proper data was received from searchCompanies.');
         setLoadDataStatus({ type: 'success' });
         return {

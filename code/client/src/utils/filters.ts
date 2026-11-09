@@ -3,10 +3,7 @@ import { FiltersState } from '@ouestware/facets';
 import { DATE_FACET, ItemType, TAGS_FACET, VERIFIED_FACET } from '../core/consts';
 import { FilterTypes, SearchFilters } from '../core/graphql';
 
-export function filtersStateToSearchFilters(
-  { filters = {}, query }: FiltersState,
-  itemType: ItemType,
-): SearchFilters {
+export function filtersStateToSearchFilters({ filters = {}, query }: FiltersState, itemType: ItemType): SearchFilters {
   const res: SearchFilters = {};
 
   if (query) {
@@ -17,11 +14,7 @@ export function filtersStateToSearchFilters(
   }
 
   const verifiedFilter = filters[VERIFIED_FACET.id];
-  if (
-    verifiedFilter &&
-    verifiedFilter.type === 'boolean' &&
-    typeof verifiedFilter.value === 'boolean'
-  ) {
+  if (verifiedFilter && verifiedFilter.type === 'boolean' && typeof verifiedFilter.value === 'boolean') {
     res.verified = {
       type: FilterTypes.Boolean,
       value: !!verifiedFilter.value,
@@ -64,6 +57,5 @@ export function filtersStateToSearchFilters(
       };
   });
 
-  console.log(filters, res);
   return res;
 }

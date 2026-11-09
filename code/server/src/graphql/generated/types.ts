@@ -1,11 +1,6 @@
 import { GraphQLResolveInfo } from 'graphql';
 export type Maybe<T> = T;
 export type InputMaybe<T> = T;
-export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
-export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
-export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
-export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> = { [_ in K]?: never };
-export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
 export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 export type RequireFields<T, K extends keyof T> = Omit<T, K> & { [P in K]-?: NonNullable<T[P]> };
 /** All built-in and custom scalars, mapped to their actual values */
@@ -31,10 +26,10 @@ export type Address = {
   messages: Array<Message>;
   messagesCount: Scalars['Int']['output'];
   name: Scalars['String']['output'];
-  otherNames?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
+  otherNames?: Maybe<Array<Scalars['String']['output']>>;
   people: Array<Person>;
   peopleCount: Scalars['Int']['output'];
-  tags?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
+  tags?: Maybe<Array<Scalars['String']['output']>>;
   verified?: Maybe<Scalars['Boolean']['output']>;
 };
 
@@ -124,10 +119,10 @@ export type Company = {
   messages: Array<Message>;
   messagesCount: Scalars['Int']['output'];
   name: Scalars['String']['output'];
-  otherNames?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
+  otherNames?: Maybe<Array<Scalars['String']['output']>>;
   people: Array<Person>;
   peopleCount: Scalars['Int']['output'];
-  tags?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
+  tags?: Maybe<Array<Scalars['String']['output']>>;
   verified?: Maybe<Scalars['Boolean']['output']>;
   years?: Maybe<Array<Maybe<Scalars['Int']['output']>>>;
 };
@@ -193,10 +188,10 @@ export type Country = {
   messages: Array<Message>;
   messagesCount: Scalars['Int']['output'];
   name: Scalars['String']['output'];
-  otherNames?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
+  otherNames?: Maybe<Array<Scalars['String']['output']>>;
   people: Array<Person>;
   peopleCount: Scalars['Int']['output'];
-  tags?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
+  tags?: Maybe<Array<Scalars['String']['output']>>;
   verified?: Maybe<Scalars['Boolean']['output']>;
 };
 
@@ -301,7 +296,7 @@ export type Message = {
   raw_countries?: Maybe<Array<Scalars['String']['output']>>;
   raw_message: Scalars['String']['output'];
   raw_people?: Maybe<Array<Scalars['String']['output']>>;
-  tags?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
+  tags?: Maybe<Array<Scalars['String']['output']>>;
   verified?: Maybe<Scalars['Boolean']['output']>;
   year: Scalars['Int']['output'];
 };
@@ -461,10 +456,10 @@ export type Person = {
   messages: Array<Message>;
   messagesCount: Scalars['Int']['output'];
   name: Scalars['String']['output'];
-  otherNames?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
+  otherNames?: Maybe<Array<Scalars['String']['output']>>;
   people: Array<Person>;
   peopleCount: Scalars['Int']['output'];
-  tags?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
+  tags?: Maybe<Array<Scalars['String']['output']>>;
   verified?: Maybe<Scalars['Boolean']['output']>;
 };
 
@@ -586,7 +581,7 @@ export type ResolverTypeWrapper<T> = Promise<T> | T;
 export type ResolverWithResolve<TResult, TParent, TContext, TArgs> = {
   resolve: ResolverFn<TResult, TParent, TContext, TArgs>;
 };
-export type Resolver<TResult, TParent = {}, TContext = {}, TArgs = {}> = ResolverFn<TResult, TParent, TContext, TArgs> | ResolverWithResolve<TResult, TParent, TContext, TArgs>;
+export type Resolver<TResult, TParent = Record<PropertyKey, never>, TContext = Record<PropertyKey, never>, TArgs = Record<PropertyKey, never>> = ResolverFn<TResult, TParent, TContext, TArgs> | ResolverWithResolve<TResult, TParent, TContext, TArgs>;
 
 export type ResolverFn<TResult, TParent, TContext, TArgs> = (
   parent: TParent,
@@ -623,21 +618,21 @@ export type SubscriptionObject<TResult, TKey extends string, TParent, TContext, 
   | SubscriptionSubscriberObject<TResult, TKey, TParent, TContext, TArgs>
   | SubscriptionResolverObject<TResult, TParent, TContext, TArgs>;
 
-export type SubscriptionResolver<TResult, TKey extends string, TParent = {}, TContext = {}, TArgs = {}> =
+export type SubscriptionResolver<TResult, TKey extends string, TParent = Record<PropertyKey, never>, TContext = Record<PropertyKey, never>, TArgs = Record<PropertyKey, never>> =
   | ((...args: any[]) => SubscriptionObject<TResult, TKey, TParent, TContext, TArgs>)
   | SubscriptionObject<TResult, TKey, TParent, TContext, TArgs>;
 
-export type TypeResolveFn<TTypes, TParent = {}, TContext = {}> = (
+export type TypeResolveFn<TTypes, TParent = Record<PropertyKey, never>, TContext = Record<PropertyKey, never>> = (
   parent: TParent,
   context: TContext,
   info: GraphQLResolveInfo
 ) => Maybe<TTypes> | Promise<Maybe<TTypes>>;
 
-export type IsTypeOfResolverFn<T = {}, TContext = {}> = (obj: T, context: TContext, info: GraphQLResolveInfo) => boolean | Promise<boolean>;
+export type IsTypeOfResolverFn<T = Record<PropertyKey, never>, TContext = Record<PropertyKey, never>> = (obj: T, context: TContext, info: GraphQLResolveInfo) => boolean | Promise<boolean>;
 
 export type NextResolverFn<T> = () => Promise<T>;
 
-export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs = {}> = (
+export type DirectiveResolverFn<TResult = Record<PropertyKey, never>, TParent = Record<PropertyKey, never>, TContext = Record<PropertyKey, never>, TArgs = Record<PropertyKey, never>> = (
   next: NextResolverFn<TResult>,
   parent: TParent,
   args: TArgs,
@@ -645,9 +640,17 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
   info: GraphQLResolveInfo
 ) => TResult | Promise<TResult>;
 
+
+
 /** Mapping of union types */
 export type ResolversUnionTypes<_RefType extends Record<string, unknown>> = {
-  NodeItem: ( Address ) | ( Company ) | ( Country ) | ( Message ) | ( Person );
+  NodeItem:
+    | ( Address )
+    | ( Company )
+    | ( Country )
+    | ( Message )
+    | ( Person )
+  ;
 };
 
 
@@ -675,13 +678,13 @@ export type ResolversTypes = {
   Int: ResolverTypeWrapper<Scalars['Int']['output']>;
   KeywordsFilter: KeywordsFilter;
   Message: ResolverTypeWrapper<Message>;
-  Mutation: ResolverTypeWrapper<{}>;
+  Mutation: ResolverTypeWrapper<Record<PropertyKey, never>>;
   NodeIdentification: NodeIdentification;
   NodeItem: ResolverTypeWrapper<ResolversUnionTypes<ResolversTypes>['NodeItem']>;
   NumberFilter: NumberFilter;
   PendingModificationsIndexationReport: ResolverTypeWrapper<PendingModificationsIndexationReport>;
   Person: ResolverTypeWrapper<Person>;
-  Query: ResolverTypeWrapper<{}>;
+  Query: ResolverTypeWrapper<Record<PropertyKey, never>>;
   SearchFilters: SearchFilters;
   SearchResults: ResolverTypeWrapper<Omit<SearchResults, 'results'> & { results: Array<Maybe<ResolversTypes['NodeItem']>> }>;
   SortBy: SortBy;
@@ -709,13 +712,13 @@ export type ResolversParentTypes = {
   Int: Scalars['Int']['output'];
   KeywordsFilter: KeywordsFilter;
   Message: Message;
-  Mutation: {};
+  Mutation: Record<PropertyKey, never>;
   NodeIdentification: NodeIdentification;
   NodeItem: ResolversUnionTypes<ResolversParentTypes>['NodeItem'];
   NumberFilter: NumberFilter;
   PendingModificationsIndexationReport: PendingModificationsIndexationReport;
   Person: Person;
-  Query: {};
+  Query: Record<PropertyKey, never>;
   SearchFilters: SearchFilters;
   SearchResults: Omit<SearchResults, 'results'> & { results: Array<Maybe<ResolversParentTypes['NodeItem']>> };
   SortBy: SortBy;
@@ -736,10 +739,10 @@ export type AddressResolvers<ContextType = any, ParentType extends ResolversPare
   messages?: Resolver<Array<ResolversTypes['Message']>, ParentType, ContextType, RequireFields<AddressMessagesArgs, 'limit' | 'skip'>>;
   messagesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  otherNames?: Resolver<Maybe<Array<Maybe<ResolversTypes['String']>>>, ParentType, ContextType>;
+  otherNames?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;
   people?: Resolver<Array<ResolversTypes['Person']>, ParentType, ContextType, RequireFields<AddressPeopleArgs, 'limit' | 'skip'>>;
   peopleCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  tags?: Resolver<Maybe<Array<Maybe<ResolversTypes['String']>>>, ParentType, ContextType>;
+  tags?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;
   verified?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
@@ -747,14 +750,12 @@ export type AddressResolvers<ContextType = any, ParentType extends ResolversPare
 export type AggregateResultsResolvers<ContextType = any, ParentType extends ResolversParentTypes['AggregateResults'] = ResolversParentTypes['AggregateResults']> = {
   total?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   values?: Resolver<Array<ResolversTypes['AggregateValue']>, ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type AggregateValueResolvers<ContextType = any, ParentType extends ResolversParentTypes['AggregateValue'] = ResolversParentTypes['AggregateValue']> = {
   count?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   label?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type CompanyResolvers<ContextType = any, ParentType extends ResolversParentTypes['Company'] = ResolversParentTypes['Company']> = {
@@ -770,10 +771,10 @@ export type CompanyResolvers<ContextType = any, ParentType extends ResolversPare
   messages?: Resolver<Array<ResolversTypes['Message']>, ParentType, ContextType, RequireFields<CompanyMessagesArgs, 'limit' | 'skip'>>;
   messagesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  otherNames?: Resolver<Maybe<Array<Maybe<ResolversTypes['String']>>>, ParentType, ContextType>;
+  otherNames?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;
   people?: Resolver<Array<ResolversTypes['Person']>, ParentType, ContextType, RequireFields<CompanyPeopleArgs, 'limit' | 'skip'>>;
   peopleCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  tags?: Resolver<Maybe<Array<Maybe<ResolversTypes['String']>>>, ParentType, ContextType>;
+  tags?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;
   verified?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   years?: Resolver<Maybe<Array<Maybe<ResolversTypes['Int']>>>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -782,7 +783,6 @@ export type CompanyResolvers<ContextType = any, ParentType extends ResolversPare
 export type CountResultResolvers<ContextType = any, ParentType extends ResolversParentTypes['CountResult'] = ResolversParentTypes['CountResult']> = {
   byYear?: Resolver<Maybe<Array<Maybe<ResolversTypes['YearCountResult']>>>, ParentType, ContextType>;
   total?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type CountryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Country'] = ResolversParentTypes['Country']> = {
@@ -798,10 +798,10 @@ export type CountryResolvers<ContextType = any, ParentType extends ResolversPare
   messages?: Resolver<Array<ResolversTypes['Message']>, ParentType, ContextType, RequireFields<CountryMessagesArgs, 'limit' | 'skip'>>;
   messagesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  otherNames?: Resolver<Maybe<Array<Maybe<ResolversTypes['String']>>>, ParentType, ContextType>;
+  otherNames?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;
   people?: Resolver<Array<ResolversTypes['Person']>, ParentType, ContextType, RequireFields<CountryPeopleArgs, 'limit' | 'skip'>>;
   peopleCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  tags?: Resolver<Maybe<Array<Maybe<ResolversTypes['String']>>>, ParentType, ContextType>;
+  tags?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;
   verified?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
@@ -809,13 +809,11 @@ export type CountryResolvers<ContextType = any, ParentType extends ResolversPare
 export type ImportReportResolvers<ContextType = any, ParentType extends ResolversParentTypes['ImportReport'] = ResolversParentTypes['ImportReport']> = {
   count?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   errors?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type IndexingPendingModificationResolvers<ContextType = any, ParentType extends ResolversParentTypes['IndexingPendingModification'] = ResolversParentTypes['IndexingPendingModification']> = {
   nbItems?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   startTime?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type MessageResolvers<ContextType = any, ParentType extends ResolversParentTypes['Message'] = ResolversParentTypes['Message']> = {
@@ -837,7 +835,7 @@ export type MessageResolvers<ContextType = any, ParentType extends ResolversPare
   raw_countries?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;
   raw_message?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   raw_people?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;
-  tags?: Resolver<Maybe<Array<Maybe<ResolversTypes['String']>>>, ParentType, ContextType>;
+  tags?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;
   verified?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   year?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -868,7 +866,6 @@ export type PendingModificationsIndexationReportResolvers<ContextType = any, Par
   country?: Resolver<Maybe<ResolversTypes['ImportReport']>, ParentType, ContextType>;
   message?: Resolver<Maybe<ResolversTypes['ImportReport']>, ParentType, ContextType>;
   person?: Resolver<Maybe<ResolversTypes['ImportReport']>, ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type PersonResolvers<ContextType = any, ParentType extends ResolversParentTypes['Person'] = ResolversParentTypes['Person']> = {
@@ -884,10 +881,10 @@ export type PersonResolvers<ContextType = any, ParentType extends ResolversParen
   messages?: Resolver<Array<ResolversTypes['Message']>, ParentType, ContextType, RequireFields<PersonMessagesArgs, 'limit' | 'skip'>>;
   messagesCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  otherNames?: Resolver<Maybe<Array<Maybe<ResolversTypes['String']>>>, ParentType, ContextType>;
+  otherNames?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;
   people?: Resolver<Array<ResolversTypes['Person']>, ParentType, ContextType, RequireFields<PersonPeopleArgs, 'limit' | 'skip'>>;
   peopleCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  tags?: Resolver<Maybe<Array<Maybe<ResolversTypes['String']>>>, ParentType, ContextType>;
+  tags?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;
   verified?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
@@ -908,13 +905,11 @@ export type SearchResultsResolvers<ContextType = any, ParentType extends Resolve
   results?: Resolver<Array<Maybe<ResolversTypes['NodeItem']>>, ParentType, ContextType>;
   scrollId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   total?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type YearCountResultResolvers<ContextType = any, ParentType extends ResolversParentTypes['YearCountResult'] = ResolversParentTypes['YearCountResult']> = {
   count?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   year?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type Resolvers<ContextType = any> = {

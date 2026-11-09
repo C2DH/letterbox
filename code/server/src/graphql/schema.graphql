@@ -9,12 +9,7 @@ enum DataItemType {
   message
 }
 
-union NodeItem @query(read: false, aggregate: false) =
-  | Company
-  | Address
-  | Country
-  | Person
-  | Message
+union NodeItem = Company | Address | Country | Person | Message
 
 input NodeIdentification {
   type: DataItemType!
@@ -25,15 +20,11 @@ input NodeIdentification {
 # Item Address
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-type Address
-  @node
-  @query(read: true, aggregate: false)
-  @mutation(operations: [])
-  @subscription(events: []) {
-  id: ID! @unique
+type Address @node @query(read: true, aggregate: false) @mutation(operations: []) @subscription(events: []) {
+  id: ID!
   name: String!
-  otherNames: [String]
-  tags: [String]
+  otherNames: [String!]
+  tags: [String!]
   verified: Boolean
   deleted: Boolean
 
@@ -181,15 +172,11 @@ type Address
 # Item Company
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-type Company
-  @node
-  @query(read: true, aggregate: false)
-  @mutation(operations: [])
-  @subscription(events: []) {
-  id: ID! @unique
+type Company @node {
+  id: ID!
   name: String!
-  otherNames: [String]
-  tags: [String]
+  otherNames: [String!]
+  tags: [String!]
   verified: Boolean
   deleted: Boolean
 
@@ -351,15 +338,11 @@ type Company
 # Item Country
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-type Country
-  @node
-  @query(read: true, aggregate: false)
-  @mutation(operations: [])
-  @subscription(events: []) {
-  id: ID! @unique
+type Country @node @query(read: true, aggregate: false) @mutation(operations: []) @subscription(events: []) {
+  id: ID!
   name: String!
-  otherNames: [String]
-  tags: [String]
+  otherNames: [String!]
+  tags: [String!]
   verified: Boolean
   deleted: Boolean
 
@@ -506,17 +489,13 @@ type Country
 # Item Message
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-type Message
-  @node
-  @query(read: true, aggregate: false)
-  @mutation(operations: [])
-  @subscription(events: []) {
-  id: ID! @unique
+type Message @node @query(read: true, aggregate: false) @mutation(operations: []) @subscription(events: []) {
+  id: ID!
   year: Int!
   filename: String!
   pageNumber: Float!
   message: String!
-  tags: [String]
+  tags: [String!]
   verified: Boolean
   deleted: Boolean
 
@@ -636,15 +615,11 @@ type Message
 # Item Person
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-type Person
-  @node
-  @query(read: true, aggregate: false)
-  @mutation(operations: [])
-  @subscription(events: []) {
-  id: ID! @unique
+type Person @node @query(read: true, aggregate: false) @mutation(operations: []) @subscription(events: []) {
+  id: ID!
   name: String!
-  otherNames: [String]
-  tags: [String]
+  otherNames: [String!]
+  tags: [String!]
   verified: Boolean
   deleted: Boolean
 
@@ -907,18 +882,12 @@ enum AggregationFields {
 
 # RETURN TYPE
 
-type ImportReport
-  @query(read: false, aggregate: false)
-  @mutation(operations: [])
-  @subscription(events: []) {
+type ImportReport {
   count: Int!
   errors: [String!]
 }
 
-type PendingModificationsIndexationReport
-  @query(read: false, aggregate: false)
-  @mutation(operations: [])
-  @subscription(events: []) {
+type PendingModificationsIndexationReport {
   message: ImportReport
   company: ImportReport
   person: ImportReport
@@ -926,43 +895,28 @@ type PendingModificationsIndexationReport
   country: ImportReport
 }
 
-type SearchResults
-  @query(read: false, aggregate: false)
-  @mutation(operations: [])
-  @subscription(events: []) {
+type SearchResults {
   total: Int!
   results: [NodeItem]!
   scrollId: String
 }
-type AggregateValue
-  @query(read: false, aggregate: false)
-  @mutation(operations: [])
-  @subscription(events: []) {
+type AggregateValue {
   id: String!
   label: String!
   count: Int!
 }
 
-type AggregateResults
-  @query(read: false, aggregate: false)
-  @mutation(operations: [])
-  @subscription(events: []) {
+type AggregateResults {
   total: Int!
   values: [AggregateValue!]!
 }
 
-type YearCountResult
-  @query(read: false, aggregate: false)
-  @mutation(operations: [])
-  @subscription(events: []) {
+type YearCountResult {
   year: Int
   count: Int
 }
 
-type CountResult
-  @query(read: false, aggregate: false)
-  @mutation(operations: [])
-  @subscription(events: []) {
+type CountResult {
   total: Int!
   byYear: [YearCountResult]
 }
@@ -1008,30 +962,15 @@ type Query {
   # Internal methods
   # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   _getMessageItems: [Message!]!
-    @cypher(
-      statement: "UNWIND $ids as id MATCH (n:Message { id: id }) RETURN n AS result"
-      columnName: "result"
-    )
+    @cypher(statement: "UNWIND $ids as id MATCH (n:Message { id: id }) RETURN n AS result", columnName: "result")
   _getCompanyItems: [Company!]!
-    @cypher(
-      statement: "UNWIND $ids as id MATCH (n:Company { id: id }) RETURN n AS result"
-      columnName: "result"
-    )
+    @cypher(statement: "UNWIND $ids as id MATCH (n:Company { id: id }) RETURN n AS result", columnName: "result")
   _getPersonItems: [Person!]!
-    @cypher(
-      statement: "UNWIND $ids as id MATCH (n:Person { id: id }) RETURN n AS result"
-      columnName: "result"
-    )
+    @cypher(statement: "UNWIND $ids as id MATCH (n:Person { id: id }) RETURN n AS result", columnName: "result")
   _getCountryItems: [Country!]!
-    @cypher(
-      statement: "UNWIND $ids as id MATCH (n:Country { id: id }) RETURN n AS result"
-      columnName: "result"
-    )
+    @cypher(statement: "UNWIND $ids as id MATCH (n:Country { id: id }) RETURN n AS result", columnName: "result")
   _getAddressItems: [Address!]!
-    @cypher(
-      statement: "UNWIND $ids as id MATCH (n:Address { id: id }) RETURN n AS result"
-      columnName: "result"
-    )
+    @cypher(statement: "UNWIND $ids as id MATCH (n:Address { id: id }) RETURN n AS result", columnName: "result")
 }
 
 type Mutation {

@@ -1,13 +1,14 @@
-import { ApolloProvider as AP, ApolloClient, InMemoryCache } from '@apollo/client';
-import { useMemo, type FC, type PropsWithChildren } from 'react';
+import { ApolloClient, HttpLink, InMemoryCache } from '@apollo/client';
+import { ApolloProvider as AP } from '@apollo/client/react';
+import { type FC, type PropsWithChildren, useMemo } from 'react';
 
 /**
  * Build an instance of the apollo client.
  */
 function getApolloCLient() {
   const client = new ApolloClient({
-    uri: '/graphql',
     cache: new InMemoryCache(),
+    link: new HttpLink({ uri: '/graphql' }),
   });
   return client;
 }

@@ -1,4 +1,4 @@
-import { useLazyQuery } from '@apollo/client';
+import { useLazyQuery } from '@apollo/client/react';
 import { useEffect, useState } from 'react';
 
 import { ITEM_TYPE_LABELS, ItemType } from '../core/consts';
@@ -6,6 +6,8 @@ import {
   AddressItemsCountsFragment,
   CompanyItemsCountsFragment,
   CountryItemsCountsFragment,
+  MessageItemsCountsFragment,
+  PersonItemCountsFragment,
   getAddressItemsCounts,
   getAddressItemsCountsWithCommons,
   getCompanyItemsCounts,
@@ -15,8 +17,6 @@ import {
   getMessageItemsCounts,
   getPersonItemsCounts,
   getPersonItemsCountsWithCommons,
-  MessageItemsCountsFragment,
-  PersonItemCountsFragment,
 } from '../core/graphql';
 import type { AsyncStatus } from '../types';
 

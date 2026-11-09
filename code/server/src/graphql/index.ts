@@ -1,16 +1,16 @@
-import { Server } from 'http';
 import { ApolloServer } from '@apollo/server';
-import { expressMiddleware } from '@apollo/server/express4';
 import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
 import {
   ApolloServerPluginLandingPageLocalDefault,
   ApolloServerPluginLandingPageProductionDefault,
 } from '@apollo/server/plugin/landingPage/default';
+import { expressMiddleware } from '@as-integrations/express5';
 import { Neo4jGraphQL } from '@neo4j/graphql';
 import { getLogger } from '@ouestware/node-logger';
 import { json } from 'body-parser';
 import cors from 'cors';
 import { Express } from 'express';
+import { Server } from 'http';
 
 import { Services } from '../services';
 import { Neo4j } from '../services/neo4j';
@@ -23,7 +23,7 @@ export async function initGraphql(app: Express, httpServer: Server): Promise<voi
   log.info('Init GraphQl server');
 
   log.debug('Create Neo4j GraphQl schema');
-  const neoSchema = new Neo4jGraphQL({ typeDefs, resolvers, driver: neo4j.driver });
+  const neoSchema = new Neo4jGraphQL({ typeDefs, resolvers, driver: neo4j.driver, debug: false, validate: true });
   const schema = await neoSchema.getSchema();
   await neoSchema.checkNeo4jCompat();
   await neoSchema.assertIndexesAndConstraints({
