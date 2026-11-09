@@ -60,7 +60,7 @@ export class DatasetImport {
         result.count += fileResult.count;
         result.errors.push(...fileResult.errors);
       } catch (e) {
-        throw new Error(`Error importing file ${file}: ${(e as Error).message}`);
+        throw new Error(`Error importing file ${file}: ${(e as Error).message}`, {cause:e});
       }
     }
     this.log.info(`Import done for ${result.count} with ${result.errors.length}`);

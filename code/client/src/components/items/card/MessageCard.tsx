@@ -1,26 +1,26 @@
 import { Spinner } from '@ouestware/loaders';
 import { filter, isNil } from 'lodash';
-import { useMemo, type FC } from 'react';
+import { type FC, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 
-import { Badge } from '../../../Badge.tsx';
+import { Badge } from '../../../Badge';
 import {
   FILTERABLE_ITEM_TYPES,
   ITEM_TYPE_LABELS,
   ITEM_TYPE_LABELS_PLURAL,
   ITEM_TYPE_TO_COUNT_FIELD,
   ITEM_TYPE_TO_FIELD,
-  ItemIcon,
   ItemType,
-} from '../../../core/consts.tsx';
-import { useEditionContext } from '../../../core/edition.ts';
+} from '../../../core/consts';
+import { useEditionContext } from '../../../core/edition';
 import { type MessageInlineFragment } from '../../../core/graphql';
-import { useItemCounts } from '../../../hooks/useItemCounts.ts';
-import { getMessageName } from '../../../utils/data.ts';
+import { useItemCounts } from '../../../hooks/useItemCounts';
+import { getMessageName } from '../../../utils/data';
 import { Collapsable } from '../../Collapsable';
-import { InCartButton } from '../../edition/InCartButton.tsx';
+import { InCartButton } from '../../edition/InCartButton';
+import { ItemIcon } from '../ItemIcon';
+import { ItemVerified } from '../ItemVerified';
 import { ItemsCounts } from '../ItemsCounts';
-import { ItemVerified } from '../ItemVerified.tsx';
 
 const TYPES = FILTERABLE_ITEM_TYPES as Exclude<ItemType, 'message'>[];
 

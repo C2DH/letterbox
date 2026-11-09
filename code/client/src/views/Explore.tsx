@@ -7,20 +7,20 @@ import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
-import { Timeline } from '../components/dataviz/Timeline.tsx';
-import { DateFacet } from '../components/facets/DateFacet.tsx';
-import { ItemFacet } from '../components/facets/ItemFacet.tsx';
-import { StatusFacet } from '../components/facets/StatusFacet.tsx';
-import { TagsFacet } from '../components/facets/TagsFacet.tsx';
 import { ItemsList } from '../components/ItemsList';
-import { Sidebar } from '../components/navigation/Sidebar.tsx';
+import { Timeline } from '../components/dataviz/Timeline';
+import { DateFacet } from '../components/facets/DateFacet';
+import { ItemFacet } from '../components/facets/ItemFacet';
+import { StatusFacet } from '../components/facets/StatusFacet';
+import { TagsFacet } from '../components/facets/TagsFacet';
+import { Sidebar } from '../components/navigation/Sidebar';
 import {
   FACETS,
   FILTERABLE_ITEM_TYPES,
+  ITEM_TYPES_SET,
   ITEM_TYPE_LABELS_PLURAL,
   ITEM_TYPE_TO_DATA_TYPE,
   ITEM_TYPE_TO_FIELD,
-  ITEM_TYPES_SET,
   ItemType,
 } from '../core/consts';
 import { AggregationFields } from '../core/graphql';

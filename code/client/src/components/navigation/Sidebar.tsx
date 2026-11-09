@@ -2,9 +2,10 @@ import cx from 'classnames';
 import { FC } from 'react';
 import { Link } from 'react-router-dom';
 
-import { ITEM_TYPE_LABELS_PLURAL, ITEM_TYPES, ItemIcon, ItemType } from '../../core/consts.tsx';
-import { EditionPanel } from '../edition/EditionPanel.tsx';
-import { IndexationManagement } from '../edition/IndexationManagement.tsx';
+import { ITEM_TYPES, ITEM_TYPE_LABELS_PLURAL, ItemType } from '../../core/consts';
+import { EditionPanel } from '../edition/EditionPanel';
+import { IndexationManagement } from '../edition/IndexationManagement';
+import { ItemIcon } from '../items/ItemIcon';
 
 export const Sidebar: FC<{ activeItemType?: ItemType }> = ({ activeItemType }) => {
   return (

@@ -1,7 +1,7 @@
 import { FC, ReactNode } from 'react';
 
-import { ITEM_TYPE_LABELS, ItemType } from '../../../core/consts.tsx';
-import { useEditionContext } from '../../../core/edition.ts';
+import { ITEM_TYPE_LABELS, ItemType } from '../../../core/consts';
+import { useEditionContext } from '../../../core/edition';
 import {
   AddressInlineFragment,
   CompanyInlineFragment,
@@ -10,14 +10,14 @@ import {
   NodeItem,
   PersonInlineFragment,
 } from '../../../core/graphql';
-import { getItemName } from '../../../utils/data.ts';
-import { InCartButton } from '../../edition/InCartButton.tsx';
-import { EditionActionsTooltip } from '../../edition/tooltips.tsx';
-import { AddressCard } from './AddressCard.tsx';
-import { CompanyCard } from './CompanyCard.tsx';
-import { CountryCard } from './CountryCard.tsx';
-import { MessageCard } from './MessageCard.tsx';
-import { PersonCard } from './PersonCard.tsx';
+import { getItemName } from '../../../utils/data';
+import { InCartButton } from '../../edition/InCartButton';
+import { EditionActionsTooltip } from '../../edition/tooltips';
+import { AddressCard } from './AddressCard';
+import { CompanyCard } from './CompanyCard';
+import { CountryCard } from './CountryCard';
+import { MessageCard } from './MessageCard';
+import { PersonCard } from './PersonCard';
 
 export const ItemCard: FC<{
   itemType: ItemType;

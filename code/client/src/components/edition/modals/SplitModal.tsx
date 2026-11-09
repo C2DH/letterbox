@@ -2,8 +2,9 @@ import { LoaderFill } from '@ouestware/loaders';
 import { Modal, useModal } from '@ouestware/modals';
 import { FC, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { ItemIcon } from '~/components/items/ItemIcon';
 
-import { ItemIcon, ItemType } from '../../../core/consts';
+import { ItemType } from '../../../core/consts';
 import { useEditionContext } from '../../../core/edition';
 import { DataItemType } from '../../../core/graphql';
 import { useItemActions } from '../../../hooks/useItemActions';

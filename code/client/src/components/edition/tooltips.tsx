@@ -2,9 +2,9 @@ import { Tooltip } from '@ouestware/tooltip';
 import { FC } from 'react';
 import { RiMore2Line } from 'react-icons/ri';
 
-import { DEFAULT_TOOLTIP_CLASSNAME, ItemType } from '../../core/consts.tsx';
-import { ItemEditionMenu } from './ItemEditionMenu.tsx';
-import { QuickSwapTypeMenu } from './QuickSwapTypeMenu.tsx';
+import { DEFAULT_TOOLTIP_CLASSNAME, ItemType } from '../../core/consts';
+import { ItemEditionMenu } from './ItemEditionMenu';
+import { QuickSwapTypeMenu } from './QuickSwapTypeMenu';
 
 export const EditionActionsTooltip: FC<{
   itemType: ItemType;

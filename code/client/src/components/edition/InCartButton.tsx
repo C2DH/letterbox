@@ -1,9 +1,9 @@
 import { FC, useMemo } from 'react';
 
-import { ItemType } from '../../core/consts.tsx';
-import { useEditionContext } from '../../core/edition.ts';
-import { isInCart } from '../../utils/edition.ts';
-import { EditionIcons } from './EditionIcons.tsx';
+import { ItemType } from '../../core/consts';
+import { useEditionContext } from '../../core/edition';
+import { isInCart } from '../../utils/edition';
+import { EditionIcons } from './EditionIcons';
 
 export const InCartButton: FC<{ type: ItemType; id: string; label: string; fromCart?: boolean }> = (
   item,

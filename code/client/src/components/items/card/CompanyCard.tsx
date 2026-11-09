@@ -1,14 +1,14 @@
 import { filter, isNil, max, min } from 'lodash';
-import { useMemo, type FC } from 'react';
+import { type FC, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 
-import { Badge } from '../../../Badge.tsx';
-import type { ItemType } from '../../../core/consts.tsx';
+import { Badge } from '../../../Badge';
+import type { ItemType } from '../../../core/consts';
 import { type CompanyInlineFragment } from '../../../core/graphql';
-import { useItemCounts } from '../../../hooks/useItemCounts.ts';
-import { ItemDeleted } from '../ItemDeleted.tsx';
+import { useItemCounts } from '../../../hooks/useItemCounts';
+import { ItemDeleted } from '../ItemDeleted';
+import { ItemVerified } from '../ItemVerified';
 import { ItemsCounts } from '../ItemsCounts';
-import { ItemVerified } from '../ItemVerified.tsx';
 
 export const CompanyCard: FC<{
   data: CompanyInlineFragment;

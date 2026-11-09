@@ -1,11 +1,14 @@
 import { useApolloClient, useQuery } from '@apollo/client';
 import { useCallback, useMemo } from 'react';
 
-import { ITEM_TYPE_TO_FIELD, ItemType } from '../core/consts.tsx';
+import { ITEM_TYPE_TO_FIELD, ItemType } from '../core/consts';
 import {
   AddressItemsCountsFragment,
   CompanyItemsCountsFragment,
   CountryItemsCountsFragment,
+  MessageItemsCountsFragment,
+  NodeItem,
+  PersonItemCountsFragment,
   getAddressAddresses,
   getAddressById,
   getAddressCompanies,
@@ -40,9 +43,6 @@ import {
   getPersonItemsCounts,
   getPersonMessages,
   getPersonPeople,
-  MessageItemsCountsFragment,
-  NodeItem,
-  PersonItemCountsFragment,
 } from '../core/graphql';
 
 const SORT_HINT_COMMON_COMPANIES = 'Companies in common (desc), name (asc)';

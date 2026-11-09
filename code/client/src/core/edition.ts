@@ -1,7 +1,7 @@
 import { noop } from 'lodash';
 import { createContext, useContext } from 'react';
 
-import { ItemType } from './consts.tsx';
+import { ItemType } from './consts';
 
 export type EditionItem = { id: string; label: string; type: ItemType };
 

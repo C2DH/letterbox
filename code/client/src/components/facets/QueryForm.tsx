@@ -2,7 +2,7 @@ import { useFacetsContext } from '@ouestware/facets-client';
 import { FC, useEffect, useState } from 'react';
 import { RiSearch2Line } from 'react-icons/ri';
 
-import { ITEM_TYPE_LABELS_PLURAL, ItemType } from '../../core/consts.tsx';
+import { ITEM_TYPE_LABELS_PLURAL, ItemType } from '../../core/consts';
 
 export const QueryForm: FC<{ itemType: ItemType }> = ({ itemType }) => {
   const [query, setQuery] = useState('');
@@ -12,6 +12,7 @@ export const QueryForm: FC<{ itemType: ItemType }> = ({ itemType }) => {
   } = useFacetsContext();
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setQuery(stateQuery || '');
   }, [stateQuery]);
 

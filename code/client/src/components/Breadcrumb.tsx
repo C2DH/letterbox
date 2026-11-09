@@ -1,5 +1,5 @@
 import cx from 'classnames';
-import { FC } from 'react';
+import { FC, JSX } from 'react';
 import { Link } from 'react-router-dom';
 
 interface BreadcrumbProps {

@@ -1,9 +1,10 @@
 import { LoaderFill } from '@ouestware/loaders';
 import { Modal, useModal } from '@ouestware/modals';
-import { useCallback, useState, type FC } from 'react';
+import { type FC, useCallback, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { ItemIcon } from '~/components/items/ItemIcon';
 
-import { ItemIcon, ItemType } from '../../../core/consts';
+import { ItemType } from '../../../core/consts';
 import { DataItemType } from '../../../core/graphql';
 import { useItemActions } from '../../../hooks/useItemActions';
 import type { AsyncStatus } from '../../../types';

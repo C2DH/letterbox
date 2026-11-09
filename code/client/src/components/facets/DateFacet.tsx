@@ -3,7 +3,7 @@ import { useFacetsContext } from '@ouestware/facets-client';
 import { FC, useEffect, useMemo, useState } from 'react';
 import { RiCloseFill } from 'react-icons/ri';
 
-import config from '../../config.ts';
+import config from '../../config';
 
 export const DateFacet: FC = () => {
   const {
@@ -14,6 +14,7 @@ export const DateFacet: FC = () => {
   const filter = useMemo(() => (filters || {}).date as DateFilter | undefined, [filters]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setState({
       min: filter?.min,
       max: filter?.max,

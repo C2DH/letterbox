@@ -6,15 +6,16 @@ import { flatten, mapValues, toPairs } from 'lodash';
 import { FC } from 'react';
 import { Link } from 'react-router-dom';
 
-import { ITEM_TYPE_LABELS_PLURAL, ITEM_TYPES, ItemIcon, ItemType } from '../../core/consts.tsx';
-import { useEditionContext } from '../../core/edition.ts';
-import { getCartSize } from '../../utils/edition.ts';
-import { shortenNumber } from '../../utils/number.ts';
-import { EditionIcons } from './EditionIcons.tsx';
-import { InCartButton } from './InCartButton.tsx';
-import { DeleteModal } from './modals/DeleteModal.tsx';
-import { MergeModal } from './modals/MergeModal.tsx';
-import { EditionActionsTooltip } from './tooltips.tsx';
+import { ITEM_TYPES, ITEM_TYPE_LABELS_PLURAL, ItemType } from '../../core/consts';
+import { useEditionContext } from '../../core/edition';
+import { getCartSize } from '../../utils/edition';
+import { shortenNumber } from '../../utils/number';
+import { ItemIcon } from '../items/ItemIcon';
+import { EditionIcons } from './EditionIcons';
+import { InCartButton } from './InCartButton';
+import { DeleteModal } from './modals/DeleteModal';
+import { MergeModal } from './modals/MergeModal';
+import { EditionActionsTooltip } from './tooltips';
 
 export const EditionPanel: FC = () => {
   const { enabled, cart, toggle, removeFromCart } = useEditionContext();

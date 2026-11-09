@@ -4,12 +4,13 @@ import cx from 'classnames';
 import { FC, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { FILTERABLE_ITEM_TYPES, ItemIcon, ItemType } from '../../core/consts.tsx';
-import { useEditionContext } from '../../core/edition.ts';
-import { DataItemType } from '../../core/graphql/index.ts';
-import { useItemActions } from '../../hooks/useItemActions.tsx';
-import { isInCart } from '../../utils/edition.ts';
-import { getErrorData } from '../../utils/error.ts';
+import { FILTERABLE_ITEM_TYPES, ItemType } from '../../core/consts';
+import { useEditionContext } from '../../core/edition';
+import { DataItemType } from '../../core/graphql/index';
+import { useItemActions } from '../../hooks/useItemActions';
+import { isInCart } from '../../utils/edition';
+import { getErrorData } from '../../utils/error';
+import { ItemIcon } from '../items/ItemIcon';
 
 export const QuickSwapTypeMenu: FC<{ type: ItemType; id: string }> = ({ type: itemType, id }) => {
   const [loading, setLoading] = useState<ItemType | undefined>(undefined);
