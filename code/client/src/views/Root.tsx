@@ -8,13 +8,13 @@ import { BsXOctagonFill } from 'react-icons/bs';
 import { FaCheckCircle, FaExclamationTriangle, FaInfoCircle } from 'react-icons/fa';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 
+import ScrollToAnchor from '../components/ScrollToAnchor';
 import { Error } from '../components/error';
-import ScrollToAnchor from '../components/ScrollToAnchor.tsx';
-import { DEFAULT_EDITION_DATA, EditionContext, EditionItem } from '../core/edition.ts';
+import { DEFAULT_EDITION_DATA, EditionContext, EditionItem } from '../core/edition';
 import { ApolloProvider } from '../core/graphql';
-import { deserializeEditionState, EDITION_STATE_KEY } from '../utils/edition.ts';
-import { Explore } from './Explore.tsx';
-import { ItemView } from './ItemView.tsx';
+import { EDITION_STATE_KEY, deserializeEditionState } from '../utils/edition';
+import { Explore } from './Explore';
+import { ItemView } from './ItemView';
 
 export const Root: FC = () => {
   const [editionState, setEditionState] = useStorage('localStorage', EDITION_STATE_KEY, {

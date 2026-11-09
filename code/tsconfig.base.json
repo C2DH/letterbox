@@ -6,7 +6,6 @@
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
     "alwaysStrict": true,
-    "baseUrl": ".",
     "declaration": true,
     "declarationDir": "./dist",
     "diagnostics": false,

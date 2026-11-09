@@ -16,11 +16,11 @@ import {
 } from 'react';
 import { RiCloseFill, RiContractLeftLine, RiContractRightLine } from 'react-icons/ri';
 
-import config from '../../config.ts';
-import { APP_LANGUAGE, ITEM_TYPE_LABELS, ITEM_TYPE_LABELS_PLURAL } from '../../core/consts.tsx';
+import config from '../../config';
+import { APP_LANGUAGE, ITEM_TYPE_LABELS, ITEM_TYPE_LABELS_PLURAL } from '../../core/consts';
 import { DataItemType } from '../../core/graphql';
-import { itemsTimeline, messagesTimeline } from '../../core/graphql/queries/timeline.ts';
-import { filtersStateToSearchFilters } from '../../utils/filters.ts';
+import { itemsTimeline, messagesTimeline } from '../../core/graphql/queries/timeline';
+import { filtersStateToSearchFilters } from '../../utils/filters';
 
 const { minYear, maxYear } = config;
 
@@ -217,6 +217,7 @@ export const Timeline: FC<{
   // Update extents on filters change:
   useEffect(() => {
     if (typeof filter?.min === 'number' || typeof filter?.max === 'number')
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setExtents({
         min: filter.min,
         max: filter.max,

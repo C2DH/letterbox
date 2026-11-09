@@ -1,6 +1,6 @@
 import { FiltersState } from '@ouestware/facets';
 
-import { DATE_FACET, ItemType, TAGS_FACET, VERIFIED_FACET } from '../core/consts.tsx';
+import { DATE_FACET, ItemType, TAGS_FACET, VERIFIED_FACET } from '../core/consts';
 import { FilterTypes, SearchFilters } from '../core/graphql';
 
 export function filtersStateToSearchFilters(

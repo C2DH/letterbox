@@ -1,35 +1,35 @@
 import { LoaderFill, Spinner } from '@ouestware/loaders';
 import cx from 'classnames';
 import { isNil, omit } from 'lodash';
-import { ReactNode, useMemo, type FC } from 'react';
+import { type FC, ReactNode, useMemo } from 'react';
 import { Helmet } from 'react-helmet';
 import { RiFile3Line, RiListSettingsLine, RiPriceTag3Line } from 'react-icons/ri';
 import { Link, useParams } from 'react-router-dom';
 
 import { Collapsable } from '../components/Collapsable';
-import { InCartButton } from '../components/edition/InCartButton.tsx';
-import { TagsSelect } from '../components/edition/TagsSelect.tsx';
-import { ToggleVerified } from '../components/edition/ToggleVerified.tsx';
-import { EditionActionsTooltip } from '../components/edition/tooltips.tsx';
-import { ItemCard } from '../components/items/card/ItemCard.tsx';
-import { ItemDeleted } from '../components/items/ItemDeleted.tsx';
 import { ListWithLoadMore, type ListWithLoadMoreProps } from '../components/ListWithLoadMore';
-import { Sidebar } from '../components/navigation/Sidebar.tsx';
-import { PdfViewer } from '../components/pdfViewer.tsx';
+import { InCartButton } from '../components/edition/InCartButton';
+import { TagsSelect } from '../components/edition/TagsSelect';
+import { ToggleVerified } from '../components/edition/ToggleVerified';
+import { EditionActionsTooltip } from '../components/edition/tooltips';
+import { ItemDeleted } from '../components/items/ItemDeleted';
+import { ItemIcon } from '../components/items/ItemIcon';
+import { ItemCard } from '../components/items/card/ItemCard';
+import { Sidebar } from '../components/navigation/Sidebar';
+import { PdfViewer } from '../components/pdfViewer';
 import {
+  ITEM_TYPES,
+  ITEM_TYPES_SET,
   ITEM_TYPE_LABELS,
   ITEM_TYPE_LABELS_PLURAL,
   ITEM_TYPE_TO_COUNT_FIELD,
-  ITEM_TYPES,
-  ITEM_TYPES_SET,
-  ItemIcon,
   ItemType,
-} from '../core/consts.tsx';
-import { useEditionContext } from '../core/edition.ts';
+} from '../core/consts';
+import { useEditionContext } from '../core/edition';
 import { NodeItem } from '../core/graphql';
-import { useLoadItemData } from '../hooks/useItem.tsx';
-import { useItemCounts } from '../hooks/useItemCounts.ts';
-import { getMessageName } from '../utils/data.ts';
+import { useLoadItemData } from '../hooks/useItem';
+import { useItemCounts } from '../hooks/useItemCounts';
+import { getMessageName } from '../utils/data';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type RelatedDefinition<T = any> = ListWithLoadMoreProps<T> & {

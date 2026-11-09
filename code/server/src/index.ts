@@ -1,6 +1,6 @@
-import http, { Server } from 'http';
 import { getLogger } from '@ouestware/node-logger';
 import express, { json, urlencoded } from 'express';
+import http, { Server } from 'http';
 
 import config from './config';
 import { errorFilter } from './error';
@@ -14,6 +14,7 @@ async function initServer() {
   try {
     log.info('Init Express');
     const app = express();
+    app.set('trust proxy', true);
     app.use(urlencoded({ extended: true }));
     app.use(json());
 

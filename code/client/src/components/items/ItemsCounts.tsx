@@ -5,14 +5,14 @@ import type { FC } from 'react';
 
 import {
   APP_LANGUAGE,
+  ITEM_TYPES_AFFINITIES,
   ITEM_TYPE_LABELS,
   ITEM_TYPE_LABELS_PLURAL,
-  ITEM_TYPES_AFFINITIES,
-  ItemIcon,
   ItemType,
 } from '../../core/consts';
-import type { AsyncStatus } from '../../types.ts';
-import { shortenNumber } from '../../utils/number.ts';
+import type { AsyncStatus } from '../../types';
+import { shortenNumber } from '../../utils/number';
+import { ItemIcon } from './ItemIcon';
 
 export const ItemsCounts: FC<{
   itemType: ItemType;

@@ -1,7 +1,7 @@
 import { isArray, isPlainObject, mapValues, pickBy, sumBy, values } from 'lodash';
 
-import { ITEM_TYPES_SET } from '../core/consts.tsx';
-import { EditionContextType, EditionDataType, EditionItem } from '../core/edition.ts';
+import { ITEM_TYPES_SET } from '../core/consts';
+import { EditionContextType, EditionDataType, EditionItem } from '../core/edition';
 
 export const EDITION_STATE_KEY = 'edition-state';
 

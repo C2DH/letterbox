@@ -10,7 +10,6 @@ import {
   RiZoomOutLine,
 } from 'react-icons/ri';
 import { Document, Page, pdfjs } from 'react-pdf';
-
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
 
@@ -52,6 +51,7 @@ export const PdfViewer: FC<{ className?: string; filepath: string; pageNumber: n
           onLoadSuccess={(props) => {
             setTotalPage(props._pdfInfo.numPages);
           }}
+          suspense={false}
         >
           <Page
             pageNumber={currentPage}

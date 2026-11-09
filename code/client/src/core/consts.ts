@@ -1,17 +1,14 @@
 import { Facet } from '@ouestware/facets';
 import { ValueWithCount } from '@ouestware/facets-client';
 import { keyBy, without } from 'lodash';
-import { FC, ReactNode, SVGAttributes } from 'react';
 import type { IconType } from 'react-icons';
 import {
-  RiArrowDownSLine,
   RiArticleLine,
   RiBuildingLine,
   RiFlagLine,
   RiMapPin2Line,
   RiUser2Line,
 } from 'react-icons/ri';
-import { Props } from 'react-select';
 
 import { AggregationFields, DataItemType } from './graphql';
 
@@ -36,20 +33,6 @@ export const ITEM_TYPE_ICONS: Record<ItemType, IconType> = {
   country: CountryIcon,
   person: PersonIcon,
   message: MessageIcon,
-};
-
-interface IconBaseProps extends SVGAttributes<SVGElement> {
-  children?: ReactNode;
-  size?: string | number;
-  color?: string;
-  title?: string;
-}
-export const ItemIcon: FC<Omit<IconBaseProps, 'type'> & { type: ItemType }> = ({
-  type,
-  ...props
-}) => {
-  const Component = ITEM_TYPE_ICONS[type];
-  return <Component {...props} />;
 };
 
 export const ITEM_TYPE_LABELS: Record<ItemType, string> = {
@@ -137,21 +120,3 @@ export const FACETS_DICT = keyBy(FACETS, 'id');
 export type ItemValue = ValueWithCount & { link?: string; label?: string };
 
 export const DEFAULT_TOOLTIP_CLASSNAME = 'tooltip show opacity-100 py-1';
-
-export const REACT_SELECT_BASE_PROPS: Partial<Props> = {
-  classNames: {
-    valueContainer: () => 'form-control px-3',
-    control: () => 'input-group',
-    indicatorSeparator: () => 'd-none',
-    indicatorsContainer: () => 'input-group-text',
-    multiValue: () => 'm-0 me-2',
-  },
-  styles: {
-    control: () => ({}),
-    placeholder: (base) => ({ ...base, marginLeft: 0 }),
-  },
-  components: {
-    DropdownIndicator: () => <RiArrowDownSLine />,
-  },
-  getOptionLabel: (o) => (o as ItemValue).label || (o as ItemValue).value,
-};

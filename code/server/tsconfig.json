@@ -1,6 +1,6 @@
 {
   "extends": "../tsconfig.base.json",
-  "include": ["src"],
+  "include": ["./src"],
   "compilerOptions": {
     "declaration": false,
     "declarationDir": null,
@@ -9,7 +9,10 @@
     "moduleResolution": "NodeNext",
     "target": "ESNext",
     "outDir": "build",
-    "rootDir": "src",
+    "paths": {
+      "~/*": ["./src/*"]
+    },
+    "rootDir": "./src",
     "strictPropertyInitialization": false
   }
 }

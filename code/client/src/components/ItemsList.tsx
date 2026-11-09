@@ -12,19 +12,19 @@ import {
   APP_LANGUAGE,
   ITEM_TYPE_LABELS_PLURAL,
   ITEM_TYPE_TO_DATA_TYPE,
-  ItemIcon,
   ItemType,
 } from '../core/consts';
 import { EsSortDirection, NodeItem } from '../core/graphql';
 import { searchItems } from '../core/graphql/queries/search';
-import type { AsyncStatus } from '../types.ts';
-import { escapeToCSVValue, objectToCSV } from '../utils/csv.ts';
-import { ITEM_CSV_FIELDS_BY_TYPE } from '../utils/data.ts';
-import { getErrorData } from '../utils/error.ts';
+import type { AsyncStatus } from '../types';
+import { escapeToCSVValue, objectToCSV } from '../utils/csv';
+import { ITEM_CSV_FIELDS_BY_TYPE } from '../utils/data';
+import { getErrorData } from '../utils/error';
 import { filtersStateToSearchFilters } from '../utils/filters';
-import { ErrorInline } from './error/index.tsx';
-import { QueryForm } from './facets/QueryForm.tsx';
-import { ItemCard } from './items/card/ItemCard.tsx';
+import { ErrorInline } from './error/index';
+import { QueryForm } from './facets/QueryForm';
+import { ItemIcon } from './items/ItemIcon';
+import { ItemCard } from './items/card/ItemCard';
 
 const ListComponent = InfiniteScroll<NodeItem, { itemType: ItemType }>;
 type ListProps = InfiniteScrollProps<NodeItem, { itemType: ItemType }>;

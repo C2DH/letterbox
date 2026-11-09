@@ -18,23 +18,23 @@ import { RiDownloadLine, RiFilterLine, RiFilterOffLine, RiShareBoxLine } from 'r
 import { Link } from 'react-router-dom';
 import AsyncSelect from 'react-select/async';
 import streamSaver from 'streamsaver';
+import { REACT_SELECT_BASE_PROPS } from '~/utils/react-select';
 
 import {
   APP_LANGUAGE,
   FACETS_DICT,
   ITEM_TYPE_LABELS,
   ITEM_TYPE_LABELS_PLURAL,
-  ItemIcon,
   ItemType,
   ItemValue,
-  REACT_SELECT_BASE_PROPS,
-} from '../../core/consts.tsx';
-import { useEditionContext } from '../../core/edition.ts';
-import type { AsyncStatus } from '../../types.ts';
-import { getErrorData } from '../../utils/error.ts';
-import { InCartButton } from '../edition/InCartButton.tsx';
-import { EditionActionsTooltip } from '../edition/tooltips.tsx';
-import { ErrorInline } from '../error/index.tsx';
+} from '../../core/consts';
+import { useEditionContext } from '../../core/edition';
+import type { AsyncStatus } from '../../types';
+import { getErrorData } from '../../utils/error';
+import { InCartButton } from '../edition/InCartButton';
+import { EditionActionsTooltip } from '../edition/tooltips';
+import { ErrorInline } from '../error/index';
+import { ItemIcon } from '../items/ItemIcon';
 
 const HistogramRow: FC<
   {

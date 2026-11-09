@@ -3,13 +3,9 @@ import { isNil } from 'lodash';
 import { FC, useCallback, useState } from 'react';
 import { Props } from 'react-select';
 import Select from 'react-select/async-creatable';
+import { REACT_SELECT_BASE_PROPS } from '~/utils/react-select';
 
-import {
-  ITEM_TYPE_TO_DATA_TYPE,
-  ITEM_TYPE_TO_FIELD,
-  ItemType,
-  REACT_SELECT_BASE_PROPS,
-} from '../../core/consts';
+import { ITEM_TYPE_TO_DATA_TYPE, ITEM_TYPE_TO_FIELD, ItemType } from '../../core/consts';
 import { NodeItem } from '../../core/graphql';
 import { setTagsMutation } from '../../core/graphql/queries/actions';
 import { aggregateItems } from '../../core/graphql/queries/search';

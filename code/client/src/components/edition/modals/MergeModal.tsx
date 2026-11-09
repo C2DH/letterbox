@@ -4,8 +4,9 @@ import { flatten, reverse, sortBy, sum, toPairs } from 'lodash';
 import { FC, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Select from 'react-select';
+import { ItemIcon } from '~/components/items/ItemIcon';
 
-import { ItemIcon, ItemType } from '../../../core/consts';
+import { ItemType } from '../../../core/consts';
 import { ItemCart, useEditionContext } from '../../../core/edition';
 import { DataItemType } from '../../../core/graphql';
 import { useItemActions } from '../../../hooks/useItemActions';

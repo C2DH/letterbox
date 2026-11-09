@@ -3,12 +3,12 @@ import { useNotifications } from '@ouestware/notifications';
 import { FC, ReactNode, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { ItemType } from '../../core/consts.tsx';
-import { EditionIcons } from './EditionIcons.tsx';
-import { DeleteModal } from './modals/DeleteModal.tsx';
-import { RenameModal } from './modals/RenameModal.tsx';
-import { SplitModal } from './modals/SplitModal.tsx';
-import { UnlinkModal } from './modals/UnlinkModal.tsx';
+import { ItemType } from '../../core/consts';
+import { EditionIcons } from './EditionIcons';
+import { DeleteModal } from './modals/DeleteModal';
+import { RenameModal } from './modals/RenameModal';
+import { SplitModal } from './modals/SplitModal';
+import { UnlinkModal } from './modals/UnlinkModal';
 
 type MenuItem =
   | { type: 'separator' }
