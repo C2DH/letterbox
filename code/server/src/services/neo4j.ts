@@ -1,9 +1,10 @@
-import { getLogger } from '@ouestware/node-logger';
 import * as neo4j from 'neo4j-driver';
+import { getLogger } from '@ouestware/node-logger';
+import { isInteger, isNil } from 'lodash';
 import Stream from 'ts-stream';
 import { singleton } from 'tsyringe';
 
-import config from '../config';
+import config from '~/config';
 
 @singleton()
 export class Neo4j {
@@ -25,15 +26,10 @@ export class Neo4j {
   /**
    * Default constructor
    */
-  constructor() {
-    const neoConfig = config.neo4j;
+  constructor(neoConfig: typeof config.neo4j = config.neo4j) {
     this.log.info('Creating the neo4j driver with configuration', neoConfig);
     this.database = neoConfig.database;
-    this.driver = neo4j.driver(
-      neoConfig.url,
-      neo4j.auth.basic(neoConfig.login, neoConfig.password),
-      neoConfig.options,
-    );
+    this.driver = neo4j.driver(neoConfig.url, neo4j.auth.basic(neoConfig.login, neoConfig.password), neoConfig.options);
   }
 
   /**
@@ -58,8 +54,7 @@ export class Neo4j {
     // );
     let result: Array<T> = [];
 
-    const shouldBatch =
-      query.includes('$skip') && !params.skip && query.includes('$limit') && !params.limit;
+    const shouldBatch = query.includes('$skip') && !params.skip && query.includes('$limit') && !params.limit;
     const fetchSize = config.neo4j.options?.fetchSize || 1000;
 
     let completed = false;
@@ -67,10 +62,10 @@ export class Neo4j {
       const batchResult = await tx.run(
         query,
         !shouldBatch
-          ? params
-          : { ...params, skip: neo4j.int(result.length), limit: neo4j.int(fetchSize) },
+          ? this.normalizedParams(params)
+          : this.normalizedParams({ ...params, skip: neo4j.int(result.length), limit: neo4j.int(fetchSize) }),
       );
-      result = [...result, ...batchResult.records.map((n) => n.get(field) as unknown as T)];
+      result = [...result, ...batchResult.records.map((n) => this.normalizedRecord(n.get(field)) as T)];
       if (!shouldBatch || batchResult.records.length < fetchSize) completed = true;
     }
     return result;
@@ -91,12 +86,10 @@ export class Neo4j {
     params: Record<string, unknown>,
     field = 'result',
   ): Promise<T | null> {
-    // this.log.debug(
-    //   `Running query ${query} with params ${JSON.stringify(omit(params, ['password']), null, 2)}`,
-    // );
-    const result = await tx.run(query, params);
+    this.log.debug(`Running query ${query} with params ${JSON.stringify(params)}`);
+    const result = await tx.run(query, this.normalizedParams(params));
     const record = result.records.shift();
-    return !record ? null : (record.get(field) as T);
+    return !record ? null : (this.normalizedRecord(record.get(field)) as T);
   }
 
   /**
@@ -109,11 +102,7 @@ export class Neo4j {
    * @param params Cypher query parameters
    * @param field The cypher query variable to return (default is 'result')
    */
-  async getResultQuery<T>(
-    query: string,
-    params: Record<string, unknown>,
-    field = 'result',
-  ): Promise<Array<T>> {
+  async getResultQuery<T>(query: string, params: Record<string, unknown>, field = 'result'): Promise<Array<T>> {
     const session = this.driver.session({ database: this.database });
     const tx = await session.beginTransaction();
     try {
@@ -122,6 +111,7 @@ export class Neo4j {
       return result;
     } catch (e) {
       await tx.rollback();
+      this.log.error('Failed to execute cypher query', { e, query, params });
       throw e;
     } finally {
       await tx.close();
@@ -137,11 +127,7 @@ export class Neo4j {
    * @param  field Field to get from the first row
    * @returns The query's result with the given projection
    */
-  async getFirstResultQuery<T>(
-    query: string,
-    params: Record<string, unknown>,
-    field = 'result',
-  ): Promise<T | null> {
+  async getFirstResultQuery<T>(query: string, params: Record<string, unknown>, field = 'result'): Promise<T | null> {
     const session = this.driver.session({ database: this.database });
     const tx = await session.beginTransaction();
     try {
@@ -150,6 +136,7 @@ export class Neo4j {
       return result;
     } catch (e) {
       await tx.rollback();
+      this.log.error('Failed to execute cypher query', { e, query, params });
       throw e;
     } finally {
       await tx.close();
@@ -174,9 +161,9 @@ export class Neo4j {
     session
       .executeRead(async (tx) => {
         try {
-          const result = tx.run(query, params);
+          const result = tx.run(query, this.normalizedParams(params));
           for await (const record of result) {
-            await stream.write(record.get('result') as T);
+            await stream.write(this.normalizedRecord(record.get('result')) as T);
           }
           stream.end();
         } catch (error) {
@@ -204,5 +191,36 @@ export class Neo4j {
     } finally {
       await session.close();
     }
+  }
+
+  private normalizedParams(params: Record<string, unknown>): Record<string, unknown> {
+    return this.normalizedParamsValue(params) as Record<string, unknown>;
+  }
+
+  private normalizedParamsValue(value: unknown): unknown {
+    if (value instanceof Date) return neo4j.types.DateTime.fromStandardDate(value);
+    if (isInteger(value)) return neo4j.int(value as number);
+    if (Array.isArray(value)) return value.map((item) => this.normalizedParamsValue(item));
+    if (value !== null && typeof value === 'object') {
+      return Object.fromEntries(Object.entries(value).map(([key, val]) => [key, this.normalizedParamsValue(val)]));
+    }
+
+    return value;
+  }
+
+  private normalizedRecord(record: unknown): unknown {
+    return this.normalizedRecordValue(record);
+  }
+
+  private normalizedRecordValue(value: unknown): unknown {
+    if (isNil(value)) return null;
+    if (neo4j.isDateTime(value) || neo4j.isLocalDateTime(value)) return value.toStandardDate();
+    if (value instanceof neo4j.types.Integer) return value.toInt();
+    if (Array.isArray(value)) return value.map((item) => this.normalizedRecordValue(item));
+    if (value !== null && typeof value === 'object') {
+      return Object.fromEntries(Object.entries(value).map(([key, val]) => [key, this.normalizedRecordValue(val)]));
+    }
+
+    return value;
   }
 }

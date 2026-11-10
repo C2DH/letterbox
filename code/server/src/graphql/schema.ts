@@ -1,4 +1,3 @@
-import { readFileSync } from 'node:fs';
 import * as path from 'path';
 import { estypes } from '@elastic/elasticsearch';
 import { delegateToSchema } from '@graphql-tools/delegate';
@@ -7,14 +6,15 @@ import Boom from '@hapi/boom';
 import { Filter } from '@ouestware/facets';
 import { GraphQLResolveInfo, OperationTypeNode } from 'graphql';
 import { capitalize, head } from 'lodash';
+import { readFileSync } from 'node:fs';
 
 import { Services } from '../services';
 import { DatasetEdition } from '../services/dataset/edition';
 import { DatasetImport } from '../services/dataset/import';
 import { DatasetIndexation } from '../services/dataset/indexation';
 import { Elastic } from '../services/elastic';
-import { EsIndices, Neo4jLabels, type ItemType } from '../types';
-import { KeywordsFilter, Resolvers, SearchFilters, type NodeItem } from './generated/types';
+import { EsIndices, type ItemType, Neo4jLabels } from '../types';
+import { KeywordsFilter, type NodeItem, Resolvers, SearchFilters } from './generated/types';
 
 export const typeDefs = readFileSync(path.resolve(__dirname, './schema.graphql'), 'utf8');
 
@@ -59,9 +59,7 @@ async function getGraphQlItems<T>(
     transforms,
   });
 
-  return data
-    ? data.map((d: object) => ({ __typename: Neo4jLabels[type], ...d }) as unknown as NodeItem)
-    : undefined;
+  return data ? data.map((d: object) => ({ __typename: Neo4jLabels[type], ...d }) as unknown as NodeItem) : undefined;
 }
 
 /**
@@ -98,12 +96,7 @@ export const resolvers: Resolvers<unknown> = {
   },
   Query: {
     // SEARCH
-    search: async (
-      _root,
-      { itemType, filters, sortBy, limit, from, scrollTimeout, includes },
-      _context,
-      _info,
-    ) => {
+    search: async (_root, { itemType, filters, sortBy, limit, from, scrollTimeout, includes }, _context, _info) => {
       const sort = sortBy ? elasticSearch.formatSort(sortBy) : undefined;
       const transformedFilters = await datasetIndexation.formatFilters(filters);
       const { total, results, scrollId } = await elasticSearch.search(
@@ -159,19 +152,9 @@ export const resolvers: Resolvers<unknown> = {
     },
 
     // TOP
-    aggregate: async (
-      _root,
-      { itemType, field, query, includes, filters, size },
-      _context,
-      _info,
-    ) => {
-      const formattedFilters = (await datasetIndexation.formatFilters(filters)) as Record<
-        string,
-        Filter
-      >;
-      const fieldFilter = formattedFilters[field as keyof SearchFilters] as
-        | KeywordsFilter
-        | undefined;
+    aggregate: async (_root, { itemType, field, query, includes, filters, size }, _context, _info) => {
+      const formattedFilters = (await datasetIndexation.formatFilters(filters)) as Record<string, Filter>;
+      const fieldFilter = formattedFilters[field as keyof SearchFilters] as KeywordsFilter | undefined;
       const results = await elasticSearch.fieldAggregation({
         index: EsIndices[itemType],
         field,
@@ -192,9 +175,7 @@ export const resolvers: Resolvers<unknown> = {
   },
   Mutation: {
     import: async (_root, { fileNamePattern }, _context, _info) => {
-      const reFileNamePattern: RegExp | undefined = fileNamePattern
-        ? new RegExp(fileNamePattern, 'i')
-        : undefined;
+      const reFileNamePattern: RegExp | undefined = fileNamePattern ? new RegExp(fileNamePattern, 'i') : undefined;
       return await datasetImport.doImport(reFileNamePattern);
     },
     index: async () => {
@@ -258,8 +239,7 @@ export const resolvers: Resolvers<unknown> = {
         context,
         info,
       );
-      if (data.length !== values.length)
-        throw Boom.internal(`Split in ${values.length} nodes but got ${data.length}`);
+      if (data.length !== values.length) throw Boom.internal(`Split in ${values.length} nodes but got ${data.length}`);
       return data;
     },
 

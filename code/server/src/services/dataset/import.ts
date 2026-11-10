@@ -27,8 +27,8 @@ export class DatasetImport {
     @inject(Neo4j) public neo4j: Neo4j,
     @inject(FileSystem) public fs: FileSystem,
   ) {
-    if (fs.fileExists(config.server.import.pdfFilenameList)) {
-      this.pdfFilenames = new Set(fs.readFile(config.server.import.pdfFilenameList).split('\n'));
+    if (fs.fileExists(config.import.pdfFilenameList)) {
+      this.pdfFilenames = new Set(fs.readFile(config.import.pdfFilenameList).split('\n'));
     }
   }
 
@@ -40,8 +40,8 @@ export class DatasetImport {
     await this.importTags();
 
     let files = await this.fs.listFiles(
-      config.server.import.pathToMessages,
-      config.server.import.messages_file_glob_pattern,
+      config.import.pathToMessages,
+      config.import.messages_file_glob_pattern,
     );
     this.log.info(`Found ${files.length} files to import in data folder`);
     if (fileNamePattern) {
@@ -78,8 +78,8 @@ export class DatasetImport {
 
     const stream = this.fs.streamFile(file).pipe(
       parse({
-        delimiter: config.server.import.column_seperator,
-        columns: true, //config.server.import.headers as unknown as string[],
+        delimiter: config.import.column_seperator,
+        columns: true, //config.import.headers as unknown as string[],
         encoding,
         //quote: '"',
         //skip_records_with_error: true,
@@ -91,14 +91,14 @@ export class DatasetImport {
       if (wrongFileHeaders === false)
         try {
           // check columns
-          if (!config.server.import.headers.every((h) => _record[h] !== undefined)) {
+          if (!config.import.headers.every((h) => _record[h] !== undefined)) {
             wrongFileHeaders = true;
             throw new Error(
-              `file ${file} does not have those required columns: ${config.server.import.headers.filter((h) => _record[h] === undefined)}`,
+              `file ${file} does not have those required columns: ${config.import.headers.filter((h) => _record[h] === undefined)}`,
             );
           }
           const record = _record as MessageCsvRecord;
-          if (Object.keys(record).length !== config.server.import.headers.length) {
+          if (Object.keys(record).length !== config.import.headers.length) {
             errors.push(
               `Invalid number of columns in record n°${count} in file ${file} : ${Object.keys(record).join(',')}`,
             );
@@ -110,7 +110,7 @@ export class DatasetImport {
         } catch (e) {
           errors.push(`Error parsing record n°${count} in file ${file}: ${(e as Error).message}`);
         }
-      if (records.length >= config.server.import.batchSize) {
+      if (records.length >= config.import.batchSize) {
         await this.importRecords(records);
         records = [];
       }
@@ -253,7 +253,7 @@ export class DatasetImport {
         .filter((it) => it !== 'message')
         .map(async (itemType) => {
           let nbItems = 0;
-          const tagsPath = path.join(config.server.import.pathToTags, `${itemType}.csv`);
+          const tagsPath = path.join(config.import.pathToTags, `${itemType}.csv`);
           if (this.fs.fileExists(tagsPath)) {
             this.log.info(`Importing tags for ${itemType} from ${tagsPath}`);
             const session = this.neo4j.getWriteSession();
@@ -383,7 +383,7 @@ export class DatasetImport {
   private cleanRecordValue(value: unknown, multiple: boolean = false) {
     if (checkNilOREmptyString(value)) return multiple ? [] : undefined;
     if (multiple)
-      return `${value}`.split(config.server.import.value_separator).map((v) => v.trim());
+      return `${value}`.split(config.import.value_separator).map((v) => v.trim());
     return toString(value)?.trim();
   }
 }

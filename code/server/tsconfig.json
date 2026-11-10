@@ -5,9 +5,9 @@
     "declaration": false,
     "declarationDir": null,
     "lib": ["esnext"],
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
-    "target": "ESNext",
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "target": "esnext",
     "outDir": "build",
     "paths": {
       "~/*": ["./src/*"]

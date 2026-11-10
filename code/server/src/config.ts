@@ -1,31 +1,36 @@
+const baseUrl = process.env.BASE_URL || 'http://localhost';
+
 export default {
   server: {
     port: process.env.SERVER_PORT || 4000,
+    baseUrl,
+    ssl: baseUrl.startsWith('https'),
+    secret: process.env.SERVER_SECRET || 'azertyuiop',
     data_folder: process.env.DATA_FOLDER || '../../docker/project/data',
-    import: {
-      headers: [
-        'Year',
-        'Company_Name_Main',
-        'Company_Name_Alternative',
-        'Alternate_Address',
-        'Address_Main',
-        'People',
-        'People_Abbr',
-        'Countries',
-        'FileName',
-        'PageNumber',
-        'Date',
-        'Description_Business',
-      ] as const,
-      column_seperator: ',',
-      value_separator: '  |  ',
-      // path relative to the data folder
-      pathToMessages: '/messages',
-      pathToTags: '/tags',
-      messages_file_glob_pattern: '*.csv',
-      batchSize: 5000,
-      pdfFilenameList: 'pdf_files.txt',
-    },
+  },
+  import: {
+    headers: [
+      'Year',
+      'Company_Name_Main',
+      'Company_Name_Alternative',
+      'Alternate_Address',
+      'Address_Main',
+      'People',
+      'People_Abbr',
+      'Countries',
+      'FileName',
+      'PageNumber',
+      'Date',
+      'Description_Business',
+    ] as const,
+    column_seperator: ',',
+    value_separator: '  |  ',
+    // path relative to the data folder
+    pathToMessages: '/messages',
+    pathToTags: '/tags',
+    messages_file_glob_pattern: '*.csv',
+    batchSize: 5000,
+    pdfFilenameList: 'pdf_files.txt',
   },
   elastic: {
     node: process.env.ELASTICSEARCH_URL || 'http://localhost:9200/',
@@ -34,8 +39,7 @@ export default {
     nested_objects_limit: 10000,
     idValueSeparator: '¤¤',
     maxParallelBulkUpdate:
-      process.env.ELASTICSEARCH_MAX_PARALLEL_UPDATE &&
-      !isNaN(+process.env.ELASTICSEARCH_MAX_PARALLEL_UPDATE)
+      process.env.ELASTICSEARCH_MAX_PARALLEL_UPDATE && !isNaN(+process.env.ELASTICSEARCH_MAX_PARALLEL_UPDATE)
         ? +process.env.ELASTICSEARCH_MAX_PARALLEL_UPDATE
         : 2,
   },
@@ -45,7 +49,6 @@ export default {
     password: process.env.NEO4J_PASSWORD || 'l3tm31n!',
     database: process.env.NEO4J_DATABASE || 'neo4j',
     options: {
-      disableLosslessIntegers: true,
       fetchSize: 10000,
       connectionAcquisitionTimeout: 60000,
       maxRetries: 3,
@@ -59,5 +62,20 @@ export default {
     file_maxsize: process.env.LOG_FILE_MAXSIZE || '25m',
     file_retention: process.env.LOG_FILE_RETENTION || '7d',
     file_path: process.env.LOG_FILE_PATH || './',
+  },
+  mailer: {
+    noReply: process.env.SMTP_NO_REPLY || 'no-reply@ouestware.com',
+    transport: process.env.SMTP_HOST
+      ? {
+          host: process.env.SMTP_HOST,
+          port: process.env.SMTP_PORT ? Number(process.env.SMTP_PORT) : 25,
+          auth: {
+            user: process.env.SMTP_USER || '',
+            pass: process.env.SMTP_PASSWORD || '',
+          },
+        }
+      : {
+          jsonTransport: true,
+        },
   },
 };

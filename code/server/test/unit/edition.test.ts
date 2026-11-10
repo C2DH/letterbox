@@ -1,11 +1,11 @@
-import { afterEach } from 'node:test';
 import { sum, values } from 'lodash';
+import { afterEach } from 'node:test';
 import { v4 as uuid } from 'uuid';
 import { beforeAll, describe, expect, test } from 'vitest';
 
-import type { DataMessage, ItemType } from '../..//src/types';
 import { Services } from '../../src/services';
 import { DatasetEdition } from '../../src/services/dataset/edition';
+import type { DataMessage, ItemType } from '../../src/types';
 import {
   checkMessage,
   cleanTestDataset,
@@ -214,10 +214,7 @@ describe('Dataset edition', () => {
 
       await expect(
         edition.mergeNodes(
-          [
-            ...people.map((p) => ({ type: 'person' as ItemType, id: p.id })),
-            { type: 'person' as ItemType, id: '404' },
-          ],
+          [...people.map((p) => ({ type: 'person' as ItemType, id: p.id })), { type: 'person' as ItemType, id: '404' }],
           'person',
           nodeName,
         ),

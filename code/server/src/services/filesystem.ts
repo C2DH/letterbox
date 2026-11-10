@@ -1,10 +1,10 @@
+import { getLogger } from '@ouestware/node-logger';
 import fs from 'fs/promises';
-import { createReadStream, existsSync, readFileSync, ReadStream } from 'node:fs';
+import { globby } from 'globby';
+import { ReadStream, createReadStream, existsSync, readFileSync } from 'node:fs';
 import path from 'path';
 import readline from 'readline';
 import { finished } from 'stream/promises';
-import { getLogger } from '@ouestware/node-logger';
-import { globby } from 'globby';
 import { singleton } from 'tsyringe';
 
 import config from '../config';
@@ -97,9 +97,7 @@ export class FileSystem {
   /**
    * Wait a stream to finished
    */
-  async streamFinished(
-    stream: NodeJS.ReadableStream | NodeJS.WritableStream | NodeJS.ReadWriteStream,
-  ) {
+  async streamFinished(stream: NodeJS.ReadableStream | NodeJS.WritableStream | NodeJS.ReadWriteStream) {
     return finished(stream);
   }
 }

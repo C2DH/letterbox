@@ -1,6 +1,6 @@
 import config from './config';
 
-export type MessageCsvRecord = Record<(typeof config.server.import.headers)[number], string>;
+export type MessageCsvRecord = Record<(typeof config.import.headers)[number], string>;
 
 // This interface MUST be compatible with the "Message" defined in code/server/src/graphql/schema.ts
 export type DataMessage<T = string> = {
@@ -54,3 +54,13 @@ export const Neo4jLabelsPendingModificationsLabels = {
   ToReIndexFlag: 'ToReIndexFlag',
   IndexingPendingModification: 'IndexingPendingModification',
 };
+
+export interface UserDto {
+  id: string;
+  name: string;
+  email: string;
+  emailVerified: boolean;
+  image?: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+}

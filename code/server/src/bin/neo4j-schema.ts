@@ -1,8 +1,6 @@
 import { wait } from '@ouestware/async';
-
-import 'reflect-metadata';
-
 import { Neo4jError } from 'neo4j-driver';
+import 'reflect-metadata';
 
 import { Neo4j } from '../services/neo4j';
 
@@ -38,12 +36,7 @@ async function exec(iteration = 0) {
         await neo4j.getFirstResultQuery(query, {});
       } catch (e) {
         if (e) console.error('Failed to run query', query);
-        if (
-          !(
-            e instanceof Neo4jError &&
-            e.code === 'Neo.ClientError.Schema.IndexWithNameAlreadyExists'
-          )
-        ) {
+        if (!(e instanceof Neo4jError && e.code === 'Neo.ClientError.Schema.IndexWithNameAlreadyExists')) {
           throw e;
         }
       }

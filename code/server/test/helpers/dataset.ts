@@ -116,6 +116,9 @@ export function generateRandomMessages(
       filename: faker.system.fileName(),
       pageNumber: faker.number.int({ min: 1, max: 100 }),
       message: faker.lorem.sentence(),
+      tags: [],
+      verified: faker.datatype.boolean(),
+      raw_people_abbr: [],
       raw_company: getRandomSetItem(companies),
       raw_address: getRandomSetItem(addresses),
       raw_people: getRandomSetItems(people, faker.number.int({ min: 1, max: 5 })),
@@ -132,9 +135,7 @@ export function generateRandomMessages(
 /**
  * Retrieve the data of a message.
  */
-export async function getDataMessage(
-  id: string,
-): Promise<null | DataMessage<{ id: string; name: string }>> {
+export async function getDataMessage(id: string): Promise<null | DataMessage<{ id: string; name: string }>> {
   const message = await neo4j.getFirstResultQuery<DataMessage<{ id: string; name: string }>>(
     ` MATCH (n:Message {id: $id}) 
       RETURN { 
@@ -154,10 +155,7 @@ export async function getDataMessage(
   return message;
 }
 
-export async function checkMessage(
-  messageId: string,
-  message: DataMessage<{ id: string; name: string }>,
-) {
+export async function checkMessage(messageId: string, message: DataMessage<{ id: string; name: string }>) {
   const data = await getDataMessage(messageId);
 
   expect(data).not.toBeNull();

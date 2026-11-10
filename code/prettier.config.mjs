@@ -5,10 +5,11 @@ const config = {
   arrowParens: 'always',
   proseWrap: 'always',
   trailingComma: 'all',
-  importOrder: ['<THIRD_PARTY_MODULES>', '^[./]'],
+  importOrder: ['<THIRD_PARTY_MODULES>', '^[./~]'],
   importOrderSeparation: true,
   importOrderSortSpecifiers: true,
   importOrderGroupNamespaceSpecifiers: true,
+  importOrderParserPlugins: ['typescript', 'decorators-legacy'],
   plugins: ['@trivago/prettier-plugin-sort-imports'],
 };
 
