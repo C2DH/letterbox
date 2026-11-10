@@ -1,26 +1,15 @@
-import { useApolloClient } from '@apollo/client/react';
 import { DateFilter } from '@ouestware/facets';
 import { useFacetsContext } from '@ouestware/facets-client';
-import { getAsyncMemoData, useAsyncMemo } from '@ouestware/hooks';
 import { LoaderFill } from '@ouestware/loaders';
 import cx from 'classnames';
-import { clamp, fromPairs, inRange, max, range } from 'lodash';
-import {
-  CSSProperties,
-  FC,
-  MouseEvent as ReactMouseEvent,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { clamp, inRange, range } from 'lodash';
+import { CSSProperties, FC, MouseEvent as ReactMouseEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { RiCloseFill, RiContractLeftLine, RiContractRightLine } from 'react-icons/ri';
 
 import config from '../../config';
 import { APP_LANGUAGE, ITEM_TYPE_LABELS, ITEM_TYPE_LABELS_PLURAL } from '../../core/consts';
 import { DataItemType } from '../../core/graphql';
-import { itemsTimeline, messagesTimeline } from '../../core/graphql/queries/timeline';
-import { filtersStateToSearchFilters } from '../../utils/filters';
+import { TimelineData } from '../../hooks/useTimelineData';
 
 const { minYear, maxYear } = config;
 
@@ -72,13 +61,12 @@ function getYear(x: number, width: number): number {
 
 export const Timeline: FC<{
   itemType: DataItemType;
-}> = ({ itemType }) => {
+  timelineData: TimelineData | null;
+  loading?: boolean;
+}> = ({ itemType, timelineData, loading }) => {
   const root = useRef<HTMLElement>(null);
   const { state: filtersState, setFilter } = useFacetsContext();
-  const filter = useMemo(
-    () => filtersState?.filters?.date as DateFilter | undefined,
-    [filtersState],
-  );
+  const filter = useMemo(() => filtersState?.filters?.date as DateFilter | undefined, [filtersState]);
   const [extents, setExtents] = useState<null | Extents>({
     min: minYear + 3,
     max: minYear + 5,
@@ -86,28 +74,6 @@ export const Timeline: FC<{
   const [hoveredYear, setHoveredYear] = useState<null | number>(null);
   const [mouse, setMouse] = useState<MouseState>({ type: 'idle' });
   const hasDragged = useRef(false);
-  const client = useApolloClient();
-  const dataState = useAsyncMemo(
-    () =>
-      client.query({
-        fetchPolicy: 'no-cache',
-        query: itemType === 'message' ? messagesTimeline : itemsTimeline,
-        variables: {
-          itemType,
-          filters: filtersStateToSearchFilters(filtersState, itemType),
-        },
-      }),
-    [filtersState, itemType],
-  );
-  const data = useMemo(() => getAsyncMemoData(dataState), [dataState]);
-  const timelineData = useMemo(() => {
-    if (!data || !data.data) return null;
-
-    return {
-      maxCount: max(data.data.aggregate.values.map(({ count }) => count)) || 0,
-      counts: fromPairs(data.data.aggregate.values.map(({ id, count }) => [id, count])),
-    };
-  }, [data]);
 
   // Handle body mouse events while interacting with the timeline:
   useEffect(() => {
@@ -170,9 +136,7 @@ export const Timeline: FC<{
           initialExtents: { min = minYear, max = maxYear },
         } = mouse;
         const offset = x - initialX;
-        const yearsOffset = Math.round(
-          (offset / root.current!.offsetWidth) * (maxYear - minYear + 1),
-        );
+        const yearsOffset = Math.round((offset / root.current!.offsetWidth) * (maxYear - minYear + 1));
         const clampedYearsOffset = clamp(yearsOffset, minYear - min, maxYear - max);
         setExtents({
           min: min + clampedYearsOffset,
@@ -184,9 +148,7 @@ export const Timeline: FC<{
         setExtents(() => {
           const { x, initialX, initialExtents } = mouse;
           const offset = x - initialX;
-          const yearsOffset = Math.round(
-            (offset / root.current!.offsetWidth) * (maxYear - minYear + 1),
-          );
+          const yearsOffset = Math.round((offset / root.current!.offsetWidth) * (maxYear - minYear + 1));
           let newMin = initialExtents?.min ?? minYear;
           let newMax = initialExtents?.max ?? maxYear;
 
@@ -232,11 +194,7 @@ export const Timeline: FC<{
       {filter && <div className="filter-range" style={getSliderStyle(filter)}></div>}
       <div className="timeline-barchart axis-x justify-content-around">
         {range(minYear, maxYear + 1).map((year) => (
-          <div
-            key={year}
-            className="bar-wrapper position-relative flex-grow-0 fs-6"
-            style={{ width: 5 }}
-          >
+          <div key={year} className="bar-wrapper position-relative flex-grow-0 fs-6" style={{ width: 5 }}>
             {(year % 10 === 0 || year === minYear || year === maxYear) && (
               <span
                 className={cx(
@@ -401,7 +359,7 @@ export const Timeline: FC<{
           </div>
         </div>
       )}
-      {dataState.type === 'loading' && <LoaderFill />}
+      {loading && <LoaderFill />}
     </section>
   );
 };

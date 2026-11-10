@@ -8,8 +8,7 @@ import { Helmet } from 'react-helmet';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
 import { ItemsList } from '../components/ItemsList';
-import { Timeline } from '../components/dataviz/Timeline';
-import { DateFacet } from '../components/facets/DateFacet';
+import { TimelineHeader } from '../components/dataviz/TimelineHeader';
 import { ItemFacet } from '../components/facets/ItemFacet';
 import { StatusFacet } from '../components/facets/StatusFacet';
 import { TagsFacet } from '../components/facets/TagsFacet';
@@ -41,10 +40,7 @@ export const Explore: FC = () => {
   }, [inputType]);
   const listBlocks = useMemo(() => without(FILTERABLE_ITEM_TYPES, selectedType), [selectedType]);
 
-  const fingerprint = useMemo(
-    () => JSON.stringify({ selectedType, ...state }),
-    [selectedType, state],
-  );
+  const fingerprint = useMemo(() => JSON.stringify({ selectedType, ...state }), [selectedType, state]);
 
   const fetchItems = useCallback(
     async (facet: KeywordsFacet, filters: FiltersState, input = '') => {
@@ -112,31 +108,13 @@ export const Explore: FC = () => {
         {/* MAIN CONTENT */}
         <main className="p-4">
           {/* HEADER (timeline + date inputs) */}
-          <section className="explore-header d-flex flex-row align-items-end mb-4 pb-1">
-            <div
-              className="h-100 flex-grow-1"
-              style={{
-                borderBottom: 'var(--bs-border-width) solid var(--bs-border-color-translucent)',
-              }}
-            >
-              <Timeline itemType={ITEM_TYPE_TO_DATA_TYPE[selectedType]} />
-            </div>
-            <div className="ps-2 explore-date">
-              <DateFacet />
-            </div>
-          </section>
+          <TimelineHeader itemType={ITEM_TYPE_TO_DATA_TYPE[selectedType]} />
 
           {/* LIST BLOCKS */}
           <section className="row align-items-stretch">
             {listBlocks.map((itemType) => (
-              <div
-                key={itemType}
-                className={cx('mb-4', listBlocks.length === 3 ? 'col-6 col-xxl-4' : 'col-6')}
-              >
-                <div
-                  className="card overflow-y-auto"
-                  style={{ height: listBlocks.length === 3 ? 800 : 400 }}
-                >
+              <div key={itemType} className={cx('mb-4', listBlocks.length === 3 ? 'col-6 col-xxl-4' : 'col-6')}>
+                <div className="card overflow-y-auto" style={{ height: listBlocks.length === 3 ? 800 : 400 }}>
                   <div className="card-body">
                     <ItemFacet itemType={itemType} selectedType={selectedType} />
                   </div>

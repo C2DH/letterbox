@@ -1,11 +1,11 @@
 import { DateFilter } from '@ouestware/facets';
 import { useFacetsContext } from '@ouestware/facets-client';
-import { FC, useEffect, useMemo, useState } from 'react';
+import { FC, ReactNode, useEffect, useMemo, useState } from 'react';
 import { RiCloseFill } from 'react-icons/ri';
 
 import config from '../../config';
 
-export const DateFacet: FC = () => {
+export const DateFacet: FC<{ actions?: ReactNode }> = ({ actions }) => {
   const {
     state: { filters },
     setFilter,
@@ -52,9 +52,7 @@ export const DateFacet: FC = () => {
                 id={`date-${key}`}
                 value={state[key] || ''}
                 placeholder={placeholder + ''}
-                onChange={(e) =>
-                  setState({ ...state, [key]: e.target.value ? +e.target.value : undefined })
-                }
+                onChange={(e) => setState({ ...state, [key]: e.target.value ? +e.target.value : undefined })}
               />
               <button
                 className="btn btn-outline-secondary"
@@ -74,9 +72,12 @@ export const DateFacet: FC = () => {
             </div>
           </div>
         ))}
-        <button className="btn btn-outline-dark ms-2" type="submit">
-          Update
-        </button>
+        <div className="d-flex flex-row align-items-stretch gap-2 ms-2">
+          <button className="btn btn-outline-dark" type="submit">
+            Update
+          </button>
+          {actions}
+        </div>
       </section>
     </form>
   );
