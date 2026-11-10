@@ -85,6 +85,7 @@ export const Timeline: FC<{
   });
   const [hoveredYear, setHoveredYear] = useState<null | number>(null);
   const [mouse, setMouse] = useState<MouseState>({ type: 'idle' });
+  const hasDragged = useRef(false);
   const client = useApolloClient();
   const dataState = useAsyncMemo(
     () =>
@@ -121,6 +122,7 @@ export const Timeline: FC<{
       });
     };
     const upHandler = () => {
+      hasDragged.current = true;
       setMouse({
         type: 'idle',
       });
@@ -273,6 +275,7 @@ export const Timeline: FC<{
       <div
         className="timeline-barchart"
         onMouseDown={(e) => {
+          hasDragged.current = false;
           if (mouse.type !== 'idle' || extents || !root.current) return;
 
           e.stopPropagation();
@@ -290,7 +293,7 @@ export const Timeline: FC<{
           });
         }}
         onClick={(e) => {
-          if (!root.current || !filter) return;
+          if (hasDragged.current || !root.current || !filter) return;
 
           e.stopPropagation();
           e.preventDefault();
