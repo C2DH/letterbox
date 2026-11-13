@@ -17,7 +17,6 @@ import { ITEM_CSV_FIELDS_BY_TYPE } from '../utils/data';
 import { getErrorData } from '../utils/error';
 import { filtersStateToSearchFilters } from '../utils/filters';
 import { ErrorInline } from './error/index';
-import { QueryForm } from './facets/QueryForm';
 import { ItemIcon } from './items/ItemIcon';
 import { ItemCard } from './items/card/ItemCard';
 
@@ -142,8 +141,8 @@ export const ItemsList: FC<{ itemType: ItemType }> = ({ itemType }) => {
   const Top: ListProps['top'] = useMemo(
     () =>
       ({ total }) => (
-        <div className="row mb-4">
-          <h2 className="fs-3 with-icon fw-semibold flex-grow-1 col-8">
+        <div className="d-flex flex-row align-items-start mb-4">
+          <h2 className="fs-3 with-icon fw-semibold flex-grow-1">
             <ItemIcon type={itemType} /> {ITEM_TYPE_LABELS_PLURAL[itemType]}
             {typeof total === 'number' && (
               <>
@@ -153,16 +152,13 @@ export const ItemsList: FC<{ itemType: ItemType }> = ({ itemType }) => {
             )}
           </h2>
 
-          <div className="col-4 d-flex">
-            <QueryForm itemType={itemType} />
-            <button
-              className="btn btn-outline-dark btn-ico p-2 ms-2"
-              title={`Download ${ITEM_TYPE_LABELS_PLURAL[itemType].toLowerCase()} (Limited to 10k items)`}
-              onClick={download}
-            >
-              <RiDownloadLine />
-            </button>
-          </div>
+          <button
+            className="btn btn-outline-dark btn-ico p-2 ms-2"
+            title={`Download ${ITEM_TYPE_LABELS_PLURAL[itemType].toLowerCase()} (Limited to 10k items)`}
+            onClick={download}
+          >
+            <RiDownloadLine />
+          </button>
         </div>
       ),
     [itemType, download],

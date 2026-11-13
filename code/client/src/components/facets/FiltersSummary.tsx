@@ -2,7 +2,7 @@ import { KeywordsFacet, KeywordsFilter } from '@ouestware/facets';
 import { useFacetsContext } from '@ouestware/facets-client';
 import cx from 'classnames';
 import { omit, range, uniq, without } from 'lodash';
-import { FC, Fragment, ReactNode, useMemo, useState } from 'react';
+import { FC, Fragment, ReactNode, useMemo, useRef, useState } from 'react';
 import { RiAddLine, RiFilterLine, RiFilterOffLine } from 'react-icons/ri';
 import { ClassNamesConfig, StylesConfig } from 'react-select';
 import AsyncSelect from 'react-select/async';
@@ -31,6 +31,7 @@ import {
 } from '../../utils/filtersSummary';
 import { REACT_SELECT_BASE_PROPS } from '../../utils/react-select';
 import { ItemIcon } from '../items/ItemIcon';
+import { QueryForm, QueryFormHandle } from './QueryForm';
 
 const { minYear, maxYear } = config;
 
@@ -47,34 +48,6 @@ const RemoveButton: FC<{ title: string; onClick: () => void }> = ({ title, onCli
     <RiFilterOffLine />
   </button>
 );
-
-const QueryInput: FC<{ initialValue: string; autoFocus?: boolean; onCommit: (value: string) => void }> = ({
-  initialValue,
-  autoFocus,
-  onCommit,
-}) => {
-  const [value, setValue] = useState(initialValue);
-
-  return (
-    <input
-      type="text"
-      className="form-control"
-      aria-label="Full-text search"
-      autoFocus={autoFocus}
-      size={Math.max(value.length, 10)}
-      value={value}
-      onChange={(e) => setValue(e.target.value)}
-      onBlur={() => onCommit(value.trim())}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter') (e.target as HTMLInputElement).blur();
-        if (e.key === 'Escape') {
-          setValue(initialValue);
-          onCommit(initialValue);
-        }
-      }}
-    />
-  );
-};
 
 const YearSelect: FC<{
   value: number;
@@ -219,6 +192,7 @@ export const FiltersSummary: FC<{ itemType: ItemType; count?: number }> = ({ ite
   const { labels, addLabels } = useEntityLabels(state);
   const [expandedFacets, setExpandedFacets] = useState<Set<string>>(new Set());
   const [editTarget, setEditTarget] = useState<EditTarget | null>(null);
+  const queryFormRef = useRef<QueryFormHandle>(null);
 
   const summary = useMemo(
     () =>
@@ -263,7 +237,6 @@ export const FiltersSummary: FC<{ itemType: ItemType; count?: number }> = ({ ite
   const facetsInSentence = new Set(summary.clauses.map(({ facet }) => facet));
   const hasStatus = summary.head.some(({ type }) => type === 'status');
   const addOptions = [
-    { id: QUERY_FACET_ID, label: 'Full-text search' },
     ...ENTITY_FACETS_ORDER.filter((facet) => facet !== itemType).map((facet) => ({
       id: facet,
       label: ITEM_TYPE_LABELS_PLURAL[facet],
@@ -284,17 +257,18 @@ export const FiltersSummary: FC<{ itemType: ItemType; count?: number }> = ({ ite
             <RemoveButton title="Remove status filter" onClick={() => removeClause(VERIFIED_FACET.id)} />
           </Fragment>
         );
+      // The query is edited in the search field, below the sentence:
       case 'query':
         return (
-          <QueryInput
-            key={token.query}
-            initialValue={token.query}
-            autoFocus={editTarget?.facet === QUERY_FACET_ID}
-            onCommit={(value) => {
-              if (value !== token.query) setQuery(value || undefined);
-              setEditTarget(null);
-            }}
-          />
+          <button
+            key={key}
+            type="button"
+            className="filters-summary-query text-muted"
+            title={`${token.query} (click to edit)`}
+            onClick={() => queryFormRef.current?.focus()}
+          >
+            {tokenToText(token)}
+          </button>
         );
       case 'value':
       case 'loading':
@@ -391,7 +365,7 @@ export const FiltersSummary: FC<{ itemType: ItemType; count?: number }> = ({ ite
     );
 
   return (
-    <section className="filters-summary mb-4">
+    <section className="filters-summary border-bottom pb-4 mb-4">
       <h1 className="fs-2 with-icon mb-0">
         <ItemIcon type={itemType} />{' '}
         {summary.head.map((token, i) => (
@@ -417,8 +391,7 @@ export const FiltersSummary: FC<{ itemType: ItemType; count?: number }> = ({ ite
             {getClauseSeparator(i, summary.clauses.length)}
             {clause.tokens.map(renderToken)}
             {(clause.facet === TAGS_FACET.id || ENTITY_FACETS_SET.has(clause.facet)) && renderAddValue(clause.facet)}
-            {((clause.facet === QUERY_FACET_ID && editTarget?.facet !== QUERY_FACET_ID) ||
-              clause.facet === DATE_FACET.id) && (
+            {(clause.facet === QUERY_FACET_ID || clause.facet === DATE_FACET.id) && (
               <RemoveButton
                 title={clause.facet === QUERY_FACET_ID ? 'Remove full-text search' : 'Remove dates filter'}
                 onClick={() => removeClause(clause.facet)}
@@ -428,7 +401,8 @@ export const FiltersSummary: FC<{ itemType: ItemType; count?: number }> = ({ ite
         ))}
       </h1>
 
-      <div className="d-flex flex-row gap-2 mt-2">
+      <div className="filters-summary-toolbar d-flex flex-row flex-wrap align-items-start gap-2 mt-3">
+        <QueryForm ref={queryFormRef} itemType={itemType} />
         <AddFilterMenu
           options={addOptions}
           onSelect={(id) => {

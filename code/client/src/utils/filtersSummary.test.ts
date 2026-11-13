@@ -123,6 +123,28 @@ describe('Filters summary - full-text query', () => {
       state: { query: 'bank' },
       expected: '18 companies matching "bank"',
     },
+    {
+      title: 'query at the length limit is quoted',
+      itemType: 'message',
+      count: 7,
+      state: { query: 'loan AND bank OR tax' },
+      expected: '7 messages matching "loan AND bank OR tax"',
+    },
+    {
+      title: 'longer query refers to the search field',
+      itemType: 'message',
+      count: 3,
+      state: { query: 'loan AND (bank OR tax)' },
+      expected: '3 messages matching the query below',
+    },
+    {
+      title: 'query is never edited inline',
+      itemType: 'company',
+      count: 18,
+      state: { filters: { person: kw('p1') } },
+      editTarget: { facet: 'query' },
+      expected: '18 companies linked to Jean Dupont',
+    },
   ];
 
   test.each(cases)('$title', check);
@@ -375,14 +397,6 @@ describe('Filters summary - new filter', () => {
       state: { filters: { person: kw('p1') } },
       editTarget: { facet: 'company' },
       expected: '87 messages linked to Jean Dupont and to …',
-    },
-    {
-      title: 'full-text query',
-      itemType: 'company',
-      count: 18,
-      state: { filters: { person: kw('p1') } },
-      editTarget: { facet: 'query' },
-      expected: '18 companies matching … and linked to Jean Dupont',
     },
     {
       title: 'tags',

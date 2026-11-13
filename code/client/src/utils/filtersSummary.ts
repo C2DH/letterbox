@@ -46,6 +46,9 @@ const MAX_VISIBLE_VALUES = 3;
 
 const TAGS_VERB = 'tagged';
 const QUERY_VERB = 'matching';
+// Longer queries are not quoted in the sentence, which refers to the search field instead:
+export const QUERY_MAX_INLINE_LENGTH = 20;
+const LONG_QUERY_TEXT = 'the query below';
 export const STATUS_LABELS = { verified: 'verified', unverified: 'unverified' } as const;
 
 function getFacetNoun(facet: string, plural: boolean): string {
@@ -222,13 +225,13 @@ export function getFiltersSummary(options: FiltersSummaryOptions): FiltersSummar
 
   const clauses: SummaryClause[] = [];
 
-  // Full-text query:
-  if (query || editTarget?.facet === QUERY_FACET_ID) {
+  // Full-text query (it is edited in the search field, not inline):
+  if (query) {
     clauses.push({
       facet: QUERY_FACET_ID,
       tokens: [
         { type: 'text', text: QUERY_VERB + ' ' },
-        { type: 'query', query: query || '' },
+        { type: 'query', query },
       ],
     });
   }
@@ -290,7 +293,7 @@ export function tokenToText(token: SummaryToken): string {
     case 'status':
       return token.verified ? STATUS_LABELS.verified : STATUS_LABELS.unverified;
     case 'query':
-      return token.query ? `"${token.query}"` : '…';
+      return token.query.length > QUERY_MAX_INLINE_LENGTH ? LONG_QUERY_TEXT : `"${token.query}"`;
     case 'value':
       return token.facet === TAGS_FACET.id ? `"${token.label}"` : token.label;
     case 'loading':

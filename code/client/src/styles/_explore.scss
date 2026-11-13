@@ -246,4 +246,23 @@ main {
     font-size: inherit;
     font-weight: inherit;
   }
+
+  // The query is only referred to in the sentence: it is edited in the search field
+  .filters-summary-query {
+    font: inherit;
+    background: none;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+    &:hover,
+    &:focus-visible {
+      text-decoration: underline;
+    }
+  }
+
+  .query-form {
+    width: 50rem;
+    max-width: 100%;
+    flex-wrap: nowrap;
+  }
 }
