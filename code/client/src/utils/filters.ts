@@ -1,7 +1,16 @@
-import { FiltersState } from '@ouestware/facets';
+import { DateFilter, FiltersState } from '@ouestware/facets';
 
+import config from '../config';
 import { DATE_FACET, ItemType, TAGS_FACET, VERIFIED_FACET } from '../core/consts';
 import { FilterTypes, SearchFilters } from '../core/graphql';
+
+/**
+ * Returns a date filter with both bounds set, defaulting to the extreme years.
+ * The facets library drops empty filters, so this keeps the date filter alive.
+ */
+export function getDateFilter({ min, max }: Omit<DateFilter, 'type'>): Required<DateFilter> {
+  return { type: 'date', min: min ?? config.minYear, max: max ?? config.maxYear };
+}
 
 export function filtersStateToSearchFilters({ filters = {}, query }: FiltersState, itemType: ItemType): SearchFilters {
   const res: SearchFilters = {};
@@ -23,11 +32,17 @@ export function filtersStateToSearchFilters({ filters = {}, query }: FiltersStat
 
   const datesFilter = filters[DATE_FACET.id];
   if (datesFilter && datesFilter.type === 'date') {
-    res[itemType === 'message' ? 'year' : 'years'] = {
-      type: FilterTypes.Date,
-      min: datesFilter.min,
-      max: datesFilter.max,
-    };
+    // Drop bounds that do not narrow the range, to keep items without dates:
+    const { minYear, maxYear } = config;
+    const min = datesFilter.min !== undefined && datesFilter.min > minYear ? datesFilter.min : undefined;
+    const max = datesFilter.max !== undefined && datesFilter.max < maxYear ? datesFilter.max : undefined;
+    if (min !== undefined || max !== undefined) {
+      res[itemType === 'message' ? 'year' : 'years'] = {
+        type: FilterTypes.Date,
+        min,
+        max,
+      };
+    }
   }
 
   const tagsFilter = filters[TAGS_FACET.id];

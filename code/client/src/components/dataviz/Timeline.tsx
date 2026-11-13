@@ -10,6 +10,7 @@ import config from '../../config';
 import { APP_LANGUAGE, ITEM_TYPE_LABELS, ITEM_TYPE_LABELS_PLURAL } from '../../core/consts';
 import { DataItemType } from '../../core/graphql';
 import { TimelineData } from '../../hooks/useTimelineData';
+import { getDateFilter } from '../../utils/filters';
 
 const { minYear, maxYear } = config;
 
@@ -92,12 +93,7 @@ export const Timeline: FC<{
       setMouse({
         type: 'idle',
       });
-      setFilter('date', {
-        ...(filter || {}),
-        type: 'date',
-        min: extents?.min && extents.min > minYear ? extents.min : undefined,
-        max: extents?.max && extents.max < maxYear ? extents.max : undefined,
-      });
+      setFilter('date', getDateFilter(extents || {}));
     };
 
     document.body.addEventListener('mousemove', moveHandler);
@@ -106,7 +102,7 @@ export const Timeline: FC<{
       document.body.removeEventListener('mousemove', moveHandler);
       document.body.removeEventListener('mouseup', upHandler);
     };
-  }, [extents, filter, mouse, setFilter]);
+  }, [extents, mouse, setFilter]);
 
   // Handle body move event to detect hovered year:
   useEffect(() => {
