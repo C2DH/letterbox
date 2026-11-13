@@ -8,7 +8,6 @@ import { ITEM_TYPE_LABELS_PLURAL } from '../../core/consts';
 import { DataItemType } from '../../core/graphql';
 import { useTimelineData } from '../../hooks/useTimelineData';
 import { escapeToCSVValue } from '../../utils/csv';
-import { DateFacet } from '../facets/DateFacet';
 import { Timeline } from './Timeline';
 
 const { minYear, maxYear } = config;
@@ -41,24 +40,20 @@ export const TimelineHeader: FC<{ itemType: DataItemType }> = ({ itemType }) => 
       >
         <Timeline itemType={itemType} timelineData={data} loading={loading} />
       </div>
-      <div className="ps-2 explore-date">
-        <DateFacet
-          actions={
-            <button
-              type="button"
-              className="btn btn-outline-dark btn-ico p-2"
-              title={
-                itemType === DataItemType.Message
-                  ? `Download number of ${label.toLowerCase()} by year`
-                  : `Download number of ${label.toLowerCase()} by year (an item can be counted in several years)`
-              }
-              disabled={!data}
-              onClick={download}
-            >
-              <RiDownloadLine />
-            </button>
+      <div className="ps-2">
+        <button
+          type="button"
+          className="btn btn-outline-dark btn-ico p-2"
+          title={
+            itemType === DataItemType.Message
+              ? `Download number of ${label.toLowerCase()} by year`
+              : `Download number of ${label.toLowerCase()} by year (an item can be counted in several years)`
           }
-        />
+          disabled={!data}
+          onClick={download}
+        >
+          <RiDownloadLine />
+        </button>
       </div>
     </section>
   );
