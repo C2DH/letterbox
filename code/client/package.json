@@ -10,7 +10,8 @@
     "dev": "concurrently -n dev,generate \"vite --host\" \"npm run generate -- --watch\"",
     "start": "npm run build && vite preview --host",
     "lint": "eslint 'src/**/*.{ts,tsx}' --cache",
-    "compile": "tsc -b"
+    "compile": "tsc -b",
+    "test": "vitest"
   },
   "dependencies": {
     "@apollo/client": "^4.3.7",
