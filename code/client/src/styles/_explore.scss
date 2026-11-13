@@ -207,3 +207,61 @@ main {
   display: flex;
   align-items: center;
 }
+
+// The filters summary sentence is the page title. It contains inline inputs, so its line height
+// is fixed to fit them, so that adding a filter never changes the title height.
+// Note: $input-height cannot be used here, since it is in em, and would scale with the title font.
+.filters-summary {
+  h1 {
+    line-height: 2.25rem;
+  }
+
+  // Only direct children: react-select also uses .form-control inside, and must keep its layout
+  h1 > .form-control,
+  h1 > .form-select,
+  .filters-summary-picker {
+    display: inline-block;
+    width: auto;
+    vertical-align: middle;
+    // Inputs are a bit higher than the title line: negative margins prevent them from growing it
+    margin-block: -0.25rem;
+  }
+
+  .filters-summary-picker {
+    width: 260px;
+    line-height: $input-line-height;
+    font-weight: $font-weight-normal;
+  }
+
+  .filters-summary-value {
+    display: inline-flex;
+    align-items: center;
+    vertical-align: baseline;
+    line-height: $headings-line-height;
+    padding-left: 0.4em;
+
+    // Long labels are cropped (the full label is in the title attribute):
+    .filters-summary-label {
+      max-width: 12em;
+    }
+
+    // Clickable label, to replace the value:
+    .filters-summary-editable {
+      font: inherit;
+      color: inherit;
+      background: none;
+      border: 0;
+      padding: 0;
+      cursor: pointer;
+      &:hover,
+      &:focus-visible {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  .filters-summary-more {
+    font-size: inherit;
+    font-weight: inherit;
+  }
+}

@@ -8,12 +8,7 @@ import { FC, useCallback, useMemo, useState } from 'react';
 import { RiDownloadLine } from 'react-icons/ri';
 import streamSaver from 'streamsaver';
 
-import {
-  APP_LANGUAGE,
-  ITEM_TYPE_LABELS_PLURAL,
-  ITEM_TYPE_TO_DATA_TYPE,
-  ItemType,
-} from '../core/consts';
+import { APP_LANGUAGE, ITEM_TYPE_LABELS_PLURAL, ITEM_TYPE_TO_DATA_TYPE, ItemType } from '../core/consts';
 import { EsSortDirection, NodeItem } from '../core/graphql';
 import { searchItems } from '../core/graphql/queries/search';
 import type { AsyncStatus } from '../types';
@@ -34,9 +29,7 @@ const ItemComponent: ListProps['element'] = ({ itemType, data }) => {
     <article
       className={cx(
         'card-item mb-4',
-        itemType === 'message'
-          ? 'col-sm-6 col-md-6 col-lg-4 col-xl-2'
-          : 'col-sm-6 col-md-4 col-lg-3 col-xl-2',
+        itemType === 'message' ? 'col-sm-6 col-md-6 col-lg-4 col-xl-2' : 'col-sm-6 col-md-4 col-lg-3 col-xl-2',
       )}
     >
       <ItemCard data={data} itemType={itemType} />
@@ -99,17 +92,13 @@ export const ItemsList: FC<{ itemType: ItemType }> = ({ itemType }) => {
    * It takes the histogramData that we already have, and generate a CSV of it.
    */
   const download = useCallback(async () => {
-    const fileStream = streamSaver.createWriteStream(
-      `${ITEM_TYPE_LABELS_PLURAL[itemType].toLowerCase()}.csv`,
-    );
+    const fileStream = streamSaver.createWriteStream(`${ITEM_TYPE_LABELS_PLURAL[itemType].toLowerCase()}.csv`);
     const writer = fileStream.getWriter();
     try {
       // Header
       const headers = ITEM_CSV_FIELDS_BY_TYPE[itemType];
       if (!headers) throw new Error(`${itemType} has no CSV definition`);
-      writer.write(
-        new TextEncoder().encode(headers.map((e) => escapeToCSVValue(e)).join(',') + '\n'),
-      );
+      writer.write(new TextEncoder().encode(headers.map((e) => escapeToCSVValue(e)).join(',') + '\n'));
 
       // Load data in chunks of 500 items
       notify({
@@ -154,7 +143,7 @@ export const ItemsList: FC<{ itemType: ItemType }> = ({ itemType }) => {
     () =>
       ({ total }) => (
         <div className="row mb-4">
-          <h2 className="with-icon fw-semibold flex-grow-1 col-8">
+          <h2 className="fs-3 with-icon fw-semibold flex-grow-1 col-8">
             <ItemIcon type={itemType} /> {ITEM_TYPE_LABELS_PLURAL[itemType]}
             {typeof total === 'number' && (
               <>

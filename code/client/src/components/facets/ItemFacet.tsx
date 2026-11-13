@@ -371,7 +371,7 @@ export const ItemFacet: FC<{ itemType: ItemType; selectedType: ItemType }> = ({
   return (
     <>
       <div className="card-title d-flex flex-row align-items-baseline">
-        <h2 className="with-icon fw-semibold flex-grow-1 m-0">
+        <h2 className="fs-3 with-icon fw-semibold flex-grow-1 m-0">
           <ItemIcon type={itemType} /> {ITEM_TYPE_LABELS_PLURAL[itemType]}
           {!!histogramData.total && (
             <>

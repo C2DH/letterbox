@@ -9,7 +9,7 @@ export const StatusFacet: FC = () => {
 
   return (
     <>
-      <h2 className="with-icon fw-semibold">Status</h2>
+      <h2 className="fs-3 with-icon fw-semibold">Status</h2>
       <div>
         {FACETS_STATUS.map(({ id, label, isChecked, getFilter }) => (
           <div key={id} className="form-check">

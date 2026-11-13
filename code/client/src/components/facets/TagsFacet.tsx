@@ -43,7 +43,7 @@ export const TagsFacet: FC = () => {
 
   return (
     <>
-      <h2 className="with-icon fw-semibold">
+      <h2 className="fs-3 with-icon fw-semibold">
         <RiPriceTagLine /> Tags
       </h2>
       <AsyncSelect

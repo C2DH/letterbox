@@ -1,4 +1,4 @@
-import { useApolloClient } from '@apollo/client/react';
+import { useApolloClient, useQuery } from '@apollo/client/react';
 import { FiltersState, KeywordsFacet, searchToState, stateToSearch } from '@ouestware/facets';
 import { FacetsRoot } from '@ouestware/facets-client';
 import cx from 'classnames';
@@ -9,6 +9,7 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
 import { ItemsList } from '../components/ItemsList';
 import { TimelineHeader } from '../components/dataviz/TimelineHeader';
+import { FiltersSummary } from '../components/facets/FiltersSummary';
 import { ItemFacet } from '../components/facets/ItemFacet';
 import { StatusFacet } from '../components/facets/StatusFacet';
 import { TagsFacet } from '../components/facets/TagsFacet';
@@ -23,7 +24,7 @@ import {
   ItemType,
 } from '../core/consts';
 import { AggregationFields } from '../core/graphql';
-import { aggregateItems } from '../core/graphql/queries/search';
+import { aggregateItems, searchItems } from '../core/graphql/queries/search';
 import { filtersStateToSearchFilters } from '../utils/filters';
 
 export const Explore: FC = () => {
@@ -41,6 +42,18 @@ export const Explore: FC = () => {
   const listBlocks = useMemo(() => without(FILTERABLE_ITEM_TYPES, selectedType), [selectedType]);
 
   const fingerprint = useMemo(() => JSON.stringify({ selectedType, ...state }), [selectedType, state]);
+
+  // Total number of results, loaded here since the items list only loads once scrolled into view:
+  const { loading: totalLoading, data: totalData } = useQuery(searchItems, {
+    variables: {
+      itemType: ITEM_TYPE_TO_DATA_TYPE[selectedType],
+      filters: useMemo(() => filtersStateToSearchFilters(state, selectedType), [state, selectedType]),
+      // The server replaces 0 with its default limit:
+      limit: 1,
+    },
+    fetchPolicy: 'no-cache',
+  });
+  const total = totalLoading ? undefined : totalData?.search?.total;
 
   const fetchItems = useCallback(
     async (facet: KeywordsFacet, filters: FiltersState, input = '') => {
@@ -107,6 +120,9 @@ export const Explore: FC = () => {
 
         {/* MAIN CONTENT */}
         <main className="p-4">
+          {/* FILTERS SUMMARY */}
+          <FiltersSummary itemType={selectedType} count={total} />
+
           {/* HEADER (timeline + date inputs) */}
           <TimelineHeader itemType={ITEM_TYPE_TO_DATA_TYPE[selectedType]} />
 
